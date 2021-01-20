@@ -1,6 +1,9 @@
-before_script:
-  - docker info
-
 build_image:
+  stage: build
   script:
-    - docker info
+    - docker build -t api:${CI_COMMIT_SHORT_SHA} -f packages/api/Dockerfile .
+
+run_tests:
+  stage: test
+  script:
+    - docker run api:${CI_COMMIT_SHORT_SHA} npm test
