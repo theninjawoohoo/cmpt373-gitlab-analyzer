@@ -3,7 +3,8 @@ FROM node:14
 COPY . /project
 WORKDIR /project
 
-RUN npx lerna bootstrap --ci
+RUN npm ci
+RUN npm run bootstrap:ci
 
 WORKDIR /project/packages/api
 

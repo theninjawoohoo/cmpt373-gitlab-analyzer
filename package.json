@@ -1,6 +1,12 @@
 {
   "name": "root",
   "private": true,
+  "scripts": {
+    "bootstrap": "lerna bootstrap --no-ci",
+    "bootstrap:ci": "lerna bootstrap --ci",
+    "format": "lerna run --parallel format",
+    "lint": "lerna run --parallel lint"
+  },
   "devDependencies": {
     "lerna": "^3.22.1"
   }
