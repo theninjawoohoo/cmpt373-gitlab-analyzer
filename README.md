@@ -4,7 +4,7 @@
 
 1. Install [node.js](https://nodejs.org/en/) (version 14 LTS recommended)
 
-2. In the project root, run `npx lerna bootstrap`
+2. In the project root, run `npm install` and then `npm run bootstrap`
 
 ## Packages
 
