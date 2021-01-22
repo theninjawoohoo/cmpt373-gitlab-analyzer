@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  db:
+    image: postgres:12
+    restart: always
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  api:
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile
+    depends_on:
+      - db
+    image: gitlab-analyzer-api:latest
+    environment:
+      TYPEORM_TYPE: postgres
+      TYPEORM_HOST: db
+      TYPEORM_PORT: 5432
+      TYPEORM_DATABASE: postgres
+      TYPEORM_USERNAME: postgres
+      TYPEORM_PASSWORD: postgres
+    ports:
+      - 4000:4000
+  webapp:
+    build:
+      context: .
+      dockerfile: packages/webapp/Dockerfile
+    image: gitlab-analyzer-webapp:latest
+    ports:
+      - 3000:3000
+
+
+volumes:
+  pgdata:
