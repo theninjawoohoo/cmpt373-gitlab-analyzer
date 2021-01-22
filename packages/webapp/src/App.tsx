@@ -1,17 +1,17 @@
 import React from 'react';
+import { getSample } from './api/sample';
 import logo from './logo.svg';
 import './App.css';
 import { useQuery } from 'react-query';
-import axios from './util/axios';
 
 function App() {
-  const { data: res } = useQuery('sample', async () => axios('/sample'));
+  const { data } = useQuery('sample', getSample);
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>This is fetch from the backend: {res?.data}</p>
+        <p>This is fetched from the backend: <pre>{data}</pre></p>
         <a
           className="App-link"
           href="https://reactjs.org"
