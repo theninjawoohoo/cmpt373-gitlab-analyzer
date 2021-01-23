@@ -10,8 +10,8 @@ If you want to just run the webapp without any setup:
 ## Setup
 
 1. Install [node.js](https://nodejs.org/en/) (version 14 LTS recommended)
-
-2. In the project root, run `npm install` and then `npm run bootstrap`
+2. In the project root, run `docker-compose up -d db` (you'll need to install docker and docker-compse, see instructions above): this command will start up the postgres database on port 5433 on your computer.
+3. In the project root, run `npm install` and then `npm run bootstrap`
 
 ## Packages
 
