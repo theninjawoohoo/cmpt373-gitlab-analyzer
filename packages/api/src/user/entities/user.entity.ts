@@ -7,11 +7,12 @@ interface SfuAuth {
 
 export type Auth = SfuAuth;
 
-@Entity()
+// user is a reserved word in postgres
+@Entity('user_profile')
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column('jsonb')
-  auth: Auth[];
+  auth: Auth;
 }

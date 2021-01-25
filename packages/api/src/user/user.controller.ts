@@ -1,13 +1,14 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { SfuLoginDto } from './dtos/sfu-login.dto';
-import { SfuService } from './services/sfu.service';
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UserService } from './services/user.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly sfuService: SfuService) {}
-
-  @Post('login')
-  async login(@Body() sfuLoginDto: SfuLoginDto) {
-    return this.sfuService.getUserIdForTicket(sfuLoginDto.ticket);
+  constructor(private readonly userService: UserService) {}
+  @UseGuards(JwtAuthGuard)
+  @Get('/profile')
+  getProfile(@Req() req) {
+    const userId: string = req.user.sub;
+    return this.userService.getProfileById(userId);
   }
 }
