@@ -15,5 +15,7 @@ If you want to just run the webapp without any setup:
 
 ## Packages
 
-* `packages/api`: The backend server, which uses the Express and NestJS frameworks. Run `npm run start:dev` (in `packages/api`) to start the server in development mode.
+* `packages/api`: The backend server, which uses the Express and NestJS frameworks.  In `packages/api`, run: 
+    1. `npm run build && npm run migrate`: to build the app and then run migrations to keep your database schema up to date
+    2. `npm run start:dev`: start the server in development mode.
 * `packages/webapp`: The frontend, which is a React application. Run `npm run start` (in `packages/webapp`) to start the front end in development mode.
