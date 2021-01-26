@@ -10,9 +10,10 @@ If you want to just run the webapp without any setup:
 ## Setup
 
 1. Install [node.js](https://nodejs.org/en/) (version 14 LTS recommended)
-
-2. In the project root, run `npm install` and then `npm run bootstrap`
+2. In the project root, run `docker-compose up -d db` (you'll need to install docker and docker-compse, see instructions above): this command will start up the postgres database on port 5433 on your computer.
+3. In the project root, run `npm install` and then `npm run bootstrap`
 
 ## Packages
 
 * `packages/api`: The backend server, which uses the Express and NestJS frameworks. Run `npm run start:dev` (in `packages/api`) to start the server in development mode.
+* `packages/webapp`: The frontend, which is a React application. Run `npm run start` (in `packages/webapp`) to start the front end in development mode.

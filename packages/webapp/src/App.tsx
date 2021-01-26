@@ -1,28 +1,17 @@
 import React from 'react';
-import { getSample } from './api/sample';
-import logo from './logo.svg';
 import './App.css';
-import { useQuery } from 'react-query';
+import { Router } from './components/Router';
+import ThemeProvider from './components/ThemeProvider';
+import { AuthContextProvider } from './contexts/AuthContext';
 
-function App() {
-  const { data } = useQuery('sample', getSample);
-
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>This is fetched from the backend: <pre>{data}</pre></p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthContextProvider>
+      <ThemeProvider>
+        <Router />
+      </ThemeProvider>
+    </AuthContextProvider>
   );
-}
+};
 
 export default App;
