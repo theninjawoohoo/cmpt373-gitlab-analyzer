@@ -9,10 +9,9 @@ import Link from '@material-ui/core/Link';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-
     title: {
-      fontSize: '2rem',
-      textAlign: 'center',
+      fontSize: "2rem",
+      textAlign: "center",
     },
 
   }),
@@ -23,7 +22,6 @@ const HomeLayout: React.FC = ({ children }) => {
   const { state: authState, dispatch } = useAuthContext();
   return (
     <>
-
     <Grid 
       container 
       direction="column" 
@@ -32,7 +30,9 @@ const HomeLayout: React.FC = ({ children }) => {
       spacing={2} 
       style ={{ minHeight: "100vh"}}>
         <Grid item>
-          <Typography variant='h1' className={styles.title}>GitLab Analyzer</Typography>
+          <Typography variant="h1" className={styles.title}>
+            GitLab Analyzer
+          </Typography>
         </Grid>
         <Grid item>
           <Link href='https://cas.sfu.ca?service=http://localhost:3000/login/sfu'>
