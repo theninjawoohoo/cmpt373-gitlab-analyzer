@@ -12,5 +12,5 @@ run_tests:
 clean_up:
   stage: .post
   script:
-    - docker rm $(docker ps -a -q)
+    - docker rm $(docker ps -a -q) 2>&1 /dev/null
     - docker image rm api:${CI_COMMIT_SHORT_SHA}
