@@ -1,26 +1,25 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ProjectService } from './service/project.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Repo } from './entities/project.entity';
 
-@Controller('project')
+// var username='wens';
+var token='2P52x1JLbMvoSHSpr5gE';
+
+// https://wanago.io/2020/05/11/nestjs-api-controllers-routing-module/
+@Controller(`projects?private_token=${token}`)
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
+  @Get()
+  getAllProjects(@Param('token') token: string){
+    return this.projectService.getAllProjects(String(token));
+  }
 
-
-  @UseGuards(JwtAuthGuard)
-  @Get('/getProject')
-  getProject(@Req() req) {  
-    const request = require('request');
-    var token='2P52x1JLbMvoSHSpr5gE';
-    var username='wens';
-
-    // let array=[];
-    // https://github.com/request/request
-    request(`http://cmpt373-1211-08.cmpt.sfu.ca:5000/api/v4/users/${username}/projects?private_token=${token}`, {json: true}, function (error, response, body) {
-        console.error('error:', error); // Print the error if one occurred
-        console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-        console.log('body:', body); // Print the HTML 
-    });
-    }
+  @Get(':id')
+  getProjectById(@Param('id') id: string, @Param('token') token: string){
+    return this.projectService.getProjectById(Number(id), String(token));
+  }
 }
 
