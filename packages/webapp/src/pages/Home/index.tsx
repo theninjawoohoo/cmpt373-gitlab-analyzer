@@ -1,8 +1,6 @@
-import React from 'react';
-import DefaultPageLayout from '../../components/DefaultPageLayout';
+import React from "react";
+import DefaultPageLayout from "../../components/HomePageLayout";
 
-const Home: React.FC = () => (
-  <DefaultPageLayout />
-)
+const Home: React.FC = () => <DefaultPageLayout />;
 
 export default Home;
