@@ -7,8 +7,12 @@ import NavBar from './components/NavBar';
 
 const App = () => {
   return (
-    <NavBar>
-    </NavBar>
+    <AuthContextProvider>
+      <ThemeProvider>
+        <NavBar>
+        </NavBar>
+      </ThemeProvider>
+    </AuthContextProvider>
   );
 };
 
