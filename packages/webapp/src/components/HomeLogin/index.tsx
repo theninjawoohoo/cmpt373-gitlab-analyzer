@@ -1,5 +1,5 @@
 import React from 'react';
-import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import { useAuthContext } from '../../contexts/AuthContext';
@@ -7,30 +7,33 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    title: {
-      fontSize: "2rem",
-      textAlign: "center",
+const useStyles = makeStyles((theme) => ({
+    root: {
+      minHeight: '100vh',
     },
+    
+    title: {
+      fontSize: '2rem',
+      fontWeight: 'bold',
+      textAlign: 'center',
+      color: 'white',
+    },
+  }));
 
-  }),
-);
-
-const HomeLayout: React.FC = ({ children }) => {
-  const styles = useStyles();
+const HomeLogin: React.FC = ({ children }) => {
+  const classes = useStyles();
   const { state: authState, dispatch } = useAuthContext();
   return (
-    <>
+    <div>
     <Grid 
       container 
       direction="column" 
       justify="center" 
       alignItems="center" 
-      spacing={2} 
-      style ={{ minHeight: "100vh"}}>
+      spacing={2}
+      className={classes.root}>
         <Grid item>
-          <Typography variant="h1" className={styles.title}>
+          <Typography className={classes.title}>
             GitLab Analyzer
           </Typography>
         </Grid>
@@ -42,18 +45,8 @@ const HomeLayout: React.FC = ({ children }) => {
           </Link>
         </Grid>
     </Grid>
-    </>
+    </div>
   );
 };
 
-// export function SimplePaper() {
-//   const classes = useStyles();
-
-//   return (
-//     <div className={classes.paperBlock}>
-//       <Paper elevation={3} />
-//     </div>
-//   );
-// }
-
-export default HomeLayout;
+export default HomeLogin;

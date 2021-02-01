@@ -3,9 +3,7 @@ import { createMuiTheme, ThemeProvider as MuiThemeProvider } from '@material-ui/
 
 const theme = createMuiTheme({
   typography: {
-    h1: {
-      fontSize: '3rem'
-    },
+    fontFamily: 'Montserrat, sans-serif',
   }
 });
 
