@@ -4,8 +4,9 @@ import HomeLogin from '../../components/HomeLogin';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-      minHeight: '100vh',
-      minWidth: '100vw',
+      height: '100vh',
+      width: '100vw',
+      overflow: 'hidden',
       backgroundImage: `url(${process.env.PUBLIC_URL + '/landing-bg.jpg'})`,
       backgroundPosition: 'center',
       backgroundSize: 'cover',
