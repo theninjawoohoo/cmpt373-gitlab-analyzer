@@ -1,6 +1,5 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { CssBaseline } from '@material-ui/core';
 import HomeLogin from '../../components/HomeLogin';
 
 const useStyles = makeStyles((theme) => ({
@@ -18,7 +17,6 @@ const Login: React.FC = ({ children }) => {
   const classes = useStyles();
   return (
     <div className={classes.root}>
-      <CssBaseline/>
       <HomeLogin/>
     </div>
   );

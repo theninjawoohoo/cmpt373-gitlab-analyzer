@@ -41,7 +41,7 @@ const HomeLogin: React.FC = ({ children }) => {
           <Button 
             variant="outlined" 
             color="secondary" 
-            href='https://cas.sfu.ca?service=http://localhost:3000/login/sfu' 
+            href='https://cas.sfu.ca?service=http://localhost:3000/sfu' 
             className={classes.loginButton}>
             Log in via SFU
           </Button>

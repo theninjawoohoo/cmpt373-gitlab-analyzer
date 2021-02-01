@@ -35,7 +35,7 @@ const SfuVerify: React.FC = () => {
   }, [ticket, dispatch])
 
   if (verified) {
-    return <Redirect to='/' />
+    return <Redirect to='/home' />
   }
 
   if (!ticket) {
