@@ -10,6 +10,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import { useAuthContext } from "../../contexts/AuthContext";
 import UndecoratedLink from "../UndecoratedLink";
 import APIKeyModal from "./APIKeyModal";
+import NavBar from "../NavBar"
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -24,7 +25,9 @@ const DefaultPageLayout: React.FC = ({ children }) => {
   const [apiKey, setApiKey] = useState("");
   return (
     <>
+      
       <AppBar>
+        <NavBar apiKey={apiKey}></NavBar>
         <Container>
           <Toolbar>
             <Typography variant="h2" className={styles.title}>

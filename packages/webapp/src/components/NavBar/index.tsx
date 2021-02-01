@@ -8,7 +8,7 @@ const useStyles = makeStyles(() => ({
    drawerPaper: {width: 'inherit'}
 }));
 
-export const NavBar: React.FC = ({ children }) => {
+export default function NavBar(props: any) {
   const styles = useStyles();
   const { state: authState, dispatch } = useAuthContext();
   return (
@@ -21,12 +21,15 @@ export const NavBar: React.FC = ({ children }) => {
                 open={true}
                 classes={{paper: styles.drawerPaper}}
             >
-                <List mt={2}>
+                <List>
                     <ListItem>
                         <ListItemIcon>
                             <PersonIcon></PersonIcon>
                         </ListItemIcon>
                         <ListItemText primary={"UserName"}/>
+                    </ListItem>
+                    <ListItem>
+                        <ListItemText primary={"API KEY: " + props.apiKey}/>
                     </ListItem>
                 </List>
             </Drawer>
@@ -34,5 +37,3 @@ export const NavBar: React.FC = ({ children }) => {
     </>
   );
 };
-
-export default NavBar;
