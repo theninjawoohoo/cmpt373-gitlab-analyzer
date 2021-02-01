@@ -4,10 +4,10 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 @Entity('repository')
 export class Repo {
   @PrimaryColumn()
-  id: number;
+  repo_id: number;
 
   @Column()
-  name: string;
+  repo_name: string;
 
   @Column()
   web_url: string;
@@ -15,6 +15,6 @@ export class Repo {
   @Column()
   token: string;
 
-  @Column()
-  json: string;
+  @Column('jsonb')
+  repo_detail: object;
 }

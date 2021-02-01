@@ -12,14 +12,15 @@ var token='2P52x1JLbMvoSHSpr5gE';
 @Controller(`projects?private_token=${token}`)
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
+
   @Get()
   getAllProjects(@Param('token') token: string){
     return this.projectService.getAllProjects(String(token));
   }
 
   @Get(':id')
-  getProjectById(@Param('id') id: string, @Param('token') token: string){
-    return this.projectService.getProjectById(Number(id), String(token));
+  getProjectById(@Param('id') id: string){
+    return this.projectService.getProjectById(Number(id));
   }
 }
 
