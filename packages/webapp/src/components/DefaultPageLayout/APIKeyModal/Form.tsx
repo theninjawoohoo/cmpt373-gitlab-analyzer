@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Form() {
+export default function Form(props: any) {
   const classes = useStyles();
   const [apiKey, setApiKey] = useState("");
   const changeApiKey = (event: any) => {
@@ -30,11 +30,13 @@ export default function Form() {
   };
   const handleSubmit = (event: any) => {
     event.preventDefault();
+    props.handleClose();
     const data = apiKey;
     fetch("/api/api-key", {
       method: "POST",
       body: data,
     });
+    props.setApiKey(apiKey);
   };
 
   return (

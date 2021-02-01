@@ -55,7 +55,7 @@ const DefaultPageLayout: React.FC = ({ children }) => {
       </AppBar>
       <Box height="4rem" />
       {children}
-      <APIKeyModal apiKey={apiKey} />
+      <APIKeyModal apiKey={apiKey} setApiKey={setApiKey} />
     </>
   );
 };

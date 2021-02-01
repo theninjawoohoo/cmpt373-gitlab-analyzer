@@ -52,7 +52,7 @@ export default function APIKeyModal(props: any) {
       >
         <Fade in={open}>
           <div className={classes.paper}>
-            <Form></Form>
+            <Form handleClose={handleClose} setApiKey={props.setApiKey} />
           </div>
         </Fade>
       </Modal>
