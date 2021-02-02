@@ -7,12 +7,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { TokenService } from '../services/gitlab_token.service';
+import { GitlabTokenService } from '../services/gitlab_token.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 @Controller('token')
-export class TokenController {
-  constructor(private readonly tokenService: TokenService) {}
+export class GitlabTokenController {
+  constructor(private readonly tokenService: GitlabTokenService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()

@@ -4,7 +4,7 @@ import { GitlabToken } from '../entities/gitlab_token.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class TokenService {
+export class GitlabTokenService {
   constructor(
     @InjectRepository(GitlabToken)
     private gitlabTokenRepository: Repository<GitlabToken>,
