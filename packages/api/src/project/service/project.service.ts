@@ -13,9 +13,9 @@ export class ProjectService{
   ){}
 
   async createProject(token: string) {
-    var projects = this.http.get('http://cmpt373-1211-08.cmpt.sfu.ca:5000/api/v4/projects?private_token='+token).pipe( map(response => response.data) );
+    var projects = await this.http.get('http://cmpt373-1211-08.cmpt.sfu.ca:5000/api/v4/projects?private_token='+token).toPromise();
     console.log(projects);
-    await projects.forEach(project => {
+    projects.data.forEach(async project => {
       var repo = this.projectRepository.create({
         repo_id: project.id,
         repo_name: project.name,
@@ -23,7 +23,7 @@ export class ProjectService{
         token: token,
         repo_detail: project,
       });
-      this.projectRepository.save(repo);
+      await this.projectRepository.save(repo);
     });
   }
     
