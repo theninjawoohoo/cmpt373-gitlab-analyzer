@@ -5,10 +5,6 @@ import {
 } from "@material-ui/core/styles";
 const theme = createMuiTheme({
   typography: {
-<<<<<<< HEAD
-    h1: {
-      fontSize: "3rem",
-=======
     fontFamily: 'Montserrat, sans-serif',
   },
 
@@ -18,7 +14,6 @@ const theme = createMuiTheme({
     },
     secondary: {
       main: '#FFFFFF',
->>>>>>> 3acd3cc4c1719d5034a389b2a363e43f4138a7d3
     },
   },
 });
