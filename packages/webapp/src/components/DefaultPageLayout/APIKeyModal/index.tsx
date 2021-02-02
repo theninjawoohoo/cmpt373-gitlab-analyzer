@@ -4,6 +4,11 @@ import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import Form from "./Form";
+
+interface props {
+  apiKey: string,
+}
+
 const useStyles = makeStyles((theme) => ({
   modal: {
     display: "flex",
@@ -18,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function APIKeyModal(props: any) {
+export const APIKeyModal: React.FC<props> = (props) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
 
