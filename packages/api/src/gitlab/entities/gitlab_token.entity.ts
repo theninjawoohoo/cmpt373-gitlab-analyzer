@@ -6,13 +6,12 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-// user is a reserved word in postgres
 @Entity('gitlab_token')
-export class User {
+export class GitlabToken {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => User, (user) => user.id)
+  @OneToOne(() => GitlabToken, (user) => user.id)
   @JoinTable()
   user_id: string;
 

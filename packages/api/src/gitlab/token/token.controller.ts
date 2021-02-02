@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { TokenService } from '../services/gitlab_token.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
@@ -8,7 +16,12 @@ export class TokenController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  storeToken(@Req() req, @Body('token') token) {}
+  storeToken(@Req() req, @Body('token') token) {
+    this.tokenService.create(token);
+  }
 
-  // function to get token based on userID
+  @Get(':id')
+  findOne(@Param('id') id): string {
+    return this.tokenService.findOne(id);
+  }
 }
