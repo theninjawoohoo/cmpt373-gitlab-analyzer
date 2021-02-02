@@ -7,13 +7,13 @@ import SfuVerify from '../../pages/SfuVerify';
 export function Router() {
   return <BrowserRouter>
     <Switch>
-      <Route path="/login" exact>
+      <Route path="/" exact>
         <Login />
       </Route>
-      <Route path="/login/sfu" exact>
+      <Route path="/sfu" exact>
         <SfuVerify />
       </Route>
-      <Route path="/" exact>
+      <Route path="/home" exact>
         <Home />
       </Route>
     </Switch>
