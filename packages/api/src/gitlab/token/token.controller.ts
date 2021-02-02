@@ -17,11 +17,12 @@ export class TokenController {
   @UseGuards(JwtAuthGuard)
   @Post()
   storeToken(@Req() req, @Body('token') token) {
-    this.tokenService.create(token);
+    const userId: string = req.user.sub;
+    this.tokenService.create(userId, token);
   }
 
   @Get(':id')
-  findOne(@Param('id') id): string {
+  findOne(@Param('id') id) {
     return this.tokenService.findOne(id);
   }
 }

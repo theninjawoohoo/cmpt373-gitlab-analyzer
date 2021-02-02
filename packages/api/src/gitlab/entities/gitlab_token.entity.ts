@@ -13,7 +13,8 @@ export class GitlabToken {
 
   @OneToOne(() => GitlabToken, (user) => user.id)
   @JoinTable()
-  user_id: string;
+  @Column({ name: 'user_id' })
+  userId: string;
 
   @Column()
   token: string;

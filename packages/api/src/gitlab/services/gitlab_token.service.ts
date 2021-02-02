@@ -10,11 +10,15 @@ export class TokenService {
     private gitlabTokenRepository: Repository<GitlabToken>,
   ) {}
 
-  findOne(id: string): string {
-    return this.gitlabTokenRepository.findOne(id);
+  findOne(id: string) {
+    return this.gitlabTokenRepository.findOne({ where: { id } });
   }
 
-  create(token: GitlabToken) {
-    this.gitlabTokenRepository.insert(token);
+  create(userId: string, token: string) {
+    const gitlabToken = this.gitlabTokenRepository.create({
+      token: token,
+      userId: userId,
+    });
+    return this.gitlabTokenRepository.save(gitlabToken);
   }
 }
