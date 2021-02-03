@@ -18,7 +18,12 @@ export class GitlabTokenController {
   @Post()
   storeToken(@Req() req, @Body('token') token) {
     const userId: string = req.user.sub;
-    this.tokenService.create(userId, token);
+    if (this.findOne(userId) != null) {
+      console.log('updating gitlab token value');
+      this.tokenService.update(userId, token);
+    } else {
+      this.tokenService.create(userId, token);
+    }
   }
 
   @Get(':id')
