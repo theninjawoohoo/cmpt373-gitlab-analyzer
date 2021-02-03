@@ -1,5 +1,4 @@
 import Box from "@material-ui/core/Box";
-import { useState } from "react";
 import Container from "@material-ui/core/Container";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -9,8 +8,7 @@ import Button from "@material-ui/core/Button";
 import Toolbar from "@material-ui/core/Toolbar";
 import { useAuthContext } from "../../contexts/AuthContext";
 import UndecoratedLink from "../UndecoratedLink";
-import APIKeyModal from "./APIKeyModal";
-import NavBar from "../NavBar"
+import { Repository } from "./Repository";
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -58,7 +56,7 @@ const DefaultPageLayout: React.FC = ({ children }) => {
       </AppBar>
       <Box height="4rem" />
       {children}
-      <APIKeyModal apiKey={apiKey} setApiKey={setApiKey} />
+      <Repository />
     </>
   );
 };
