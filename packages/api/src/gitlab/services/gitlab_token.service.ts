@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GitlabToken } from '../entities/gitlab_token.entity';
-import { Repository, getConnection } from 'typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class GitlabTokenService {
@@ -14,6 +14,10 @@ export class GitlabTokenService {
     return this.gitlabTokenRepository.findOne({ where: { id } });
   }
 
+  findOneByUserId(userId: string) {
+    return this.gitlabTokenRepository.findOne({ where: { userId } });
+  }
+
   create(userId: string, token: string) {
     const gitlabToken = this.gitlabTokenRepository.create({
       token: token,
@@ -23,11 +27,11 @@ export class GitlabTokenService {
   }
 
   async update(userId: string, token: string) {
-    await getConnection()
-      .createQueryBuilder()
-      .update(GitlabToken)
-      .set({ token: token })
-      .where('user_id = :user_id', { user_id: userId })
-      .execute();
+    const gitlabToken = await this.gitlabTokenRepository.preload({
+      userId,
+    });
+    gitlabToken.token = token;
+    gitlabToken.expired = false;
+    return this.gitlabTokenRepository.save(gitlabToken);
   }
 }
