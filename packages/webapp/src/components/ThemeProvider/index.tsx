@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 import {
   createMuiTheme,
   ThemeProvider as MuiThemeProvider,
-} from "@material-ui/core/styles";
+} from '@material-ui/core/styles';
 const theme = createMuiTheme({
   typography: {
     fontFamily: 'Montserrat, sans-serif',
