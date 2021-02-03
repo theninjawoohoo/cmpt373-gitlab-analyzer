@@ -1,22 +1,14 @@
-import {
-  Column,
-  Entity,
-  JoinTable,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('gitlab_token')
 export class GitlabToken {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => GitlabToken, (user) => user.id)
-  @JoinTable()
-  @Column({ name: 'user_id' })
+  @Column({ name: 'user_id', type: 'text' })
   userId: string;
 
-  @Column()
+  @Column({ type: 'text' })
   token: string;
 
   @Column({ default: false })
