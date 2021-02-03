@@ -1,6 +1,8 @@
-import React from 'react';
-import { createMuiTheme, ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
-
+import React from "react";
+import {
+  createMuiTheme,
+  ThemeProvider as MuiThemeProvider,
+} from "@material-ui/core/styles";
 const theme = createMuiTheme({
   typography: {
     fontFamily: 'Montserrat, sans-serif',
@@ -17,9 +19,7 @@ const theme = createMuiTheme({
 });
 
 const ThemeProvider: React.FC = ({ children }) => (
-  <MuiThemeProvider theme={theme}>
-    {children}
-  </MuiThemeProvider>
-)
+  <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>
+);
 
 export default ThemeProvider;
