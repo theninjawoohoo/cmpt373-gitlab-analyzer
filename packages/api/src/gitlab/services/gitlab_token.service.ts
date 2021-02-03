@@ -27,9 +27,7 @@ export class GitlabTokenService {
   }
 
   async update(userId: string, token: string) {
-    const gitlabToken = await this.gitlabTokenRepository.preload({
-      userId,
-    });
+    const gitlabToken = await this.findOneByUserId(userId);
     gitlabToken.token = token;
     gitlabToken.expired = false;
     return this.gitlabTokenRepository.save(gitlabToken);

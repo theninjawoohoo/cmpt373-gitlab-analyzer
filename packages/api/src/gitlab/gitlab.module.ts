@@ -8,5 +8,6 @@ import { GitlabTokenController } from './token/gitlab_token.controller';
   imports: [TypeOrmModule.forFeature([GitlabToken])],
   controllers: [GitlabTokenController],
   providers: [GitlabTokenService],
+  exports: [GitlabTokenService],
 })
 export class GitlabModule {}
