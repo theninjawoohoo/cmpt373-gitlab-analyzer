@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, Dispatch, SetStateAction } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 
+interface FormProps {
+  apiKey?: string,
+  setApiKey: Dispatch<SetStateAction<string>>,
+  handleClose: () => void;
+}
 const useStyles = makeStyles((theme) => ({
   root: {
     "& > *": {
@@ -22,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Form(props: any) {
+const Form: React.FC<FormProps> = (FormProps) => {
   const classes = useStyles();
   const [apiKey, setApiKey] = useState("");
   const changeApiKey = (event: any) => {
@@ -30,13 +35,13 @@ export default function Form(props: any) {
   };
   const handleSubmit = (event: any) => {
     event.preventDefault();
-    props.handleClose();
+    FormProps.handleClose();
     const data = apiKey;
     fetch("/api/api-key", {
       method: "POST",
       body: data,
     });
-    props.setApiKey(apiKey);
+    FormProps.setApiKey(apiKey);
   };
 
   return (
@@ -64,3 +69,5 @@ export default function Form(props: any) {
     </form>
   );
 }
+
+export default Form

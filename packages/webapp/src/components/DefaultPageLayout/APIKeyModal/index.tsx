@@ -5,7 +5,7 @@ import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import Form from "./Form";
 
-interface props {
+interface ApiKeyModalProps {
   apiKey: string,
   setApiKey: Dispatch<SetStateAction<string>>
 }
@@ -24,12 +24,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const APIKeyModal: React.FC<props> = (props) => {
+const APIKeyModal: React.FC<ApiKeyModalProps> = (ApiKeyModalProps) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
-    if (!props.apiKey) {
+    if (!ApiKeyModalProps.apiKey) {
       handleOpen();
     }
   });
@@ -58,7 +58,7 @@ const APIKeyModal: React.FC<props> = (props) => {
       >
         <Fade in={open}>
           <div className={classes.paper}>
-            <Form handleClose={handleClose} setApiKey={props.setApiKey} />
+            <Form handleClose={handleClose} setApiKey={ApiKeyModalProps.setApiKey} />
           </div>
         </Fade>
       </Modal>
