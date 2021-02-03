@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect,Dispatch, SetStateAction } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
@@ -7,6 +7,7 @@ import Form from "./Form";
 
 interface props {
   apiKey: string,
+  setApiKey: Dispatch<SetStateAction<string>>
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -23,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const APIKeyModal: React.FC<props> = (props) => {
+const APIKeyModal: React.FC<props> = (props) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
 
@@ -64,3 +65,5 @@ export const APIKeyModal: React.FC<props> = (props) => {
     </div>
   );
 }
+
+export default APIKeyModal
