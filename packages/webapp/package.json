@@ -69,7 +69,7 @@
     }
   },
   "lint-staged": {
-    "*.+(js|jsx|json|css|md|ts|tsx)": [
+    "packages/webapp/**/*.+(js|jsx|json|css|md|ts|tsx)": [
       "eslint --fix",
       "git add"
     ]
