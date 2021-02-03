@@ -2,7 +2,7 @@ export default () => ({
   jwtSigningKey: process.env.JWT_SIGNING_KEY || 'localdev',
   jwtAuthExpiryPeriod: process.env.JWT_AUTH_EXPIRY_PERIOD || '24h',
   sfuAuthFrontEndService:
-    process.env.SFU_AUTH_FRONT_END_SERVICE || 'http://localhost:3000/login/sfu',
+    process.env.SFU_AUTH_FRONT_END_SERVICE || 'http://localhost:3000/sfu',
   sfuValidationEndpoint:
     process.env.SFU_VALIDATION_ENDPOINT ||
     'https://cas.sfu.ca/cas/serviceValidate',
