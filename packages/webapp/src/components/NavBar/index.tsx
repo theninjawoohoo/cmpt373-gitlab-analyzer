@@ -4,8 +4,10 @@ import { useAuthContext } from '../../contexts/AuthContext';
 import { Drawer, List, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person'; 
 
-const useStyles = makeStyles(() => ({
-   drawerPaper: {width: 'inherit'}
+const useStyles = makeStyles((theme) => ({
+    drawerPaper: {
+       width: 'inherit',
+    }
 }));
 
 export default function NavBar(props: any) {
