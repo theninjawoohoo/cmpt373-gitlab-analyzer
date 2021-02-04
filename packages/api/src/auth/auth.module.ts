@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { GitlabModule } from '../gitlab/gitlab.module';
 import { UserModule } from '../user/user.module';
 import { AuthService } from './services/auth.service';
 import { SfuService } from './services/sfu.service';
@@ -20,6 +21,7 @@ import { AuthController } from './auth.controller';
       }),
       inject: [ConfigService],
     }),
+    GitlabModule,
     UserModule,
   ],
   providers: [SfuStrategy, SfuService, AuthService, JwtStrategy],
