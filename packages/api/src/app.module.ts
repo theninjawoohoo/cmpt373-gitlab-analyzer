@@ -5,7 +5,6 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { SampleModule } from './sample/sample.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { GitlabModule } from './gitlab/gitlab.module';
@@ -24,7 +23,6 @@ import config from './config';
       }),
       inject: [ConfigService],
     }),
-    SampleModule,
     UserModule,
     AuthModule,
     GitlabModule,
