@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 interface FormProps {
   apiKey?: string;
   setApiKey: Dispatch<SetStateAction<string>>;
-  handleClose: () => void;
+  handleClose?: () => void;
 }
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,7 +35,9 @@ const Form: React.FC<FormProps> = (FormProps) => {
   };
   const handleSubmit = (event: any) => {
     event.preventDefault();
-    FormProps.handleClose();
+    if (typeof FormProps.handleClose != 'undefined') {
+      FormProps.handleClose();
+    }
     const data = apiKey;
     fetch('/api/api-key', {
       method: 'POST',
