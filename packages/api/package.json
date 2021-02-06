@@ -10,6 +10,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "migrate": "typeorm migration:run",
+    "migrate:generate": "typeorm migration:generate -n",
     "migrate:revert": "typeorm migration:revert",
     "start": "nest start",
     "start:dev": "nest start --watch",

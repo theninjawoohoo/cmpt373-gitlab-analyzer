@@ -1,8 +1,7 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-// user is a reserved word in postgres
 @Entity('repository')
-export class Repo {
+export class Repository_Entity {
   @PrimaryColumn()
   repo_id: number;
 
@@ -11,7 +10,7 @@ export class Repo {
 
   @Column()
   web_url: string;
-  
+
   @Column()
   token: string;
 
