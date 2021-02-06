@@ -24,7 +24,8 @@
       {
         "singleQuote": true,
         "trailingComma": "all",
-        "jsxSingleQuote": true
+        "jsxSingleQuote": true,
+        "endOfLine": "auto"
       }
     ],
     "react/prop-types": [2, { "ignore": ["children"] }],

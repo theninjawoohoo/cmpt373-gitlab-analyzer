@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { RepositoryModule } from './repository/repository.module';
 import { GitlabModule } from './gitlab/gitlab.module';
 import config from './config';
 
@@ -25,6 +26,7 @@ import config from './config';
     }),
     UserModule,
     AuthModule,
+    RepositoryModule,
     GitlabModule,
   ],
   controllers: [AppController],

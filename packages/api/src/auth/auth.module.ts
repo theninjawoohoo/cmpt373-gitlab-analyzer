@@ -9,6 +9,7 @@ import { SfuService } from './services/sfu.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { SfuStrategy } from './strategies/sfu.strategy';
 import { AuthController } from './auth.controller';
+import { RepositoryModule } from 'src/repository/repository.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AuthController } from './auth.controller';
     }),
     GitlabModule,
     UserModule,
+    RepositoryModule,
   ],
   providers: [SfuStrategy, SfuService, AuthService, JwtStrategy],
   controllers: [AuthController],
