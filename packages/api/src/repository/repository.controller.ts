@@ -1,13 +1,14 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { ProjectService } from './service/project.service';
+import { RepositoryService } from './service/repository.service';
 
-// var username='wens';
+const username = 'wens';
 const token = '2P52x1JLbMvoSHSpr5gE';
 
 // https://wanago.io/2020/05/11/nestjs-api-controllers-routing-module/
-@Controller(`projects?private_token=${token}`)
-export class ProjectController {
-  constructor(private readonly projectService: ProjectService) {}
+@Controller(`users/${username}/projects?private_token=${token}`)
+// @Controller(`projects?private_token=${token}`)
+export class RepositoryController {
+  constructor(private readonly projectService: RepositoryService) {}
 
   @Get()
   getAllProjects(@Param('token') token: string) {

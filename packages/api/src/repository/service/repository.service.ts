@@ -1,21 +1,21 @@
 import { Injectable, HttpService } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Repository_Entity } from '../entities/project.entity';
+import { Repository_Entity } from '../entities/repository.entity';
 
 @Injectable()
-export class ProjectService {
+export class RepositoryService {
   constructor(
     private http: HttpService,
     @InjectRepository(Repository_Entity)
     private readonly projectRepository: Repository<Repository_Entity>,
   ) {}
 
-  async createProject(token: string) {
+  async createRepository(username: string, token: string) {
     const projects = await this.http
       .get(
-        'http://cmpt373-1211-08.cmpt.sfu.ca:5000/api/v4/projects?private_token=' +
-          token,
+        `http://cmpt373-1211-08.cmpt.sfu.ca:5000/api/v4/users/${username}/projects?private_token=${token}`,
+        // `http://cmpt373-1211-08.cmpt.sfu.ca:5000/api/v4/projects?private_token=${token}`,
       )
       .toPromise();
     console.log(projects);

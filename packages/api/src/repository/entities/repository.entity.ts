@@ -15,5 +15,5 @@ export class Repository_Entity {
   token: string;
 
   @Column('jsonb')
-  repo_detail: object;
+  repo_detail: string;
 }

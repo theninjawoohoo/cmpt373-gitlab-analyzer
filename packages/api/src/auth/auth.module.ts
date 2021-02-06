@@ -1,15 +1,14 @@
-import { Module, HttpService } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { UserModule } from '../user/user.module';
 import { AuthService } from './services/auth.service';
 import { SfuService } from './services/sfu.service';
-import { ProjectService } from '../project/service/project.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { SfuStrategy } from './strategies/sfu.strategy';
 import { AuthController } from './auth.controller';
-import { ProjectModule } from 'src/project/project.module';
+import { RepositoryModule } from 'src/repository/repository.module';
 
 @Module({
   imports: [
@@ -22,7 +21,8 @@ import { ProjectModule } from 'src/project/project.module';
       }),
       inject: [ConfigService],
     }),
-    UserModule, ProjectModule
+    UserModule,
+    RepositoryModule,
   ],
   providers: [SfuStrategy, SfuService, AuthService, JwtStrategy],
   controllers: [AuthController],
