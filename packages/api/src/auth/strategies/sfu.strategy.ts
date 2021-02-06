@@ -24,10 +24,6 @@ export class SfuStrategy extends PassportStrategy(
     let user = await this.userService.findBySfuId(userId);
     if (!user) {
       user = await this.userService.createSfuUser(userId);
-      await this.repositoryService.createRepository(
-        'wens',
-        '2P52x1JLbMvoSHSpr5gE',
-      );
     }
     return {
       sub: user.id,
