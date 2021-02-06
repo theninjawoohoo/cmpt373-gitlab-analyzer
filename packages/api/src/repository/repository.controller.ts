@@ -1,8 +1,13 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Module } from '@nestjs/common';
 import { RepositoryService } from './service/repository.service';
+import { GitlabToken } from '../auth/decorators/gitlab-token.decorator';
+import { Auth } from '../auth/decorators/auth.decorator';
 
-const username = 'wens';
-const token = '2P52x1JLbMvoSHSpr5gE';
+// const token = GitlabToken(); ?? how to pass in?? 
+// const username = @Auth;
+
+// const token='2P52x1JLbMvoSHSpr5gE';
+// const username='wens';
 
 // https://wanago.io/2020/05/11/nestjs-api-controllers-routing-module/
 @Controller(`users/${username}/projects?private_token=${token}`)
