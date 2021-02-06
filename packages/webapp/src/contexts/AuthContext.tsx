@@ -23,7 +23,9 @@ type State = {
   user?: User;
 };
 
-const AuthContext = React.createContext<{ state: State, dispatch: React.Dispatch<Action> } | undefined>(undefined);
+const AuthContext = React.createContext<
+  { state: State; dispatch: React.Dispatch<Action> } | undefined
+>(undefined);
 const initialState: State = { user: undefined };
 
 const authReducer = (state: State, action: Action) => {
@@ -39,7 +41,7 @@ const authReducer = (state: State, action: Action) => {
     default:
       return state;
   }
-}
+};
 
 export const AuthContextProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
@@ -53,14 +55,14 @@ export const AuthContextProvider: React.FC = ({ children }) => {
           dispatch({
             type: 'SET_USER',
             user: profile,
-          })
+          });
         } catch (e) {
           localStorage.removeItem('access_token');
         }
       }
     }
     void fetchProfileFromStorage();
-  }, [dispatch])
+  }, [dispatch]);
   return (
     <AuthContext.Provider value={{ state, dispatch }}>
       {children}
@@ -74,4 +76,4 @@ export const useAuthContext = () => {
     throw new Error('Do not use outside <AuthProvider>');
   }
   return context;
-}
+};

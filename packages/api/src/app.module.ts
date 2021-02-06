@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SampleModule } from './sample/sample.module';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { RepositoryModule } from './repository/repository.module';
+import { GitlabModule } from './gitlab/gitlab.module';
 import config from './config';
 
 @Module({
@@ -22,12 +24,18 @@ import config from './config';
       }),
       inject: [ConfigService],
     }),
-    SampleModule,
     UserModule,
     AuthModule,
     RepositoryModule,
+    GitlabModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
