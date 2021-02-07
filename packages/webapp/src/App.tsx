@@ -8,7 +8,7 @@ const App = () => {
   return (
     <AuthContextProvider>
       <ThemeProvider>
-        <Router/>
+        <Router />
       </ThemeProvider>
     </AuthContextProvider>
   );

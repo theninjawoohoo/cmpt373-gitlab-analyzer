@@ -1,41 +1,53 @@
-import { makeStyles } from '@material-ui/core/styles';
+import { createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import React from 'react';
 import { useAuthContext } from '../../contexts/AuthContext';
-import { Drawer, List, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
-import PersonIcon from '@material-ui/icons/Person'; 
+import { Drawer, List, ListItem, ListItemText } from '@material-ui/core';
+import ItemBox from './itemBox';
 
-const useStyles = makeStyles((theme) => ({
-    drawerPaper: {
-       width: 'inherit',
-    }
+interface UserNameProps {
+  username: string;
+}
+
+const theme = createMuiTheme();
+
+const useStyles = makeStyles(() => ({
+  drawerPaper: {
+    width: 'inherit',
+    marginTop: theme.spacing(1),
+  },
 }));
 
-export default function NavBar(props: any) {
+const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
   const styles = useStyles();
   const { state: authState, dispatch } = useAuthContext();
   return (
     <>
-        <div>
-            <Drawer
-                style={{width: '25vw'}}
-                variant="persistent"
-                anchor="left"
-                open={true}
-                classes={{paper: styles.drawerPaper}}
-            >
-                <List>
-                    <ListItem>
-                        <ListItemIcon>
-                            <PersonIcon></PersonIcon>
-                        </ListItemIcon>
-                        <ListItemText primary={"UserName"}/>
-                    </ListItem>
-                    <ListItem>
-                        <ListItemText primary={"API KEY: " + props.apiKey}/>
-                    </ListItem>
-                </List>
-            </Drawer>
-        </div>
+      <div>
+        <Drawer
+          style={{ width: '15vw' }}
+          variant='persistent'
+          anchor='left'
+          open={true}
+          classes={{ paper: styles.drawerPaper }}
+        >
+          <List>
+            <ItemBox
+              icon='user'
+              primary={UserNameProps.username}
+              url='/'
+            ></ItemBox>
+            <ItemBox icon='repo' primary={'Repository'} url='/home'></ItemBox>
+            <ItemBox
+              icon='setting'
+              primary={'Settings'}
+              url='/settings'
+            ></ItemBox>
+            <ItemBox icon='logout' primary={'Logout'} url='/logout'></ItemBox>
+          </List>
+        </Drawer>
+      </div>
     </>
   );
 };
+
+export default NavBar;

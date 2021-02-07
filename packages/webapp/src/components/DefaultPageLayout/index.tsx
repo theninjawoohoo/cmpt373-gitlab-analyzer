@@ -11,6 +11,7 @@ import { useAuthContext } from '../../contexts/AuthContext';
 import UndecoratedLink from '../UndecoratedLink';
 import APIKeyModal from './APIKeyModal';
 import Repository from './Repository';
+import NavBar from '../NavBar';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -25,37 +26,15 @@ const DefaultPageLayout: React.FC = ({ children }) => {
   const [apiKey, setApiKey] = useState('');
   return (
     <>
-      
-      <AppBar>
-        <NavBar apiKey={apiKey}></NavBar>
-        <Container>
-          <Toolbar>
-            <Typography variant='h2' className={styles.title}>
-              GitLab Analyzer
-            </Typography>
-            <UndecoratedLink to='/'>
-              <Button color='inherit'>Home</Button>
-            </UndecoratedLink>
-            {authState?.user?.sfuId ? (
-              <>
-                <UndecoratedLink to='/profile'>
-                  <Button color='inherit'>{authState.user.sfuId}</Button>
-                </UndecoratedLink>
-                <Button
-                  color='inherit'
-                  onClick={() => dispatch({ type: 'LOGOUT' })}
-                >
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <UndecoratedLink to='/login'>
-                <Button color='inherit'>Login</Button>
-              </UndecoratedLink>
-            )}
-          </Toolbar>
-        </Container>
-      </AppBar>
+      <Container>
+        {authState?.user?.sfuId ? (
+          <>
+            <NavBar username={authState.user.sfuId}></NavBar>
+          </>
+        ) : (
+          <NavBar username={'Guest'}></NavBar>
+        )}
+      </Container>
       <Box height='4rem' />
       {children}
       <APIKeyModal apiKey={apiKey} setApiKey={setApiKey} />
