@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Repository } from '../../gitlab/repository/repository.entity';
 
 interface SfuAuth {
   type: 'sfu';
@@ -15,4 +16,7 @@ export class User {
 
   @Column('jsonb')
   auth: Auth;
+
+  @OneToMany(() => Repository, (repository) => repository.user)
+  repositories: Repository[];
 }

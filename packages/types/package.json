@@ -1,0 +1,27 @@
+{
+  "name": "@ceres/types",
+  "version": "0.0.0",
+  "description": "Shared resource types between webapp and api",
+  "homepage": "",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "directories": {
+    "lib": "dist"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@csil-git1.cs.surrey.sfu.ca:373-2021-1-Ceres/gitlabanalyzer.git"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "typescript": "^4.1.3"
+  }
+}
