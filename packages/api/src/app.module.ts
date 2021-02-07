@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { ResponseMapper } from './common/response-mapper.interceptor';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { RepositoryModule } from './repository/repository.module';
 import { GitlabModule } from './gitlab/gitlab.module';
 import config from './config';
 
@@ -26,7 +26,6 @@ import config from './config';
     }),
     UserModule,
     AuthModule,
-    RepositoryModule,
     GitlabModule,
   ],
   controllers: [AppController],
@@ -35,6 +34,10 @@ import config from './config';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseMapper,
     },
   ],
 })

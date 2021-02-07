@@ -6,6 +6,9 @@ export default () => ({
   sfuValidationEndpoint:
     process.env.SFU_VALIDATION_ENDPOINT ||
     'https://cas.sfu.ca/cas/serviceValidate',
+  gitlabBaseUrl:
+    process.env.GITLAB_BASE_URL ||
+    'http://cmpt373-1211-08.cmpt.sfu.ca:5000/api/v4',
   database: {
     type: process.env.TYPEORM_CONNECTION || 'postgres',
     host: process.env.TYPEORM_HOST || 'localhost',
