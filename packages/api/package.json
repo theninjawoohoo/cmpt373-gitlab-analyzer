@@ -1,6 +1,6 @@
 {
-  "name": "api",
-  "version": "0.0.1",
+  "name": "@ceres/api",
+  "version": "0.0.0",
   "description": "",
   "author": "",
   "private": true,
@@ -10,6 +10,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "migrate": "typeorm migration:run",
+    "migrate:generate": "typeorm migration:generate -n",
     "migrate:revert": "typeorm migration:revert",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -44,6 +45,7 @@
     "typeorm": "^0.2.30"
   },
   "devDependencies": {
+    "@ceres/types": "^0.0.0",
     "@nestjs/cli": "^7.5.1",
     "@nestjs/schematics": "^7.1.3",
     "@nestjs/testing": "^7.5.1",

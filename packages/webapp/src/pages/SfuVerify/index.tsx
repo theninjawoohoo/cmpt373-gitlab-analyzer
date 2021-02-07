@@ -20,7 +20,9 @@ const SfuVerify: React.FC = () => {
         const response = await loginSfu(ticket as string);
         if (response.access_token) {
           dispatch({ type: 'SAVE_TOKEN', token: response.access_token });
-          axios.defaults.headers['Authorization'] = `Bearer ${response.access_token}`;
+          axios.defaults.headers[
+            'Authorization'
+          ] = `Bearer ${response.access_token}`;
           const profile = await getProfile();
           dispatch({ type: 'SET_USER', user: profile });
           setVerified(true);
@@ -28,25 +30,25 @@ const SfuVerify: React.FC = () => {
       } catch (e) {
         // TODO: show an error message
       }
-    }
+    };
     if (ticket) {
-      void verifyTicket()
+      void verifyTicket();
     }
-  }, [ticket, dispatch])
+  }, [ticket, dispatch]);
 
   if (verified) {
-    return <Redirect to='/home' />
+    return <Redirect to='/home' />;
   }
 
   if (!ticket) {
-    return <Container>No ticket found!</Container>
+    return <Container>No ticket found!</Container>;
   }
 
   return (
     <Container>
       <p>Your authentication ticket is being verified...</p>
     </Container>
-  )
-}
+  );
+};
 
 export default SfuVerify;

@@ -17,6 +17,12 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
+  async findOne(id: string) {
+    return this.userRepository.findOne({
+      where: { id },
+    });
+  }
+
   async findBySfuId(sfuId: string) {
     return this.userRepository.findOne({
       where: {
