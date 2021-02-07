@@ -1,73 +1,40 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+# `@ceres/api`
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend API for Gitlab Analzyer
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Setup
 
-## Description
+Follow the instructions in the [root README](../../README.md) on how to start Docker, install packages, and link
+dependencies. Also be sure to build the types packages before following these instructions. After you're done that, here
+are instructions:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+1. `npm run build`: This will make sure dependency links are setup properly and build the migration files.
+2. `npm run migrate`: This will run all migrations on the database. By default, this will run on your docker postgres
+   container.
+3. `npm run start:dev`: This will start the api server at `http://localhost:4000`.
 
-## Installation
+## Usage with Postman
 
-```bash
-$ npm install
-```
+In order to use the api with Postman, you will need to obtain an access token. The easiest way to this is start the
+webapp. Login to the webapp via SFU and then open console and get the `access_token` from local storage.
 
-## Running the app
+![img.png](docs/local-storage-token.png)
 
-```bash
-# development
-$ npm run start
+In Postman, open up the **Authorization** tab for a request or collection. Select **Bearer Token** and paste in your
+token.
 
-# watch mode
-$ npm run start:dev
+![postman authorization setup](docs/postman-authorization.png)
 
-# production mode
-$ npm run start:prod
-```
+You are now authenticated and can use the API from Postman!
 
-## Test
+### Setup Gitlab Token
 
-```bash
-# unit tests
-$ npm run test
+Some requests will require you to have a Gitlab token setup to access the API. To do this, complete all the Postman
+setup instructions above. Then generate and copy a Gitlab token. In Postman, setup a POST request
+to `http://locahost:4000/token` and go into the **Body** tab.
 
-# e2e tests
-$ npm run test:e2e
+Select the **Raw** radio button and set the content type to JSON. Set the body request to:
 
-# test coverage
-$ npm run test:cov
-```
+![postman gitlab token body](docs/gitlab-token-request-body.png)
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+Send the request in and your Gitlab token should be stored in the database now!
