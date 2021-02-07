@@ -18,7 +18,8 @@
   },
   "scripts": {
     "build": "tsc -b",
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "watch": "tsc -w"
   },
   "devDependencies": {
     "typescript": "^4.1.3"
