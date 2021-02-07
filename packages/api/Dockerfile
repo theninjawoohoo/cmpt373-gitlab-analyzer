@@ -5,6 +5,7 @@ WORKDIR /project
 
 RUN npm ci
 RUN npm run bootstrap:ci
+RUN npm run link
 
 WORKDIR /project/packages/api
 

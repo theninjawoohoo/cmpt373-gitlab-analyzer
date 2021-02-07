@@ -5,6 +5,7 @@
     "bootstrap": "lerna bootstrap --no-ci",
     "bootstrap:ci": "lerna bootstrap --ci",
     "format": "lerna run --parallel format",
+    "link": "lerna link",
     "lint": "lerna run --parallel lint"
   },
   "devDependencies": {
