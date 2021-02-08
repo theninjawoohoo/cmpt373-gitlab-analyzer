@@ -1,3 +1,4 @@
+import { Profile } from '@ceres/types';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Repository } from '../../gitlab/repository/repository.entity';
 
@@ -16,6 +17,9 @@ export class User {
 
   @Column('jsonb')
   auth: Auth;
+
+  @Column({ type: 'jsonb', nullable: true })
+  profile?: Profile;
 
   @OneToMany(() => Repository, (repository) => repository.user)
   repositories: Repository[];
