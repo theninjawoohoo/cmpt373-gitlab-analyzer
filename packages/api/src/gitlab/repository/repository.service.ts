@@ -25,7 +25,7 @@ export class RepositoryService {
 
   async fetchForUser(user: User, token: string) {
     const axiosResponse = await this.httpService
-      .get<Repository[]>('/users/jag/projects', {
+      .get<Repository[]>('/projects?membership=true', {
         headers: {
           'PRIVATE-TOKEN': token,
         },
@@ -44,13 +44,15 @@ export class RepositoryService {
               id: repo.id,
             },
           })
-          .where('user_id = :userId', { userId: user.id })
+          .andWhere('user_id = :userId', { userId: user.id })
           .getOne();
         if (!found) {
           found = await this.repository.create({
             user,
             resource: repo,
           });
+        } else {
+          found.resource = repo;
         }
         return found;
       }),
