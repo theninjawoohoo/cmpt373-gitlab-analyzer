@@ -1,7 +1,7 @@
+import React, { useState } from 'react';
 import { createMuiTheme, makeStyles } from '@material-ui/core/styles';
-import React from 'react';
 import { useAuthContext } from '../../contexts/AuthContext';
-import { Drawer, List, ListItem, ListItemText } from '@material-ui/core';
+import { Drawer, List } from '@material-ui/core';
 import ItemBox from './itemBox';
 
 interface UserNameProps {
@@ -18,6 +18,12 @@ const useStyles = makeStyles(() => ({
 }));
 
 const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
+  const [open, setOpen] = useState(false);
+
+  const handleDrawer = () => {
+    setOpen(true);
+  };
+
   const styles = useStyles();
   const { state: authState, dispatch } = useAuthContext();
   return (

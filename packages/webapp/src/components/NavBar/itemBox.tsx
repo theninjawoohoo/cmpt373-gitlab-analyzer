@@ -9,9 +9,30 @@ interface ListItemBoxProps {
   url: string;
 }
 
-const useStyles = makeStyles((theme) => ({}));
+const useStyles = makeStyles(() => ({
+  logoutButton: {
+    top: '725px',
+  },
+}));
 
 const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
+  const styles = useStyles();
+  if (ListItemBoxProps.primary == 'Logout') {
+    return (
+      <ListItem
+        button
+        component='a'
+        href={ListItemBoxProps.url}
+        className={styles.logoutButton}
+      >
+        <ListItemIcon>
+          <Icon icon={ListItemBoxProps.icon}></Icon>
+        </ListItemIcon>
+        <ListItemText primary={ListItemBoxProps.primary} />
+      </ListItem>
+    );
+  }
+
   return (
     <ListItem button component='a' href={ListItemBoxProps.url}>
       <ListItemIcon>
