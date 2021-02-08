@@ -1,6 +1,7 @@
 import { Profile } from '@ceres/types';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Repository } from '../../gitlab/repository/repository.entity';
+import { Operation } from '../../operation/operation.entity';
 
 interface SfuAuth {
   type: 'sfu';
@@ -23,4 +24,7 @@ export class User {
 
   @OneToMany(() => Repository, (repository) => repository.user)
   repositories: Repository[];
+
+  @OneToMany(() => Operation, (operation) => operation.user)
+  operations: Operation[];
 }
