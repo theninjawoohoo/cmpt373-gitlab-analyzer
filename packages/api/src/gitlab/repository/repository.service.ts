@@ -10,15 +10,15 @@ export class RepositoryService {
   constructor(
     private readonly httpService: HttpService,
     @InjectRepository(RepositoryEntity)
-    private readonly repositoryRepository: TypeORMRepository<RepositoryEntity>,
+    private readonly repository: TypeORMRepository<RepositoryEntity>,
   ) {}
 
   async findAll(user: User) {
-    return this.repositoryRepository.find({ where: { user } });
+    return this.repository.find({ where: { user } });
   }
 
   async findOne(user: User, id: string) {
-    return this.repositoryRepository.findOne({
+    return this.repository.findOne({
       where: { user, id },
     });
   }
@@ -37,7 +37,7 @@ export class RepositoryService {
   private async createOrUpdate(user: User, repositories: Repository[]) {
     const entities = await Promise.all(
       repositories.map(async (repo) => {
-        let found = await this.repositoryRepository
+        let found = await this.repository
           .createQueryBuilder()
           .where('resource @> :resource', {
             resource: {
@@ -47,7 +47,7 @@ export class RepositoryService {
           .where('user_id = :userId', { userId: user.id })
           .getOne();
         if (!found) {
-          found = await this.repositoryRepository.create({
+          found = await this.repository.create({
             user,
             resource: repo,
           });
@@ -55,6 +55,6 @@ export class RepositoryService {
         return found;
       }),
     );
-    return this.repositoryRepository.save(entities);
+    return this.repository.save(entities);
   }
 }
