@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import { useAuthContext } from '../../contexts/AuthContext';
-import { Drawer, List } from '@material-ui/core';
+import { Drawer, List, IconButton } from '@material-ui/core';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import ItemBox from './itemBox';
 
 interface UserNameProps {
@@ -18,12 +19,6 @@ const useStyles = makeStyles(() => ({
 }));
 
 const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
-  const [open, setOpen] = useState(false);
-
-  const handleDrawer = () => {
-    setOpen(true);
-  };
-
   const styles = useStyles();
   const { state: authState, dispatch } = useAuthContext();
   return (
@@ -37,6 +32,9 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
           classes={{ paper: styles.drawerPaper }}
         >
           <List>
+            <IconButton edge='end'>
+              <ExitToAppIcon />
+            </IconButton>
             <ItemBox
               icon='user'
               primary={UserNameProps.username}

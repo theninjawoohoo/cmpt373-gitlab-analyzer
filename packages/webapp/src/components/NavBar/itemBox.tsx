@@ -11,7 +11,7 @@ interface ListItemBoxProps {
 
 const useStyles = makeStyles(() => ({
   logoutButton: {
-    top: '725px',
+    top: '700px',
   },
 }));
 
