@@ -2,6 +2,7 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
 import Icon from './iconHelper';
+import { Link } from 'react-router-dom';
 
 interface ListItemBoxProps {
   icon: string;
@@ -11,7 +12,8 @@ interface ListItemBoxProps {
 
 const useStyles = makeStyles(() => ({
   logoutButton: {
-    top: '700px',
+    bottom: '-45rem',
+    position: 'absolute',
   },
 }));
 
@@ -21,8 +23,8 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
     return (
       <ListItem
         button
-        component='a'
-        href={ListItemBoxProps.url}
+        component={Link}
+        to={ListItemBoxProps.url}
         className={styles.logoutButton}
       >
         <ListItemIcon>
@@ -34,7 +36,7 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
   }
 
   return (
-    <ListItem button component='a' href={ListItemBoxProps.url}>
+    <ListItem button component={Link} to={ListItemBoxProps.url}>
       <ListItemIcon>
         <Icon icon={ListItemBoxProps.icon}></Icon>
       </ListItemIcon>

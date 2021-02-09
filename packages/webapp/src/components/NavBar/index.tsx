@@ -9,29 +9,31 @@ interface UserNameProps {
   username: string;
 }
 
-const theme = createMuiTheme();
-
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   drawerPaper: {
     width: 'inherit',
     marginTop: theme.spacing(1),
   },
+  listCSS: {
+    position: 'relative',
+  },
 }));
 
 const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
-  const styles = useStyles();
+  const theme = createMuiTheme();
+  const styles = useStyles(theme);
   const { state: authState, dispatch } = useAuthContext();
   return (
     <>
       <div>
         <Drawer
-          style={{ width: '15vw' }}
+          style={{ width: '14rem' }}
           variant='persistent'
           anchor='left'
           open={true}
           classes={{ paper: styles.drawerPaper }}
         >
-          <List>
+          <List className={styles.listCSS}>
             <IconButton edge='end'>
               <ExitToAppIcon />
             </IconButton>
