@@ -57,10 +57,8 @@ function getToken() {
 }
 
 function login(token: string) {
-  console.log({ token });
   axios.defaults.headers['Authorization'] = `Bearer ${token}`;
   localStorage.setItem(LOCAL_STORAGE_KEY, token);
-  localStorage.setItem('hello', 'world');
 }
 
 function logout() {
