@@ -17,17 +17,15 @@ const useStyles = makeStyles(() => ({
 
 const DefaultPageLayout: React.FC = ({ children }) => {
   const styles = useStyles();
-  const { state: authState, dispatch } = useAuthContext();
+  const { user } = useAuthContext();
   const [apiKey, setApiKey] = useState('');
   return (
     <>
       <Container>
-        {authState?.user?.sfuId ? (
-          <>
-            <NavBar username={authState.user.sfuId}></NavBar>
-          </>
+        {user?.sfuId ? (
+          <NavBar username={user.sfuId} />
         ) : (
-          <NavBar username={'Guest'}></NavBar>
+          <NavBar username={'Guest'} />
         )}
       </Container>
       <Box height='4rem' />
