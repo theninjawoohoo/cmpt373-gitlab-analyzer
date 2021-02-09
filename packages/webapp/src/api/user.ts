@@ -1,7 +1,6 @@
 import User from '../types/User';
-import axios from '../util/axios';
+import { useApiQuery } from './base';
 
-export const getProfile = async () => {
-  const response = await axios.get<User>('/user/profile');
-  return response.data;
-};
+export function useProfile() {
+  return useApiQuery<User>('/user/profile');
+}
