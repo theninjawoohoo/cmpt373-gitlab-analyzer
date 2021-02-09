@@ -28,11 +28,11 @@ const Repository: React.FC = () => {
                 <div className={styles.titleWrap}>
                   <div className={styles.stats}>
                     <div>
-                      <StarIcon color='#000' />
+                      <StarIcon color='primary' />
                       <span>{repo.star_count}</span>
                     </div>
                     <div>
-                      <CallSplitIcon color='#000' />
+                      <CallSplitIcon color='primary' />
                       <span>{repo.forks_count}</span>
                     </div>
                   </div>
