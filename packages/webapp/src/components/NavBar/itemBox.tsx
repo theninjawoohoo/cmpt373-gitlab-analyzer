@@ -12,7 +12,7 @@ interface ListItemBoxProps {
 
 const useStyles = makeStyles(() => ({
   logoutButton: {
-    bottom: '-45rem',
+    bottom: '1rem',
     position: 'absolute',
   },
 }));

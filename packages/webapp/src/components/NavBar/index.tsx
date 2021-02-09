@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createMuiTheme, makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { Drawer, List, IconButton } from '@material-ui/core';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
@@ -16,11 +16,12 @@ const useStyles = makeStyles((theme) => ({
   },
   listCSS: {
     position: 'relative',
+    height: '100%',
   },
 }));
 
 const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
-  const theme = createMuiTheme();
+  const theme = useTheme();
   const styles = useStyles(theme);
   const { state: authState, dispatch } = useAuthContext();
   return (
