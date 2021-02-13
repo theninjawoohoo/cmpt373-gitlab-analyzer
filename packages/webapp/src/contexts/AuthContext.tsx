@@ -1,79 +1,72 @@
-import React, { useEffect, useReducer, useContext } from 'react';
-import { getProfile } from '../api/user';
+import React, { useEffect, useContext, useState, useMemo } from 'react';
+import { useProfile } from '../api/user';
 import User from '../types/User';
 import axios from '../util/axios';
 
-interface SetUserAction {
-  type: 'SET_USER';
-  user: User | undefined;
+export function useAuthContext() {
+  return useContext(AuthContext);
 }
 
-interface SaveTokenAction {
-  type: 'SAVE_TOKEN';
-  token: string;
+function useAuthState(): AuthContextState {
+  const { data: user, invalidate, remove } = useProfile();
+  const [token, setToken] = useState<string>();
+  useEffect(() => {
+    void invalidate();
+  }, [token]);
+  useEffect(() => {
+    const savedToken = getToken();
+    if (savedToken) {
+      login(savedToken);
+      setToken(savedToken);
+    }
+  }, []);
+  return useMemo(
+    () => ({
+      user,
+      setToken: (token) => {
+        login(token);
+        setToken(token);
+      },
+      logout: () => {
+        logout();
+        setToken(null);
+        void remove();
+      },
+    }),
+    [user],
+  );
 }
 
-interface LogoutAction {
-  type: 'LOGOUT';
-}
-
-type Action = SetUserAction | SaveTokenAction | LogoutAction;
-
-type State = {
+interface AuthContextState {
   user?: User;
+  setToken: (token: string) => void;
+  logout: () => void;
+}
+
+const authContextDefault: AuthContextState = {
+  setToken: () => null,
+  logout: () => null,
 };
 
-const AuthContext = React.createContext<
-  { state: State; dispatch: React.Dispatch<Action> } | undefined
->(undefined);
-const initialState: State = { user: undefined };
+const AuthContext = React.createContext<AuthContextState>(authContextDefault);
 
-const authReducer = (state: State, action: Action) => {
-  switch (action.type) {
-    case 'SET_USER':
-      return { ...state, user: action.user };
-    case 'SAVE_TOKEN':
-      localStorage.setItem('access_token', action.token);
-      return state;
-    case 'LOGOUT':
-      localStorage.removeItem('access_token');
-      return { ...state, user: undefined };
-    default:
-      return state;
-  }
-};
+const LOCAL_STORAGE_KEY = 'access_token';
+
+function getToken() {
+  return localStorage.getItem(LOCAL_STORAGE_KEY);
+}
+
+function login(token: string) {
+  axios.defaults.headers['Authorization'] = `Bearer ${token}`;
+  localStorage.setItem(LOCAL_STORAGE_KEY, token);
+}
+
+function logout() {
+  axios.defaults.headers['Authorization'] = undefined;
+  localStorage.removeItem(LOCAL_STORAGE_KEY);
+}
 
 export const AuthContextProvider: React.FC = ({ children }) => {
-  const [state, dispatch] = useReducer(authReducer, initialState);
-  useEffect(() => {
-    async function fetchProfileFromStorage() {
-      const accessToken = localStorage.getItem('access_token');
-      if (accessToken) {
-        axios.defaults.headers['Authorization'] = `Bearer ${accessToken}`;
-        try {
-          const profile = await getProfile();
-          dispatch({
-            type: 'SET_USER',
-            user: profile,
-          });
-        } catch (e) {
-          localStorage.removeItem('access_token');
-        }
-      }
-    }
-    void fetchProfileFromStorage();
-  }, [dispatch]);
-  return (
-    <AuthContext.Provider value={{ state, dispatch }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-export const useAuthContext = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('Do not use outside <AuthProvider>');
-  }
-  return context;
+  const value = useAuthState();
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

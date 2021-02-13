@@ -1,8 +1,13 @@
-import axios from '../util/axios';
+import { useApiMutation } from './base';
 
-export const loginSfu = async (ticket: string) => {
-  const response = await axios.post<{
-    access_token?: string;
-  }>('/auth/login/sfu', { ticket });
-  return response.data;
-};
+interface AccessToken {
+  access_token: string;
+}
+
+interface Ticket {
+  ticket: string;
+}
+
+export function useLoginSfu() {
+  return useApiMutation<AccessToken, Ticket>('/auth/login/sfu', 'POST');
+}
