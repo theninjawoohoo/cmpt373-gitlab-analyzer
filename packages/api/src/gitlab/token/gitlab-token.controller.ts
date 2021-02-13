@@ -1,6 +1,6 @@
-import { Body, Controller, Get, HttpCode, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { VerifiedUser } from '../../auth/types/VerifiedUser';
-import { GitlabTokenService } from '../services/gitlab_token.service';
+import { GitlabTokenService } from '../services/gitlab-token.service';
 import { Auth } from '../../auth/decorators/auth.decorator';
 
 @Controller('token')
