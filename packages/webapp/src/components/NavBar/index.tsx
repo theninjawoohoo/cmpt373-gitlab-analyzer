@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { useAuthContext } from '../../contexts/AuthContext';
 import { Drawer, List, IconButton } from '@material-ui/core';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import ItemBox from './itemBox';
@@ -23,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
 const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
   const theme = useTheme();
   const styles = useStyles(theme);
-  const { state: authState, dispatch } = useAuthContext();
   return (
     <>
       <div>
@@ -38,18 +36,10 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
             <IconButton edge='end'>
               <ExitToAppIcon />
             </IconButton>
-            <ItemBox
-              icon='user'
-              primary={UserNameProps.username}
-              url='/'
-            ></ItemBox>
-            <ItemBox icon='repo' primary={'Repository'} url='/home'></ItemBox>
-            <ItemBox
-              icon='setting'
-              primary={'Settings'}
-              url='/settings'
-            ></ItemBox>
-            <ItemBox icon='logout' primary={'Logout'} url='/logout'></ItemBox>
+            <ItemBox icon='user' primary={UserNameProps.username} url='/' />
+            <ItemBox icon='repo' primary={'Repository'} url='/home' />
+            <ItemBox icon='setting' primary={'Settings'} url='/settings' />
+            <ItemBox icon='logout' primary={'Logout'} url='/logout' />
           </List>
         </Drawer>
       </div>

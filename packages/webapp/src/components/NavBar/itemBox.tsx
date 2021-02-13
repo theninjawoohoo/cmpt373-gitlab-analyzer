@@ -28,7 +28,7 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
         className={styles.logoutButton}
       >
         <ListItemIcon>
-          <Icon icon={ListItemBoxProps.icon}></Icon>
+          <Icon icon={ListItemBoxProps.icon} />
         </ListItemIcon>
         <ListItemText primary={ListItemBoxProps.primary} />
       </ListItem>
@@ -38,7 +38,7 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
   return (
     <ListItem button component={Link} to={ListItemBoxProps.url}>
       <ListItemIcon>
-        <Icon icon={ListItemBoxProps.icon}></Icon>
+        <Icon icon={ListItemBoxProps.icon} />
       </ListItemIcon>
       <ListItemText primary={ListItemBoxProps.primary} />
     </ListItem>
