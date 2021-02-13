@@ -1,13 +1,9 @@
-import React, { useState, Dispatch, SetStateAction } from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import { usePostToken } from '../../../api/token';
 
-interface FormProps {
-  apiKey?: string;
-  setApiKey: Dispatch<SetStateAction<string>>;
-  handleClose: () => void;
-}
 const useStyles = makeStyles((theme) => ({
   root: {
     '& > *': {
@@ -27,21 +23,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Form: React.FC<FormProps> = (FormProps) => {
+const Form: React.FC = () => {
   const classes = useStyles();
   const [apiKey, setApiKey] = useState('');
+  const { mutate } = usePostToken();
+
   const changeApiKey = (event: any) => {
     setApiKey(event.target.value);
   };
   const handleSubmit = (event: any) => {
     event.preventDefault();
-    FormProps.handleClose();
-    const data = apiKey;
-    fetch('/api/api-key', {
-      method: 'POST',
-      body: data,
-    });
-    FormProps.setApiKey(apiKey);
+    mutate({ token: apiKey });
   };
 
   return (

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
 import { useAuthContext } from '../../contexts/AuthContext';
@@ -22,7 +21,6 @@ const useStyles = makeStyles(() => ({
 const DefaultPageLayout: React.FC = ({ children }) => {
   const { user } = useAuthContext();
   const styles = useStyles();
-  const [apiKey, setApiKey] = useState('');
   return (
     <div className={styles.gridDimensions}>
       {user?.sfuId ? (
@@ -34,7 +32,7 @@ const DefaultPageLayout: React.FC = ({ children }) => {
       )}
       {children}
       <Repository />
-      <APIKeyModal apiKey={apiKey} setApiKey={setApiKey} />
+      <APIKeyModal />
     </div>
   );
 };

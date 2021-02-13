@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState, useMemo } from 'react';
 import { useProfile } from '../api/user';
-import User from '../types/User';
+import { User } from '@ceres/types';
 import axios from '../util/axios';
 
 export function useAuthContext() {
