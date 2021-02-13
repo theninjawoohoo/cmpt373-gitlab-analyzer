@@ -1,4 +1,4 @@
-import User from '../types/User';
+import { User } from '@ceres/types';
 import { useApiQuery } from './base';
 
 export function useProfile() {
