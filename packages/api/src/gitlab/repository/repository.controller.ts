@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { Controller, Get, HttpCode, Param, Post } from '@nestjs/common';
 import { RepositoryService } from './repository.service';
 import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
 import { Auth } from '../../auth/decorators/auth.decorator';
@@ -19,7 +19,11 @@ export class RepositoryController {
   }
 
   @Post()
-  fetchRepositories(@Auth() user: VerifiedUser, @GitlabToken() token: string) {
-    return this.repositoryService.fetchForUser(user.user, token);
+  @HttpCode(204)
+  async fetchRepositories(
+    @Auth() user: VerifiedUser,
+    @GitlabToken() token: string,
+  ) {
+    await this.repositoryService.fetchForUser(user.user, token);
   }
 }

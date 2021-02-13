@@ -24,14 +24,13 @@ export class RepositoryService {
   }
 
   async fetchForUser(user: User, token: string) {
-    const axiosResponse = await this.httpService
-      .get<Repository[]>('/projects?membership=true', {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-      })
-      .toPromise();
-    return this.createOrUpdate(user, axiosResponse.data);
+    let repositories: Repository[] = [];
+    let page = 1;
+    do {
+      repositories = await this.fetchByPage(token, page);
+      await this.createOrUpdate(user, repositories);
+      page++;
+    } while (repositories.length > 0);
   }
 
   private async createOrUpdate(user: User, repositories: Repository[]) {
@@ -58,5 +57,24 @@ export class RepositoryService {
       }),
     );
     return this.repository.save(entities);
+  }
+
+  private async fetchByPage(
+    token: string,
+    page: number,
+  ): Promise<Repository[]> {
+    const axiosResponse = await this.httpService
+      .get<Repository[]>('/projects', {
+        headers: {
+          'PRIVATE-TOKEN': token,
+        },
+        params: {
+          membership: true,
+          per_page: 10,
+          page,
+        },
+      })
+      .toPromise();
+    return axiosResponse.data;
   }
 }
