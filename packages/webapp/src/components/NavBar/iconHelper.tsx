@@ -4,6 +4,9 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import AppsIcon from '@material-ui/icons/Apps';
 import ErrorIcon from '@material-ui/icons/Error';
+import MergeType from '@material-ui/icons/MergeType';
+import InsertChart from '@material-ui/icons/InsertChart';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 
 export default function Icon(props: any) {
   switch (props.icon) {
@@ -15,6 +18,14 @@ export default function Icon(props: any) {
       return <ExitToAppIcon />;
     case 'repo':
       return <AppsIcon />;
+    case 'collapse':
+      return <ExitToAppIcon />;
+    case 'graph':
+      return <InsertChart />;
+    case 'merge':
+      return <MergeType />;
+    case 'commit':
+      return <ArrowUpwardIcon />;
   }
   return <ErrorIcon />;
 }
