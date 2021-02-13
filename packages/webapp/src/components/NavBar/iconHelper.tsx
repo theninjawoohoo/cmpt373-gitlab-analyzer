@@ -8,13 +8,13 @@ import ErrorIcon from '@material-ui/icons/Error';
 export default function Icon(props: any) {
   switch (props.icon) {
     case 'user':
-      return <PersonIcon></PersonIcon>;
+      return <PersonIcon />;
     case 'setting':
-      return <SettingsIcon></SettingsIcon>;
+      return <SettingsIcon />;
     case 'logout':
-      return <ExitToAppIcon></ExitToAppIcon>;
+      return <ExitToAppIcon />;
     case 'repo':
-      return <AppsIcon></AppsIcon>;
+      return <AppsIcon />;
   }
-  return <ErrorIcon></ErrorIcon>;
+  return <ErrorIcon />;
 }
