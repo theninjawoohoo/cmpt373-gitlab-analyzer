@@ -1,6 +1,4 @@
-import Box from '@material-ui/core/Box';
 import { useState } from 'react';
-import Grid from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
 import { useAuthContext } from '../../contexts/AuthContext';
@@ -22,17 +20,17 @@ const useStyles = makeStyles(() => ({
 }));
 
 const DefaultPageLayout: React.FC = ({ children }) => {
+  const { user } = useAuthContext();
   const styles = useStyles();
-  const { state: authState, dispatch } = useAuthContext();
   const [apiKey, setApiKey] = useState('');
   return (
     <div className={styles.gridDimensions}>
-      {authState?.user?.sfuId ? (
+      {user?.sfuId ? (
         <>
-          <NavBar username={authState.user.sfuId}></NavBar>
+          <NavBar username={user.sfuId} />
         </>
       ) : (
-        <NavBar username={'Guest'}></NavBar>
+        <NavBar username={'Guest'} />
       )}
       {children}
       <Repository />

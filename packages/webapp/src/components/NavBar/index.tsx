@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useState } from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { useAuthContext } from '../../contexts/AuthContext';
 import { ListItem, List } from '@material-ui/core';
 import ItemBox from './itemBox';
 
@@ -25,7 +25,6 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
   const theme = useTheme();
   const styles = useStyles(theme);
   const [open, setOpen] = useState(false);
-  const { state: authState, dispatch } = useAuthContext();
   return (
     <>
       <div
@@ -34,27 +33,15 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
       >
         <List className={styles.listCSS}>
           <ListItem button onClick={() => setOpen(!open)}>
-            <ItemBox icon='collapse' primary={'Collapse'} url='nil'></ItemBox>
+            <ItemBox icon='collapse' primary={'Collapse'} url='nil' />
           </ListItem>
-          <ItemBox
-            icon='user'
-            primary={UserNameProps.username}
-            url='/'
-          ></ItemBox>
-          <ItemBox icon='repo' primary={'Repository'} url='/home'></ItemBox>
-          <ItemBox icon='graph' primary={'Graph'} url='/graph'></ItemBox>
-          <ItemBox
-            icon='merge'
-            primary={'Merge Reqests'}
-            url='/merge'
-          ></ItemBox>
-          <ItemBox icon='commit' primary={'Commits'} url='/commits'></ItemBox>
-          <ItemBox
-            icon='setting'
-            primary={'Settings'}
-            url='/settings'
-          ></ItemBox>
-          <ItemBox icon='logout' primary={'Logout'} url='/logout'></ItemBox>
+          <ItemBox icon='user' primary={UserNameProps.username} url='/' />
+          <ItemBox icon='repo' primary={'Repository'} url='/home' />
+          <ItemBox icon='graph' primary={'Graph'} url='/graph' />
+          <ItemBox icon='merge' primary={'Merge Reqests'} url='/merge' />
+          <ItemBox icon='commit' primary={'Commits'} url='/commits' />
+          <ItemBox icon='setting' primary={'Settings'} url='/settings' />
+          <ItemBox icon='logout' primary={'Logout'} url='/logout' />
         </List>
       </div>
     </>

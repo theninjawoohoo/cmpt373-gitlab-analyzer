@@ -1,3 +1,6 @@
 packages/*/dist
+packages/*/build
 packages/*/node_modules
+packages/*/.eslintcache
+node_modules
 lerna-debug.log

@@ -21,9 +21,14 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
   const styles = useStyles();
   if (ListItemBoxProps.primary == 'Logout') {
     return (
-      <ListItem button component={Link} to={ListItemBoxProps.url}>
+      <ListItem
+        button
+        component={Link}
+        to={ListItemBoxProps.url}
+        className={styles.logoutButton}
+      >
         <ListItemIcon>
-          <Icon icon={ListItemBoxProps.icon}></Icon>
+          <Icon icon={ListItemBoxProps.icon} />
         </ListItemIcon>
         <ListItemText primary={ListItemBoxProps.primary} />
       </ListItem>
@@ -32,7 +37,7 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
     return (
       <>
         <ListItemIcon>
-          <Icon icon={ListItemBoxProps.icon}></Icon>
+          <Icon icon={ListItemBoxProps.icon} />
         </ListItemIcon>
         <ListItemText primary={ListItemBoxProps.primary} />
       </>
@@ -42,7 +47,7 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
   return (
     <ListItem button component={Link} to={ListItemBoxProps.url}>
       <ListItemIcon>
-        <Icon icon={ListItemBoxProps.icon}></Icon>
+        <Icon icon={ListItemBoxProps.icon} />
       </ListItemIcon>
       <ListItemText primary={ListItemBoxProps.primary} />
     </ListItem>

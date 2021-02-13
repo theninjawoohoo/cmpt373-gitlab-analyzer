@@ -1,16 +1,10 @@
 build_image:
   stage: build
   script:
-    - docker build -t api:${CI_COMMIT_SHORT_SHA} -f packages/api/Dockerfile .
-
-run_tests:
-  stage: test
-  script:
-    - docker run -t api:${CI_COMMIT_SHORT_SHA} npm run lint
-    - docker run -t api:${CI_COMMIT_SHORT_SHA} npm test
+    - docker build -t ci-build:${CI_COMMIT_SHORT_SHA} -f devops/docker/Dockerfile .
 
 clean_up:
   stage: .post
   script:
     - docker container prune -f
-    - docker image rm api:${CI_COMMIT_SHORT_SHA}
+    - docker image rm ci-build:${CI_COMMIT_SHORT_SHA}

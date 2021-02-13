@@ -4,6 +4,7 @@
   "scripts": {
     "bootstrap": "lerna bootstrap --no-ci",
     "bootstrap:ci": "lerna bootstrap --ci",
+    "build": "lerna run build",
     "format": "lerna run --parallel format",
     "link": "lerna link",
     "lint": "lerna run --parallel lint"
