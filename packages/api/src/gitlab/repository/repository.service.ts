@@ -27,7 +27,7 @@ export class RepositoryService {
     let repositories: Repository[] = [];
     let page = 1;
     do {
-      repositories = await this.fetchRepositories(token, page);
+      repositories = await this.fetchByPage(token, page);
       await this.createOrUpdate(user, repositories);
       page++;
     } while (repositories.length > 0);
@@ -59,7 +59,7 @@ export class RepositoryService {
     return this.repository.save(entities);
   }
 
-  private async fetchRepositories(
+  private async fetchByPage(
     token: string,
     page: number,
   ): Promise<Repository[]> {
