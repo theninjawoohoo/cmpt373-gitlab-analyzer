@@ -1,6 +1,6 @@
 import Box from '@material-ui/core/Box';
 import { useState } from 'react';
-import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
 import { useAuthContext } from '../../contexts/AuthContext';
@@ -13,6 +13,12 @@ const useStyles = makeStyles(() => ({
     flexGrow: 1,
     fontSize: '2rem',
   },
+
+  gridDimensions: {
+    minHeight: '100vh',
+    display: 'grid',
+    gridTemplateColumns: 'auto 1fr',
+  },
 }));
 
 const DefaultPageLayout: React.FC = ({ children }) => {
@@ -20,21 +26,18 @@ const DefaultPageLayout: React.FC = ({ children }) => {
   const { state: authState, dispatch } = useAuthContext();
   const [apiKey, setApiKey] = useState('');
   return (
-    <>
-      <Container>
-        {authState?.user?.sfuId ? (
-          <>
-            <NavBar username={authState.user.sfuId}></NavBar>
-          </>
-        ) : (
-          <NavBar username={'Guest'}></NavBar>
-        )}
-      </Container>
-      <Box height='4rem' />
+    <div className={styles.gridDimensions}>
+      {authState?.user?.sfuId ? (
+        <>
+          <NavBar username={authState.user.sfuId}></NavBar>
+        </>
+      ) : (
+        <NavBar username={'Guest'}></NavBar>
+      )}
       {children}
-      <APIKeyModal apiKey={apiKey} setApiKey={setApiKey} />
       <Repository />
-    </>
+      <APIKeyModal apiKey={apiKey} setApiKey={setApiKey} />
+    </div>
   );
 };
 

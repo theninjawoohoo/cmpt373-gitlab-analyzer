@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { useAuthContext } from '../../contexts/AuthContext';
-import { Drawer, List, IconButton } from '@material-ui/core';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import { ListItem, List } from '@material-ui/core';
 import ItemBox from './itemBox';
 
 interface UserNameProps {
@@ -10,11 +9,13 @@ interface UserNameProps {
 }
 
 const useStyles = makeStyles((theme) => ({
-  drawerPaper: {
-    width: 'inherit',
-    marginTop: theme.spacing(1),
+  root: {
+    transition: theme.transitions.create('width'),
+    overflow: 'hidden',
   },
+
   listCSS: {
+    width: '14rem',
     position: 'relative',
     height: '100%',
   },
@@ -23,35 +24,38 @@ const useStyles = makeStyles((theme) => ({
 const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
   const theme = useTheme();
   const styles = useStyles(theme);
+  const [open, setOpen] = useState(false);
   const { state: authState, dispatch } = useAuthContext();
   return (
     <>
-      <div>
-        <Drawer
-          style={{ width: '14rem' }}
-          variant='persistent'
-          anchor='left'
-          open={true}
-          classes={{ paper: styles.drawerPaper }}
-        >
-          <List className={styles.listCSS}>
-            <IconButton edge='end'>
-              <ExitToAppIcon />
-            </IconButton>
-            <ItemBox
-              icon='user'
-              primary={UserNameProps.username}
-              url='/'
-            ></ItemBox>
-            <ItemBox icon='repo' primary={'Repository'} url='/home'></ItemBox>
-            <ItemBox
-              icon='setting'
-              primary={'Settings'}
-              url='/settings'
-            ></ItemBox>
-            <ItemBox icon='logout' primary={'Logout'} url='/logout'></ItemBox>
-          </List>
-        </Drawer>
+      <div
+        style={open ? { width: '14rem' } : { width: '4rem' }}
+        className={styles.root}
+      >
+        <List className={styles.listCSS}>
+          <ListItem button onClick={() => setOpen(!open)}>
+            <ItemBox icon='collapse' primary={'Collapse'} url='nil'></ItemBox>
+          </ListItem>
+          <ItemBox
+            icon='user'
+            primary={UserNameProps.username}
+            url='/'
+          ></ItemBox>
+          <ItemBox icon='repo' primary={'Repository'} url='/home'></ItemBox>
+          <ItemBox icon='graph' primary={'Graph'} url='/graph'></ItemBox>
+          <ItemBox
+            icon='merge'
+            primary={'Merge Reqests'}
+            url='/merge'
+          ></ItemBox>
+          <ItemBox icon='commit' primary={'Commits'} url='/commits'></ItemBox>
+          <ItemBox
+            icon='setting'
+            primary={'Settings'}
+            url='/settings'
+          ></ItemBox>
+          <ItemBox icon='logout' primary={'Logout'} url='/logout'></ItemBox>
+        </List>
       </div>
     </>
   );

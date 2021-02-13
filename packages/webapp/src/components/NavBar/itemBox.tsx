@@ -21,17 +21,21 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
   const styles = useStyles();
   if (ListItemBoxProps.primary == 'Logout') {
     return (
-      <ListItem
-        button
-        component={Link}
-        to={ListItemBoxProps.url}
-        className={styles.logoutButton}
-      >
+      <ListItem button component={Link} to={ListItemBoxProps.url}>
         <ListItemIcon>
           <Icon icon={ListItemBoxProps.icon}></Icon>
         </ListItemIcon>
         <ListItemText primary={ListItemBoxProps.primary} />
       </ListItem>
+    );
+  } else if (ListItemBoxProps.primary == 'Collapse') {
+    return (
+      <>
+        <ListItemIcon>
+          <Icon icon={ListItemBoxProps.icon}></Icon>
+        </ListItemIcon>
+        <ListItemText primary={ListItemBoxProps.primary} />
+      </>
     );
   }
 
