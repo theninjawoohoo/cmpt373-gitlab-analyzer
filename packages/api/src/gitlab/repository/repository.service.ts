@@ -13,7 +13,7 @@ export class RepositoryService {
     private readonly repository: TypeORMRepository<RepositoryEntity>,
   ) {}
 
-  async findAll(user: User) {
+  async findAllForUser(user: User) {
     return this.repository.find({ where: { user } });
   }
 

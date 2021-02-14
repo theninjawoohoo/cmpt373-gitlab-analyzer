@@ -22,13 +22,19 @@ export class RepositoryController {
     await this.repositoryMemberService.syncForRepository(repository, token);
   }
 
+  @Get('/:id/members')
+  async findProjectMembers(@Param('id') id: string) {
+    const repository = await this.repositoryService.findOne(id);
+    return this.repositoryMemberService.findAllForRepository(repository);
+  }
+
   @Get()
-  getAllRepositories(@Auth() user: VerifiedUser) {
-    return this.repositoryService.findAll(user.user);
+  findAllForUser(@Auth() user: VerifiedUser) {
+    return this.repositoryService.findAllForUser(user.user);
   }
 
   @Get(':id')
-  getRepositoryById(@Param('id') repoId: string) {
+  findOne(@Param('id') repoId: string) {
     return this.repositoryService.findOne(repoId);
   }
 

@@ -18,6 +18,12 @@ export class RepositoryMemberService {
     return this.createOrUpdate(members, repository);
   }
 
+  async findAllForRepository(repository: Repository) {
+    return this.memberRepository.find({
+      where: { repository: repository },
+    });
+  }
+
   private async createOrUpdate(
     members: RepositoryMember[],
     repository: Repository,
