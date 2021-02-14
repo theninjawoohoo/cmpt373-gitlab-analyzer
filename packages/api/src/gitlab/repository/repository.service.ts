@@ -17,9 +17,9 @@ export class RepositoryService {
     return this.repository.find({ where: { user } });
   }
 
-  async findOne(user: User, id: string) {
+  async findOne(id: string) {
     return this.repository.findOne({
-      where: { user, id },
+      where: { id },
     });
   }
 
