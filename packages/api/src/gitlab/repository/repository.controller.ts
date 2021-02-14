@@ -1,4 +1,5 @@
 import { Controller, Get, HttpCode, Param, Post } from '@nestjs/common';
+import { RepositoryMemberService } from './repository-member/repository-member.service';
 import { RepositoryService } from './repository.service';
 import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
 import { Auth } from '../../auth/decorators/auth.decorator';
@@ -6,16 +7,35 @@ import { VerifiedUser } from '../../auth/types/VerifiedUser';
 
 @Controller('repository')
 export class RepositoryController {
-  constructor(private readonly repositoryService: RepositoryService) {}
+  constructor(
+    private readonly repositoryService: RepositoryService,
+    private readonly repositoryMemberService: RepositoryMemberService,
+  ) {}
+
+  @Post(':id/members/sync')
+  @HttpCode(204)
+  async syncProjectMembers(
+    @Param('id') id: string,
+    @GitlabToken() token: string,
+  ) {
+    const repository = await this.repositoryService.findOne(id);
+    await this.repositoryMemberService.syncForRepository(repository, token);
+  }
+
+  @Get('/:id/members')
+  async findProjectMembers(@Param('id') id: string) {
+    const repository = await this.repositoryService.findOne(id);
+    return this.repositoryMemberService.findAllForRepository(repository);
+  }
 
   @Get()
-  getAllRepositories(@Auth() user: VerifiedUser) {
-    return this.repositoryService.findAll(user.user);
+  findAllForUser(@Auth() user: VerifiedUser) {
+    return this.repositoryService.findAllForUser(user.user);
   }
 
   @Get(':id')
-  getRepositoryById(@Auth() user: VerifiedUser, @Param('id') repoId: string) {
-    return this.repositoryService.findOne(user.user, repoId);
+  findOne(@Param('id') repoId: string) {
+    return this.repositoryService.findOne(repoId);
   }
 
   @Post()
