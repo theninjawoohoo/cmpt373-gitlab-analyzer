@@ -1,4 +1,3 @@
-import { Operation } from '@ceres/types';
 import { Body, Controller, Post } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { Auth } from '../auth/decorators/auth.decorator';
