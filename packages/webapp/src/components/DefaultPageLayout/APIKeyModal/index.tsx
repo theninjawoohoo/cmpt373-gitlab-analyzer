@@ -23,14 +23,7 @@ const useStyles = makeStyles((theme) => ({
 const APIKeyModal: React.FC = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
-  const { data: tokenVerified, invalidate } = useVerifyToken();
-
-  useEffect(() => {
-    const interval = setInterval(invalidate, 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  const { data: tokenVerified } = useVerifyToken();
 
   useEffect(() => {
     if (tokenVerified?.verified) {
