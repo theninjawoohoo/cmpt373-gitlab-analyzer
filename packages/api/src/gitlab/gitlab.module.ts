@@ -4,9 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GitlabToken } from './entities/gitlab-token.entity';
 import { GitlabTokenController } from './token/gitlab-token.controller';
 import { RepositoryModule } from './repository/repository.module';
+import { MergeRequestModule } from './mergeRequest/mergeRequest.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([GitlabToken]), RepositoryModule],
+  imports: [TypeOrmModule.forFeature([GitlabToken]), RepositoryModule, MergeRequestModule],
   controllers: [GitlabTokenController],
   providers: [GitlabTokenService],
   exports: [GitlabTokenService],
