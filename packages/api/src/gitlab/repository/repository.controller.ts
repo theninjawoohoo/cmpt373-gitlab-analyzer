@@ -1,4 +1,12 @@
-import { Controller, Get, HttpCode, Param, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  NotFoundException,
+  Param,
+  Post,
+} from '@nestjs/common';
+import { IdParam } from '../../common/id-param';
 import { RepositoryMemberService } from './repository-member/repository-member.service';
 import { RepositoryService } from './repository.service';
 import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
@@ -23,7 +31,7 @@ export class RepositoryController {
   }
 
   @Get('/:id/members')
-  async findProjectMembers(@Param('id') id: string) {
+  async findProjectMembers(@Param() { id }: IdParam) {
     const repository = await this.repositoryService.findOne(id);
     return this.repositoryMemberService.findAllForRepository(repository);
   }
@@ -34,8 +42,12 @@ export class RepositoryController {
   }
 
   @Get(':id')
-  findOne(@Param('id') repoId: string) {
-    return this.repositoryService.findOne(repoId);
+  async findOne(@Param() { id }: IdParam) {
+    const repo = await this.repositoryService.findOne(id);
+    if (repo) {
+      return repo;
+    }
+    throw new NotFoundException(`Could not find a repository with id: ${id}`);
   }
 
   @Post()
