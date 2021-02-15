@@ -2,8 +2,9 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Box,
+  Typography,
 } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
 import { ExpandMore } from '@material-ui/icons';
 import React from 'react';
 import Root from './components/root';
@@ -36,10 +37,26 @@ const LINE_COLOR_MAP = {
 
 const LineRenderer: React.FC<{ line: Line }> = ({ line }) => {
   if (line.type === 'blank') {
-    return <p />;
+    return <Box />;
   }
   const color = LINE_COLOR_MAP[line.type];
-  return <p style={{ color, margin: '0' }}>{line.content}</p>;
+  return (
+    <Box display='flex' alignItems='center'>
+      <Box component={Typography} width='2rem'>
+        {line.lineNumber}
+      </Box>
+      <pre
+        style={{
+          color,
+          margin: '0',
+          whiteSpace: 'pre-wrap',
+          wordWrap: 'break-word',
+        }}
+      >
+        {line.content}
+      </pre>
+    </Box>
+  );
 };
 
 function computeLines(hunk: Hunk) {
@@ -121,15 +138,13 @@ const DiffView: React.FC<DiffViewProps> = ({ fileName, hunks }) => {
                 {lines.map((line) => {
                   return (
                     <>
-                      <pre style={{ margin: '0' }}>
-                        <LineRenderer line={line.left} />
-                      </pre>
-                      <pre style={{ margin: '0' }}>
-                        <LineRenderer line={line.right} />
-                      </pre>
+                      <LineRenderer line={line.left} />
+                      <LineRenderer line={line.right} />
                     </>
                   );
                 })}
+                <div>...</div>
+                <div>...</div>
               </>
             );
           })}
