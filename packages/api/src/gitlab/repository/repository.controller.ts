@@ -43,7 +43,7 @@ export class RepositoryController {
   @Get('/:id/commits')
   async getProjectCommits(@Param('id') id: string) {
     const repository = await this.repositoryService.findOne(id);
-    return this.repositoryMemberService.findAllForRepository(repository);
+    return this.commitService.findAllForRepository(repository);
   }
 
   @Get()
