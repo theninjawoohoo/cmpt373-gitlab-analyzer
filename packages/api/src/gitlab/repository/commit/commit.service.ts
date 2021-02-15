@@ -23,24 +23,23 @@ export class CommitService {
     let commits: Commit[] = [];
     let page = 1;
     do {
-      commits = await this.fetchByPage(repository.id, token, page);
+      commits = await this.fetchByPage(token, page, repository);
       await this.createOrUpdate(repository, commits);
       page++;
     } while (commits.length > 0);
   }
 
   private async fetchByPage(
-    repoId: string,
     token: string,
     page: number,
+    repo: Repository,
   ): Promise<Commit[]> {
     const axiosResponse = await this.httpService
-      .get<Commit[]>(`/projects/${repoId}/repository/commits`, {
+      .get<Commit[]>(`projects/${repo.resource.id}/repository/commits`, {
         headers: {
           'PRIVATE-TOKEN': token,
         },
         params: {
-          membership: true,
           per_page: 10,
           page,
         },

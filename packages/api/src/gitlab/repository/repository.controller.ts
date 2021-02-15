@@ -44,7 +44,6 @@ export class RepositoryController {
     @Param() { id }: IdParam,
     @GitlabToken() token: string,
   ) {
-    console.log('inside commits/sync');
     const repository = await this.repositoryService.findOne(id);
     await this.commitService.fetchForRepository(repository, token);
   }
