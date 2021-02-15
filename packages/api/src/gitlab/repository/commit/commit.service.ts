@@ -35,15 +35,18 @@ export class CommitService {
     repo: Repository,
   ): Promise<Commit[]> {
     const axiosResponse = await this.httpService
-      .get<Commit[]>(`projects/${repo.resource.id}/repository/commits`, {
-        headers: {
-          'PRIVATE-TOKEN': token,
+      .get<Commit[]>(
+        `projects/${repo.resource.id}/repository/commits?ref_name=master`,
+        {
+          headers: {
+            'PRIVATE-TOKEN': token,
+          },
+          params: {
+            per_page: 10,
+            page,
+          },
         },
-        params: {
-          per_page: 10,
-          page,
-        },
-      })
+      )
       .toPromise();
     return axiosResponse.data;
   }

@@ -39,7 +39,6 @@ export class RepositoryController {
   }
 
   @Post(':id/commits/sync')
-  @HttpCode(204)
   async syncProjectCommits(
     @Param() { id }: IdParam,
     @GitlabToken() token: string,
