@@ -14,8 +14,9 @@ interface DiffViewProps {
 }
 
 interface Line {
-  type: 'added' | 'deleted' | 'unchanged';
-  content: string;
+  type: 'added' | 'deleted' | 'unchanged' | 'blank';
+  content?: string;
+  lineNumber?: number;
 }
 
 export interface Hunk {
@@ -34,32 +35,77 @@ const LINE_COLOR_MAP = {
 };
 
 const LineRenderer: React.FC<{ line: Line }> = ({ line }) => {
+  if (line.type === 'blank') {
+    return <p />;
+  }
   const color = LINE_COLOR_MAP[line.type];
-  return <p style={{ color }}>{line.content}</p>;
+  return <p style={{ color, margin: '0' }}>{line.content}</p>;
 };
 
-function computeLines(hunks: Hunk) {
-  const left = [] as Line[];
-  const right = [] as Line[];
-  hunks.lines.forEach((line) => {
+function computeLines(hunk: Hunk) {
+  let leftLineNumber = hunk.oldStart;
+  let rightLineNumber = hunk.newStart;
+  const lines = [] as { left: Line; right: Line }[];
+  for (let i = 0; i < hunk.lines.length; i++) {
+    const line = hunk.lines[i];
     const firstChar = line.charAt(0);
     const restOfLine = line.substr(1);
     if (firstChar === '+') {
-      right.push({ type: 'added', content: restOfLine });
+      lines.push({
+        left: { type: 'blank' },
+        right: {
+          type: 'added',
+          content: restOfLine,
+          lineNumber: rightLineNumber++,
+        },
+      });
     } else if (firstChar === '-') {
-      left.push({ type: 'deleted', content: restOfLine });
+      let j = i;
+      let currentLine = hunk.lines[i];
+      const left = [] as Line[];
+      const right = [] as Line[];
+      while (currentLine?.charAt(0) === '-') {
+        left.push({
+          type: 'deleted',
+          content: currentLine.substr(1),
+          lineNumber: leftLineNumber++,
+        });
+        currentLine = hunk.lines[++j];
+      }
+      while (currentLine?.charAt(0) === '+') {
+        right.push({
+          type: 'added',
+          content: currentLine.substr(1),
+          lineNumber: rightLineNumber++,
+        });
+        currentLine = hunk.lines[++j];
+      }
+      const max = Math.max(left.length, right.length);
+      for (let m = 0; m < max; m++) {
+        lines.push({
+          left: left[m] || { type: 'blank' },
+          right: right[m] || { type: 'blank' },
+        });
+      }
+      i = j - 1;
     } else {
-      left.push({ type: 'unchanged', content: restOfLine });
-      right.push({ type: 'unchanged', content: restOfLine });
+      lines.push({
+        left: {
+          type: 'unchanged',
+          content: restOfLine,
+          lineNumber: leftLineNumber++,
+        },
+        right: {
+          type: 'unchanged',
+          content: restOfLine,
+          lineNumber: rightLineNumber++,
+        },
+      });
     }
-  });
-  return {
-    left,
-    right,
-  };
+  }
+  return lines;
 }
 
-// eslint-disable-next-line react/prop-types
 const DiffView: React.FC<DiffViewProps> = ({ fileName, hunks }) => {
   return (
     <Accordion>
@@ -69,19 +115,21 @@ const DiffView: React.FC<DiffViewProps> = ({ fileName, hunks }) => {
       <AccordionDetails>
         <Root>
           {hunks.map((hunk) => {
-            const { left, right } = computeLines(hunk);
+            const lines = computeLines(hunk);
             return (
               <>
-                <pre>
-                  {left.map((line) => (
-                    <LineRenderer key={line.content} line={line} />
-                  ))}
-                </pre>
-                <pre>
-                  {right.map((line) => (
-                    <LineRenderer key={line.content} line={line} />
-                  ))}
-                </pre>
+                {lines.map((line) => {
+                  return (
+                    <>
+                      <pre style={{ margin: '0' }}>
+                        <LineRenderer line={line.left} />
+                      </pre>
+                      <pre style={{ margin: '0' }}>
+                        <LineRenderer line={line.right} />
+                      </pre>
+                    </>
+                  );
+                })}
               </>
             );
           })}
