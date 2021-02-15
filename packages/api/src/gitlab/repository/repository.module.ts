@@ -15,5 +15,6 @@ import { CommitService } from './commit/commit.service';
   ],
   providers: [RepositoryService, RepositoryMemberService, CommitService],
   controllers: [RepositoryController],
+  exports: [RepositoryService],
 })
 export class RepositoryModule {}
