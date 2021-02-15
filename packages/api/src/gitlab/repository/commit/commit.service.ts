@@ -19,7 +19,7 @@ export class CommitService {
     });
   }
 
-  private async fetchForRepository(repository: Repository, token: string) {
+  async fetchForRepository(repository: Repository, token: string) {
     let commits: Commit[] = [];
     let page = 1;
     do {

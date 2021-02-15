@@ -45,7 +45,7 @@ export class RepositoryController {
     @GitlabToken() token: string,
   ) {
     const repository = await this.repositoryService.findOne(id);
-    await this.commitService.syncForRepository(repository, token);
+    await this.commitService.fetchForRepository(repository, token);
   }
 
   @Get('/:id/commits')
