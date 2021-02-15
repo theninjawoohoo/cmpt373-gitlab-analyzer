@@ -41,15 +41,16 @@ export class RepositoryController {
   @Post(':id/commits/sync')
   @HttpCode(204)
   async syncProjectCommits(
-    @Param('id') id: string,
+    @Param() { id }: IdParam,
     @GitlabToken() token: string,
   ) {
+    console.log('inside commits/sync');
     const repository = await this.repositoryService.findOne(id);
     await this.commitService.fetchForRepository(repository, token);
   }
 
   @Get('/:id/commits')
-  async getProjectCommits(@Param('id') id: string) {
+  async fetchCommits(@Param() { id }: IdParam) {
     const repository = await this.repositoryService.findOne(id);
     return this.commitService.findAllForRepository(repository);
   }
