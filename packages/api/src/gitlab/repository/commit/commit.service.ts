@@ -1,6 +1,7 @@
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Commit, Commit as CommitEntity } from './commit.entity';
+import { Commit as CommitEntity } from './commit.entity';
+import { Commit } from '@ceres/types';
 import { Repository as TypeORMCommit } from 'typeorm';
 import { Repository } from '../repository.entity';
 
@@ -43,7 +44,6 @@ export class CommitService {
             resource: commit,
           });
         } else {
-          // TODO: not sure how to fix the line below...
           found.resource = commit;
         }
         return found;
