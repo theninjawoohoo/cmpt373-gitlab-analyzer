@@ -13,18 +13,43 @@ export class CommitService {
     private readonly commitRepository: TypeORMCommit<CommitEntity>,
   ) {}
 
-  async syncForRepository(repository: Repository, token: string) {
-    const commits = await this.fetchForRepository(repository, token);
-    return this.createOrUpdate(commits, repository);
-  }
-
   async findAllForRepository(repository: Repository) {
     return this.commitRepository.find({
       where: { repository: repository },
     });
   }
 
-  private async createOrUpdate(commits: Commit[], repository: Repository) {
+  private async fetchForRepository(repository: Repository, token: string) {
+    let commits: Commit[] = [];
+    let page = 1;
+    do {
+      commits = await this.fetchByPage(repository.id, token, page);
+      await this.createOrUpdate(repository, commits);
+      page++;
+    } while (commits.length > 0);
+  }
+
+  private async fetchByPage(
+    repoId: string,
+    token: string,
+    page: number,
+  ): Promise<Commit[]> {
+    const axiosResponse = await this.httpService
+      .get<Commit[]>(`/projects/${repoId}/repository/commits`, {
+        headers: {
+          'PRIVATE-TOKEN': token,
+        },
+        params: {
+          membership: true,
+          per_page: 10,
+          page,
+        },
+      })
+      .toPromise();
+    return axiosResponse.data;
+  }
+
+  private async createOrUpdate(repository: Repository, commits: Commit[]) {
     const entities = await Promise.all(
       commits.map(async (commit) => {
         let found = await this.commitRepository
@@ -50,20 +75,5 @@ export class CommitService {
       }),
     );
     return this.commitRepository.save(entities);
-  }
-
-  private async fetchForRepository(repository: Repository, token: string) {
-    const url = `/projects/${repository.resource.id}/repository/commits`;
-    const axiosResponse = await this.httpService
-      .get<Commit[]>(url, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: 50,
-        },
-      })
-      .toPromise();
-    return axiosResponse.data;
   }
 }
