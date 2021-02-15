@@ -5,8 +5,11 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
 import { IdParam } from '../../common/id-param';
+import { paginatedToResponse } from '../../common/pagination';
+import { QueryDto } from '../../common/query-dto';
 import { RepositoryMemberService } from './repository-member/repository-member.service';
 import { RepositoryService } from './repository.service';
 import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
@@ -54,8 +57,9 @@ export class RepositoryController {
   }
 
   @Get()
-  findAllForUser(@Auth() user: VerifiedUser) {
-    return this.repositoryService.findAllForUser(user.user);
+  search(@Auth() user: VerifiedUser, @Query() query: QueryDto) {
+    const filters = { ...query, userId: user.sub };
+    return paginatedToResponse(this.repositoryService.search(filters));
   }
 
   @Get(':id')

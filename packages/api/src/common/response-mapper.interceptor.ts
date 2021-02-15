@@ -19,6 +19,12 @@ function mapResponse(data: any) {
   if (!data) {
     return data;
   }
+  if (Array.isArray(data.entities)) {
+    return {
+      results: (data.entities as BaseEntity<any>[]).map(mapResourceEntity),
+      total: data.total,
+    };
+  }
   if (Array.isArray(data)) {
     if (data[0] && data[0] instanceof BaseEntity) {
       return (data as BaseEntity<any>[]).map(mapResourceEntity);
