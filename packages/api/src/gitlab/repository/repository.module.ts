@@ -14,6 +14,6 @@ import { RepositoryMemberService } from './repository-member/repository-member.s
   ],
   providers: [RepositoryService, RepositoryMemberService],
   controllers: [RepositoryController],
-  exports: [RepositoryService]
+  exports: [RepositoryService],
 })
 export class RepositoryModule {}

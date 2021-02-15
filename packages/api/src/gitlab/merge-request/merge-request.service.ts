@@ -1,5 +1,5 @@
 import { MergeRequest } from '@ceres/types';
-import { MergeRequest as MergeRequestEntity } from './mergeRequest.entity';
+import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
 import { Repository } from '../repository/repository.entity';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -24,18 +24,21 @@ export class MergeRequestService {
   }
 
   async fetchForRepository(repo: Repository, token: string) {
-    let mergerequests: MergeRequest[] = [];
+    let mergeRequests: MergeRequest[] = [];
     let page = 1;
     do {
-      mergerequests = await this.fetchByPage(token, page, repo);
-      await this.createOrUpdate(repo, mergerequests);
+      mergeRequests = await this.fetchByPage(token, page, repo);
+      await this.createOrUpdate(repo, mergeRequests);
       page++;
-    } while (mergerequests.length > 0);
+    } while (mergeRequests.length > 0);
   }
 
-  private async createOrUpdate(repo: Repository, mergerequests: MergeRequest[]) {
+  private async createOrUpdate(
+    repo: Repository,
+    mergeRequests: MergeRequest[],
+  ) {
     const entities = await Promise.all(
-      mergerequests.map(async (mr) => {
+      mergeRequests.map(async (mr) => {
         let found = await this.repository
           .createQueryBuilder()
           .where('resource @> :resource', {

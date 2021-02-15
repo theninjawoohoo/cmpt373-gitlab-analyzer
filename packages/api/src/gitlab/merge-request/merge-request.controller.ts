@@ -1,10 +1,17 @@
-import { Controller, Get, HttpCode, NotFoundException ,Param, Post } from '@nestjs/common';
-import { MergeRequestService } from './mergeRequest.service';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  NotFoundException,
+  Param,
+  Post,
+} from '@nestjs/common';
+import { MergeRequestService } from './merge-request.service';
 import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
 import { RepositoryService } from '../repository/repository.service';
 import { IdParam } from 'src/common/id-param';
 
-@Controller('mergerequest')
+@Controller('merge_request')
 export class MergeRequestController {
   constructor(
     private readonly mergeRequestService: MergeRequestService,
@@ -12,14 +19,14 @@ export class MergeRequestController {
   ) {}
 
   @Get('/repository/:id')
-  async findAllForRepository(
-    @Param() { id }: IdParam
-  ){
+  async findAllForRepository(@Param() { id }: IdParam) {
     const repository = await this.repositoryService.findOne(id);
     if (repository) {
       return this.mergeRequestService.findAllForRepository(repository);
     }
-    throw new NotFoundException(`Could not find merge request for repository with id: ${id}`);
+    throw new NotFoundException(
+      `Could not find merge request for repository with id: ${id}`,
+    );
   }
 
   @Get(':id')
@@ -28,7 +35,9 @@ export class MergeRequestController {
     if (mergeRequest) {
       return mergeRequest;
     }
-    throw new NotFoundException(`Could not find a merge request with id: ${id}`);
+    throw new NotFoundException(
+      `Could not find a merge request with id: ${id}`,
+    );
   }
 
   @Post('/repository/:id')
@@ -40,9 +49,10 @@ export class MergeRequestController {
     const repository = await this.repositoryService.findOne(id);
     if (repository) {
       await this.mergeRequestService.fetchForRepository(repository, token);
-    }
-    else{
-      throw new NotFoundException(`Could not fetch merge request for repository with id: ${id}`);
+    } else {
+      throw new NotFoundException(
+        `Could not fetch merge request for repository with id: ${id}`,
+      );
     }
   }
 }
