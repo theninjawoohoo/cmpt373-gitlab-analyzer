@@ -1,7 +1,7 @@
 import { MergeRequest as MergeRequestResource } from '@ceres/types';
 import { Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../common/base-entity';
-import { Diff } from '../diff/diff.entity';
+import { Diff } from '../repository/diff/diff.entity';
 import { Repository } from '../repository/repository.entity';
 
 @Entity('merge_request')
