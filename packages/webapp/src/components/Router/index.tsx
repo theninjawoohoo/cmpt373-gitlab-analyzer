@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Home from '../../pages/Home';
 import Login from '../../pages/Login';
 import SfuVerify from '../../pages/SfuVerify';
+import Settings from '../../pages/Settings';
 
 export function Router() {
   return (
@@ -16,6 +17,9 @@ export function Router() {
         </Route>
         <Route path='/home' exact>
           <Home />
+        </Route>
+        <Route path='/settings' exact>
+          <Settings />
         </Route>
       </Switch>
     </BrowserRouter>
