@@ -73,6 +73,8 @@ export class MergeRequestService {
           'PRIVATE-TOKEN': token,
         },
         params: {
+          state: "merged",
+          target_branch: "master",
           per_page: 10,
           page,
         },
