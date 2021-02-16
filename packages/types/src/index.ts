@@ -1,4 +1,5 @@
-export * from "./Commit";
+export * from './Commit';
+export * from './Diff';
 export * from './MergeRequest';
 export * from './Operation';
 export * from './Profile';
