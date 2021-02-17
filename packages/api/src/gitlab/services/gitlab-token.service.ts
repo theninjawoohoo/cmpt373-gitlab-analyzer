@@ -37,7 +37,7 @@ export class GitlabTokenService {
   }
 
   markInvalid(token: GitlabToken) {
-    token.expired = false;
+    token.expired = true;
     return this.gitlabTokenRepository.save(token);
   }
 
