@@ -1,6 +1,6 @@
 // import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
-import BarChart from './BarChart';
+import BarGraph from './BarGraph';
 
 // const useStyles = makeStyles(() => ({}));
 
@@ -8,7 +8,7 @@ const DynamicGraph: React.FC = () => {
   // const styles = useStyles();
   return (
     <div>
-      <BarChart />
+      <BarGraph />
     </div>
   );
 };
