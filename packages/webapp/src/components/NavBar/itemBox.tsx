@@ -42,6 +42,13 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
         <ListItemText primary={ListItemBoxProps.primary} />
       </>
     );
+  } else if (ListItemBoxProps.icon == 'user') {
+    <ListItem button>
+      <ListItemIcon>
+        <Icon icon={ListItemBoxProps.icon} />
+      </ListItemIcon>
+      <ListItemText primary={ListItemBoxProps.primary} />
+    </ListItem>;
   }
 
   return (
