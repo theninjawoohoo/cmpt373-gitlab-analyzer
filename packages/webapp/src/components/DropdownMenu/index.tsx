@@ -8,7 +8,7 @@ import Select from '@material-ui/core/Select';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     menu: {
-      margin: theme.spacing(1),
+      margin: theme.spacing(2),
       minWidth: 120,
     },
     selectLabel: {
@@ -17,12 +17,22 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+const students = [
+  { studentId: 'scherbatsky', studentName: 'Robin Scherbatsky' },
+  { studentId: 'mosby', studentName: 'Ted Mosby' },
+  { studentId: 'mcconnell', studentName: 'Tracy McConnell' },
+  { studentId: 'eriksen', studentName: 'Marshall Eriksen' },
+  { studentId: 'aldrin', studentName: 'Lily Aldrin' },
+  { studentId: 'stinson', studentName: 'Barney Stinson' },
+];
+
 const StudentDropdownMenu = () => {
   const classes = useStyles();
   const [studentName, setStudentName] = React.useState('');
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setStudentName(event.target.value as string);
+    alert(`Student ${event.target.value} was selected.`); //TODO: Show results for the selected student accordingly
   };
 
   return (
@@ -41,10 +51,11 @@ const StudentDropdownMenu = () => {
           autoWidth
         >
           <MenuItem value=''>All students</MenuItem>
-          <MenuItem value={40}>First Student</MenuItem>
-          <MenuItem value={10}>Second Student</MenuItem>
-          <MenuItem value={20}>Third Student</MenuItem>
-          <MenuItem value={30}>Fourth Student</MenuItem>
+          {students.map((student) => (
+            <MenuItem key={student.studentId} value={student.studentName}>
+              {student.studentName}
+            </MenuItem>
+          ))}
         </Select>
       </FormControl>
     </div>
