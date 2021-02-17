@@ -26,6 +26,7 @@ const useStyles = makeStyles((theme) => ({
 const Form: React.FC = () => {
   const classes = useStyles();
   const [apiKey, setApiKey] = useState('');
+  const [message, setMessage] = useState('Submit');
   const { mutate } = usePostToken();
   const { invalidate: invalidateToken } = useVerifyToken();
 
@@ -39,6 +40,7 @@ const Form: React.FC = () => {
       {
         onSuccess: () => {
           void invalidateToken();
+          setMessage('Success!');
         },
       },
     );
@@ -62,8 +64,9 @@ const Form: React.FC = () => {
         className={classes.button}
         variant='contained'
         color='primary'
+        disabled={message === 'Success!'}
       >
-        Submit
+        {message}
       </Button>
     </form>
   );
