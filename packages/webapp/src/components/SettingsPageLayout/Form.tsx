@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import { usePostToken, useVerifyToken } from '../../../api/token';
+import { usePostToken, useVerifyToken } from '../../api/token';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,7 +51,6 @@ const Form: React.FC = () => {
       autoComplete='off'
       onSubmit={handleSubmit}
     >
-      <h3>Please Enter your GitLab API Key</h3>
       <TextField
         value={apiKey}
         onChange={changeApiKey}

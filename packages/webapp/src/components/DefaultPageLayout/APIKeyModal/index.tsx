@@ -1,14 +1,10 @@
-import React, { useEffect, Dispatch, SetStateAction } from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
+import { useVerifyToken } from '../../../api/token';
 import Form from './Form';
-
-interface ApiKeyModalProps {
-  apiKey: string;
-  setApiKey: Dispatch<SetStateAction<string>>;
-}
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -24,15 +20,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const APIKeyModal: React.FC<ApiKeyModalProps> = (ApiKeyModalProps) => {
+const APIKeyModal: React.FC = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
+  const { data: tokenVerified } = useVerifyToken();
 
   useEffect(() => {
-    if (!ApiKeyModalProps.apiKey) {
+    if (tokenVerified?.verified) {
+      handleClose();
+    } else if (tokenVerified && tokenVerified.verified === false) {
       handleOpen();
     }
-  });
+  }, [tokenVerified?.verified]);
 
   const handleOpen = () => {
     setOpen(true);
@@ -58,10 +57,7 @@ const APIKeyModal: React.FC<ApiKeyModalProps> = (ApiKeyModalProps) => {
       >
         <Fade in={open}>
           <div className={classes.paper}>
-            <Form
-              handleClose={handleClose}
-              setApiKey={ApiKeyModalProps.setApiKey}
-            />
+            <Form />
           </div>
         </Fade>
       </Modal>

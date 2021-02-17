@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { GitlabToken } from '../entities/gitlab_token.entity';
+import { GitlabToken } from '../entities/gitlab-token.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
