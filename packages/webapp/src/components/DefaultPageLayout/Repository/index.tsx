@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useStyles } from './style';
 import CallSplitIcon from '@material-ui/icons/CallSplit';
 import StarIcon from '@material-ui/icons/Star';
 import Button from '@material-ui/core/Button';
-
-import { data } from './sampleData';
+import { useRepository } from '../../../api/repository';
 
 const Repository: React.FC = () => {
-  const [repos] = useState(data);
+  const { data: repos } = useRepository();
   const styles = useStyles();
+  console.log(repos);
   return (
     <div className={styles.wrapper} id='projects'>
       <h2>Projects</h2>
       <div className={styles.grid}>
-        {repos.map((repo) => (
+        {repos?.map((repo) => (
           <div
             className={styles.item}
             key={repo.id.toString()}
