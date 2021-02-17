@@ -1,8 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
 import { useAuthContext } from '../../contexts/AuthContext';
-import APIKeyModal from './APIKeyModal';
-import Repository from './Repository';
 import NavBar from '../NavBar';
 
 const useStyles = makeStyles(() => ({
@@ -31,8 +29,6 @@ const DefaultPageLayout: React.FC = ({ children }) => {
         <NavBar username={'Guest'} />
       )}
       {children}
-      <Repository />
-      <APIKeyModal />
     </div>
   );
 };
