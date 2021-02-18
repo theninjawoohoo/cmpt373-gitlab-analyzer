@@ -25,7 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       payload.sub,
     );
     if (gitlabToken) {
-      payload.gitlabToken = gitlabToken.token;
+      payload.gitlabToken = gitlabToken;
     }
     return payload;
   }
