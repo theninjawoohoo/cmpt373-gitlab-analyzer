@@ -1,12 +1,12 @@
 import React from 'react';
 import DefaultPageLayout from '../../components/DefaultPageLayout';
-import MergeRequestDiffLayout from '../../components/MergeRequests';
+import MergeRequestCommitList from '../../components/MergeRequestCommitList';
 
 const RepositoryPage: React.FC = () => {
   return (
     <div>
       <DefaultPageLayout>
-        <MergeRequestDiffLayout />
+        <MergeRequestCommitList />
       </DefaultPageLayout>
     </div>
   );
