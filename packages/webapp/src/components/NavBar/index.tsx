@@ -12,6 +12,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     transition: theme.transitions.create('width'),
     overflow: 'hidden',
+    minHeight: '100vh',
   },
 
   listCSS: {
@@ -45,7 +46,7 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
           <ItemBox icon='merge' primary={'Merge Reqests'} url='/merge' />
           <ItemBox icon='commit' primary={'Commits'} url='/commits' />
           <ItemBox icon='setting' primary={'Settings'} url='/settings' />
-          <ItemBox icon='logout' primary={'Logout'} url='/logout' />
+          <ItemBox icon='logout' primary={'Logout'} url='/' />
         </List>
       </div>
     </>
