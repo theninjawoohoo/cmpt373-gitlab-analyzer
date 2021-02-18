@@ -1,6 +1,7 @@
 import { Commit as CommitResource } from '@ceres/types';
-import { Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../../common/base-entity';
+import { MergeRequest } from '../../merge-request/merge-request.entity';
 import { Diff } from '../diff/diff.entity';
 import { Repository } from '../repository.entity';
 
@@ -12,4 +13,7 @@ export class Commit extends BaseEntity<CommitResource> {
 
   @OneToMany(() => Diff, (diff) => diff.commit)
   diffs: Diff[];
+
+  @ManyToMany(() => MergeRequest, (mergeRequest) => mergeRequest.commits)
+  mergeRequests: MergeRequest[];
 }

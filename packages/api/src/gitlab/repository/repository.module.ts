@@ -23,6 +23,6 @@ import { DiffService } from './diff/diff.service';
     DiffService,
   ],
   controllers: [RepositoryController],
-  exports: [RepositoryService, DiffService],
+  exports: [RepositoryService, DiffService, CommitService],
 })
 export class RepositoryModule {}
