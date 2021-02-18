@@ -22,7 +22,12 @@ export class GitlabTokenController {
   async verify(@Auth() user: VerifiedUser) {
     const token = await this.tokenService.findOneByUserId(user.sub);
     if (token && !token.expired) {
-      return { verified: true };
+      const isValid = await this.tokenService.validate(token);
+      if (isValid) {
+        return { verified: true };
+      } else {
+        await this.tokenService.markInvalid(token);
+      }
     }
     return { verified: false };
   }

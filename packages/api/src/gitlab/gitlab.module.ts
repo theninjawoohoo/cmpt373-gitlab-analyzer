@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ApiModule } from './api/api.module';
 import { GitlabTokenService } from './services/gitlab-token.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GitlabToken } from './entities/gitlab-token.entity';
@@ -9,6 +10,7 @@ import { MergeRequestModule } from './merge-request/merge-request.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([GitlabToken]),
+    ApiModule,
     RepositoryModule,
     MergeRequestModule,
   ],

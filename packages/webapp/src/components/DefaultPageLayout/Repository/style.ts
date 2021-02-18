@@ -6,6 +6,7 @@ export const useStyles = makeStyles(() =>
       padding: '1rem',
       background: '#FFF',
       height: '100%',
+      width: '100%',
     },
     titleWrap: {
       display: 'flex',
