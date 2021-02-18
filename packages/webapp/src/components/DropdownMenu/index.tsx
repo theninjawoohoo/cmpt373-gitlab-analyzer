@@ -28,11 +28,11 @@ const students = [
 
 const StudentDropdownMenu = () => {
   const classes = useStyles();
-  const [studentName, setStudentName] = React.useState('');
+  const [studentName, setStudentName] = React.useState('All students');
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setStudentName(event.target.value as string);
-    alert(`Student ${event.target.value} was selected.`); //TODO: Show results for the selected student accordingly
+    alert(`${event.target.value} was selected.`); //TODO: Show results for the selected student accordingly
   };
 
   return (
@@ -50,7 +50,7 @@ const StudentDropdownMenu = () => {
           className={classes.selectLabel}
           autoWidth
         >
-          <MenuItem value=''>All students</MenuItem>
+          <MenuItem value='All students'>All students</MenuItem>
           {students.map((student) => (
             <MenuItem key={student.studentId} value={student.studentName}>
               {student.studentName}
