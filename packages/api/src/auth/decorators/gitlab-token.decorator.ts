@@ -8,11 +8,11 @@ import { VerifiedUser } from '../types/VerifiedUser';
 export const GitlabToken = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
     const user = context.switchToHttp().getRequest().user as VerifiedUser;
-    if (!user || !user.gitlabToken) {
+    if (user?.gitlabToken?.expired) {
       throw new UnauthorizedException(
-        'Current user does not have a gitlab token',
+        'Current user does not have a valid gitlab token',
       );
     }
-    return user.gitlabToken as string;
+    return user.gitlabToken.token as string;
   },
 );

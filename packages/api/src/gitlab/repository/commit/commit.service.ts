@@ -1,9 +1,10 @@
+import { Commit } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Commit as CommitEntity } from './commit.entity';
-import { Commit } from '@ceres/types';
 import { Repository as TypeORMCommit } from 'typeorm';
+import { DiffService } from '../diff/diff.service';
 import { Repository } from '../repository.entity';
+import { Commit as CommitEntity } from './commit.entity';
 
 @Injectable()
 export class CommitService {
@@ -11,6 +12,7 @@ export class CommitService {
     private readonly httpService: HttpService,
     @InjectRepository(CommitEntity)
     private readonly commitRepository: TypeORMCommit<CommitEntity>,
+    private readonly diffService: DiffService,
   ) {}
 
   async findAllForRepository(repository: Repository) {
@@ -24,7 +26,12 @@ export class CommitService {
     let page = 1;
     do {
       commits = await this.fetchByPage(token, page, repository);
-      await this.createOrUpdate(repository, commits);
+      const { created } = await this.createIfNotExists(repository, commits);
+      await Promise.all(
+        created
+          .map((commit) => ({ ...commit, repository }))
+          .map((commit) => this.diffService.syncForCommit(commit, token)),
+      );
       page++;
     } while (commits.length > 0);
   }
@@ -51,10 +58,10 @@ export class CommitService {
     return axiosResponse.data;
   }
 
-  private async createOrUpdate(repository: Repository, commits: Commit[]) {
+  private async createIfNotExists(repository: Repository, commits: Commit[]) {
     const entities = await Promise.all(
       commits.map(async (commit) => {
-        let found = await this.commitRepository
+        const found = await this.commitRepository
           .createQueryBuilder()
           .where('resource @> :resource', {
             resource: {
@@ -65,17 +72,25 @@ export class CommitService {
             repositoryId: repository.id,
           })
           .getOne();
-        if (!found) {
-          found = this.commitRepository.create({
+        if (found) {
+          return { commit: found, created: false };
+        }
+        return {
+          commit: this.commitRepository.create({
             repository: repository,
             resource: commit,
-          });
-        } else {
-          found.resource = commit;
-        }
-        return found;
+          }),
+          created: true,
+        };
       }),
     );
-    return this.commitRepository.save(entities);
+    return {
+      existing: entities
+        .filter(({ created }) => !created)
+        .map(({ commit }) => commit),
+      created: await this.commitRepository.save(
+        entities.filter(({ created }) => created).map(({ commit }) => commit),
+      ),
+    };
   }
 }

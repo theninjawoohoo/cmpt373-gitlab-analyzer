@@ -1,4 +1,5 @@
 import { MergeRequest } from '@ceres/types';
+import { DiffService } from '../repository/diff/diff.service';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
 import { Repository } from '../repository/repository.entity';
 import { HttpService, Injectable } from '@nestjs/common';
@@ -11,6 +12,7 @@ export class MergeRequestService {
     private readonly httpService: HttpService,
     @InjectRepository(MergeRequestEntity)
     private readonly repository: TypeORMRepository<MergeRequestEntity>,
+    private readonly diffService: DiffService,
   ) {}
 
   async findAllForRepository(repository: Repository) {
@@ -23,43 +25,65 @@ export class MergeRequestService {
     });
   }
 
-  async fetchForRepository(repo: Repository, token: string) {
+  async fetchForRepository(repository: Repository, token: string) {
     let mergeRequests: MergeRequest[] = [];
     let page = 1;
     do {
-      mergeRequests = await this.fetchByPage(token, page, repo);
-      await this.createOrUpdate(repo, mergeRequests);
+      mergeRequests = await this.fetchByPage(token, page, repository);
+      const { created } = await this.createIfNotExists(
+        repository,
+        mergeRequests,
+      );
+      await Promise.all(
+        created
+          .map((mergeRequest) => ({ ...mergeRequest, repository }))
+          .map((mergeRequest) =>
+            this.diffService.syncForMergeRequest(mergeRequest, token),
+          ),
+      );
       page++;
     } while (mergeRequests.length > 0);
   }
 
-  private async createOrUpdate(
-    repo: Repository,
+  private async createIfNotExists(
+    repository: Repository,
     mergeRequests: MergeRequest[],
   ) {
     const entities = await Promise.all(
-      mergeRequests.map(async (mr) => {
-        let found = await this.repository
+      mergeRequests.map(async (mergeRequest) => {
+        const found = await this.repository
           .createQueryBuilder()
           .where('resource @> :resource', {
             resource: {
-              id: mr.id,
+              id: mergeRequest.id,
             },
           })
-          .andWhere('repository_id = :repoId', { repoId: repo.id })
+          .andWhere('repository_id = :repositoryId', {
+            repositoryId: repository.id,
+          })
           .getOne();
-        if (!found) {
-          found = await this.repository.create({
-            repository: repo,
-            resource: mr,
-          });
-        } else {
-          found.resource = mr;
+        if (found) {
+          return { mergeRequest: found, created: false };
         }
-        return found;
+        return {
+          mergeRequest: this.repository.create({
+            repository: repository,
+            resource: mergeRequest,
+          }),
+          created: true,
+        };
       }),
     );
-    return this.repository.save(entities);
+    return {
+      existing: entities
+        .filter(({ created }) => !created)
+        .map(({ mergeRequest }) => mergeRequest),
+      created: await this.repository.save(
+        entities
+          .filter(({ created }) => created)
+          .map(({ mergeRequest }) => mergeRequest),
+      ),
+    };
   }
 
   private async fetchByPage(
