@@ -24,7 +24,7 @@ const SfuVerify: React.FC = () => {
   }, [data]);
 
   if (user) {
-    return <Redirect to='/home' />;
+    return <Redirect to='/repository' />;
   }
 
   if (!ticket) {
