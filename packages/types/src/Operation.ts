@@ -1,11 +1,10 @@
 export interface Operation {
   type: Operation.Type;
   owner: string;
-  status: {
-    start_time?: string;
-    end_time?: string;
-    stage: Operation.Stage;
-  };
+  start_time?: string;
+  end_time?: string;
+  status: Operation.Status;
+  stages: Operation.Stage[];
   output?: {
     errors?: { code: string, payload: any }[];
     warnings?: { code: string, payload: any }[];
@@ -17,12 +16,25 @@ export interface Operation {
 export namespace Operation {
   export enum Type {
     FETCH_REPOSITORIES = 'fetch-repositories',
+    SYNC_REPOSITORY = 'sync-repository',
   }
 
-  export enum Stage {
+  export enum Status {
     PENDING = 'pending',
     PROCESSING = 'processing',
     COMPLETED = 'completed',
     TERMINATED = 'terminated',
+  }
+
+  export interface Stage {
+    name: string;
+    percentage: number | false;
+    start_time?: string;
+    end_time?: string;
+    status: Operation.Status;
+  }
+
+  export interface SyncRepositoryPayload {
+    repository_id: string;
   }
 }
