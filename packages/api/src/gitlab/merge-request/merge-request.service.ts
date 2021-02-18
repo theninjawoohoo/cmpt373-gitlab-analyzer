@@ -1,10 +1,12 @@
-import { MergeRequest } from '@ceres/types';
-import { DiffService } from '../repository/diff/diff.service';
-import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
-import { Repository } from '../repository/repository.entity';
+import { Commit, MergeRequest } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AxiosResponse } from 'axios';
 import { Repository as TypeORMRepository } from 'typeorm';
+import { CommitService } from '../repository/commit/commit.service';
+import { DiffService } from '../repository/diff/diff.service';
+import { Repository } from '../repository/repository.entity';
+import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
 
 @Injectable()
 export class MergeRequestService {
@@ -13,6 +15,7 @@ export class MergeRequestService {
     @InjectRepository(MergeRequestEntity)
     private readonly repository: TypeORMRepository<MergeRequestEntity>,
     private readonly diffService: DiffService,
+    private readonly commitService: CommitService,
   ) {}
 
   async findAllForRepository(repository: Repository) {
@@ -29,20 +32,62 @@ export class MergeRequestService {
     let mergeRequests: MergeRequest[] = [];
     let page = 1;
     do {
-      mergeRequests = await this.fetchByPage(token, page, repository);
-      const { created } = await this.createIfNotExists(
-        repository,
-        mergeRequests,
-      );
+      mergeRequests = await this.fetchByPage(token, repository, page);
+      await this.syncForRepositoryPage(token, repository, mergeRequests);
+      page++;
+    } while (mergeRequests.length > 0);
+  }
+
+  async linkCommitsForRepository(token: string, repository: Repository) {
+    let page = 0;
+    let mergeRequests = [];
+    do {
+      mergeRequests = await this.repository.find({
+        where: { repository },
+        take: 10,
+        skip: page,
+        order: { id: 'ASC' },
+      });
       await Promise.all(
-        created
-          .map((mergeRequest) => ({ ...mergeRequest, repository }))
-          .map((mergeRequest) =>
-            this.diffService.syncForMergeRequest(mergeRequest, token),
-          ),
+        mergeRequests.map((mergeRequest) =>
+          this.linkCommitsForMergeRequest(token, repository, mergeRequest),
+        ),
       );
       page++;
     } while (mergeRequests.length > 0);
+  }
+
+  private async linkCommitsForMergeRequest(
+    token: string,
+    repository: Repository,
+    mergeRequest: MergeRequestEntity,
+  ) {
+    const commits = await this.fetchCommitsFromGitlab(
+      token,
+      repository,
+      mergeRequest.resource,
+    );
+    mergeRequest.commits = await Promise.all(
+      commits.map((commit) =>
+        this.commitService.findByGitlabId(repository, commit.id),
+      ),
+    );
+    await this.repository.save(mergeRequest);
+  }
+
+  async syncForRepositoryPage(
+    token: string,
+    repository: Repository,
+    mergeRequests: MergeRequest[],
+  ): Promise<void> {
+    const { created } = await this.createIfNotExists(repository, mergeRequests);
+    await Promise.all(
+      created
+        .map((mergeRequest) => ({ ...mergeRequest, repository }))
+        .map((mergeRequest) =>
+          this.diffService.syncForMergeRequest(mergeRequest, token),
+        ),
+    );
   }
 
   private async createIfNotExists(
@@ -86,12 +131,45 @@ export class MergeRequestService {
     };
   }
 
-  private async fetchByPage(
+  async getTotalForRepository(token: string, repository: Repository) {
+    const axiosResponse = await this.fetchFromGitlab(token, repository, 0, 1);
+    return parseInt(axiosResponse.headers['X-Total']);
+  }
+
+  async fetchByPage(
     token: string,
-    page: number,
     repo: Repository,
+    page: number,
   ): Promise<MergeRequest[]> {
+    const axiosResponse = await this.fetchFromGitlab(token, repo, page);
+    return axiosResponse.data;
+  }
+
+  async fetchCommitsFromGitlab(
+    token: string,
+    repository: Repository,
+    mergeRequest: MergeRequest,
+  ) {
     const axiosResponse = await this.httpService
+      .get<Commit[]>(
+        `projects/${repository.resource.id}/merge_requests/${mergeRequest.iid}/commits`,
+        {
+          headers: {
+            'PRIVATE-TOKEN': token,
+          },
+        },
+      )
+      .toPromise();
+    return axiosResponse.data;
+  }
+
+  private async fetchFromGitlab(
+    token: string,
+    repo: Repository,
+    page: number,
+    pageSize = 10,
+  ): Promise<AxiosResponse<MergeRequest[]>> {
+    return await this.httpService
       .get<MergeRequest[]>(`projects/${repo.resource.id}/merge_requests`, {
         headers: {
           'PRIVATE-TOKEN': token,
@@ -99,11 +177,10 @@ export class MergeRequestService {
         params: {
           state: 'merged',
           target_branch: 'master',
-          per_page: 10,
+          per_page: pageSize,
           page,
         },
       })
       .toPromise();
-    return axiosResponse.data;
   }
 }

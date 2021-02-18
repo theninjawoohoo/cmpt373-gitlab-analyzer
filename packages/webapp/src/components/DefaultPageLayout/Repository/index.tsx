@@ -1,25 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useStyles } from './style';
 import CallSplitIcon from '@material-ui/icons/CallSplit';
 import StarIcon from '@material-ui/icons/Star';
 import Button from '@material-ui/core/Button';
-
-import { data } from './sampleData';
+import { useRepository, usePostRepository } from '../../../api/repository';
 
 const Repository: React.FC = () => {
-  const [repos] = useState(data);
+  const { data: repos } = useRepository();
+  const { mutate } = usePostRepository();
+  useEffect(() => {
+    mutate(null);
+  }, []);
   const styles = useStyles();
+  const message =
+    repos?.length == 0 ? (
+      <h3>You have no repositories on your profile</h3>
+    ) : null;
+
+  const handleClick = (event) => {
+    console.log(event);
+  };
+  console.log(repos);
   return (
     <div className={styles.wrapper} id='projects'>
       <h2>Projects</h2>
+      {message}
       <div className={styles.grid}>
-        {repos.map((repo) => (
+        {repos?.map((repo) => (
           <div
             className={styles.item}
             key={repo.id.toString()}
             id={repo.id.toString()}
           >
-            <Button fullWidth style={{ textTransform: 'none' }}>
+            <Button
+              onClick={handleClick}
+              fullWidth
+              style={{ textTransform: 'none' }}
+            >
               <div className={styles.card}>
                 <div className={styles.content}>
                   <h4>{repo.name}</h4>
