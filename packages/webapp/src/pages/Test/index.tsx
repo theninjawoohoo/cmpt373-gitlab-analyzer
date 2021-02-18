@@ -324,7 +324,7 @@ const MergeRequestsTable = () => {
     rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
   const handleRowClick = (title: string) => {
-    alert(`Merge request ${title} was selected.`);
+    alert(`Merge request "${title}" was selected.`);
   };
 
   const handleChangePage = (
