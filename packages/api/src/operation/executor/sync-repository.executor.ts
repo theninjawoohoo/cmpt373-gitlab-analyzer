@@ -39,6 +39,7 @@ export class SyncRepositoryExecutor {
       this.syncResource(Stage.syncCommits, this.commitService),
       this.syncResource(Stage.syncMergeRequests, this.mergeRequestService),
     ]);
+    await this.linkCommitsAndMergeRequests();
   }
 
   private async init() {
@@ -71,6 +72,15 @@ export class SyncRepositoryExecutor {
       page++;
     } while (resources.length > 0);
     await this.completeStage(name);
+  }
+
+  private async linkCommitsAndMergeRequests() {
+    await this.startStage(Stage.linkCommitsAndMergeRequests);
+    await this.mergeRequestService.linkCommitsForRepository(
+      this.token,
+      this.repository,
+    );
+    await this.completeStage(Stage.linkCommitsAndMergeRequests);
   }
 
   private createStage(name: string) {

@@ -1,6 +1,14 @@
 import { MergeRequest as MergeRequestResource } from '@ceres/types';
-import { Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { BaseEntity } from '../../common/base-entity';
+import { Commit } from '../repository/commit/commit.entity';
 import { Diff } from '../repository/diff/diff.entity';
 import { Repository } from '../repository/repository.entity';
 
@@ -12,4 +20,8 @@ export class MergeRequest extends BaseEntity<MergeRequestResource> {
 
   @OneToMany(() => Diff, (diff) => diff.mergeRequest)
   diffs: Diff[];
+
+  @ManyToMany(() => Commit, (commit) => commit.mergeRequests)
+  @JoinTable()
+  commits: Commit[];
 }

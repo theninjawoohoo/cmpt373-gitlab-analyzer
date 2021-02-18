@@ -23,17 +23,25 @@ export class OperationExecutorService {
   async execute(operation: OperationEntity) {
     console.log(`Starting execution for operation: ${operation.id}`);
     operation.resource = this.startOperation(operation.resource);
+    await this.operationRepository.save(operation);
     switch (operation.resource.type) {
       case Operation.Type.SYNC_REPOSITORY:
         await this.executeSyncRepositoryOperation(operation);
         break;
     }
+    operation.resource = this.completeOperation(operation.resource);
     return this.operationRepository.save(operation);
   }
 
   private startOperation(operation: Operation) {
     operation.start_time = new Date().toISOString();
     operation.status = Operation.Status.PROCESSING;
+    return operation;
+  }
+
+  private completeOperation(operation: Operation) {
+    operation.end_time = new Date().toISOString();
+    operation.status = Operation.Status.COMPLETED;
     return operation;
   }
 

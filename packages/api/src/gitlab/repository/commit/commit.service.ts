@@ -60,6 +60,14 @@ export class CommitService {
     return axiosResponse.data;
   }
 
+  async findByGitlabId(repository: Repository, id: string) {
+    return this.commitRepository
+      .createQueryBuilder()
+      .where('repository_id = :repositoryId', { repositoryId: repository.id })
+      .andWhere('resource @> :resource', { resource: { id } })
+      .getOne();
+  }
+
   private async fetchFromGitlab(
     token: string,
     repo: Repository,
