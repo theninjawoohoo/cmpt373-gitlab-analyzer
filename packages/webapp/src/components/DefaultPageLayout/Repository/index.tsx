@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useStyles } from './style';
 import CallSplitIcon from '@material-ui/icons/CallSplit';
 import StarIcon from '@material-ui/icons/Star';
 import Button from '@material-ui/core/Button';
-import { useRepository } from '../../../api/repository';
+import { useRepository, usePostRepository } from '../../../api/repository';
 
 const Repository: React.FC = () => {
   const { data: repos } = useRepository();
+  const { mutate } = usePostRepository();
+  useEffect(() => {
+    mutate(null);
+  }, []);
   const styles = useStyles();
   const message =
-    repos.length == 0 ? (
+    repos?.length == 0 ? (
       <h3>You have no repositories on your profile</h3>
     ) : null;
 
