@@ -141,7 +141,7 @@ const MergeRequestsTable = () => {
   const { data: rows } = useMergeRequest();
 
   const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+    rowsPerPage - Math.min(rowsPerPage, rows?.length - page * rowsPerPage);
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -171,9 +171,9 @@ const MergeRequestsTable = () => {
         </TableHead>
         <TableBody>
           {(rowsPerPage > 0
-            ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            ? rows?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : rows
-          ).map((row) => (
+          )?.map((row) => (
             <TableRow key={row.id}>
               <TableCellInstance>{row.created_at}</TableCellInstance>
               <TableCellInstance style={{ fontWeight: 600 }}>
@@ -197,7 +197,7 @@ const MergeRequestsTable = () => {
           <TableRow>
             <TablePagination
               rowsPerPageOptions={[10, 15, 25, { label: 'All', value: -1 }]}
-              count={rows.length}
+              count={rows?.length}
               rowsPerPage={rowsPerPage}
               page={page}
               SelectProps={{
