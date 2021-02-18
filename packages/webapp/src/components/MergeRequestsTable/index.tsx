@@ -20,6 +20,7 @@ import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
+import StudentDropdownMenu from '../Common/StudentDropdownMenu';
 
 const useBigTableStyles = makeStyles({
   table: {
@@ -319,6 +320,8 @@ const MergeRequestsTable = () => {
   const classes = useBigTableStyles();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [studentName, setStudentName] = React.useState('All students');
+  console.log(studentName);
 
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
@@ -342,57 +345,70 @@ const MergeRequestsTable = () => {
   };
 
   return (
-    <TableContainer component={Paper}>
-      <Table className={classes.table} aria-label='merge requests table'>
-        <TableHead>
-          <TableRow>
-            <TableCellInstance>Date</TableCellInstance>
-            <TableCellInstance>Title</TableCellInstance>
-            <TableCellInstance>Created&nbsp;by</TableCellInstance>
-            <TableCellInstance>Score</TableCellInstance>
-            <TableCellInstance>Number&nbsp;of&nbsp;comments</TableCellInstance>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {(rowsPerPage > 0
-            ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            : rows
-          ).map((row) => (
-            <TableRow key={row.id} onClick={() => handleRowClick(row.title)}>
-              <TableCellInstance>{row.date}</TableCellInstance>
-              <TableCellInstance style={{ fontWeight: 600 }}>
-                {row.title}
+    <>
+      <div style={{ float: 'right' }}>
+        <StudentDropdownMenu
+          studentName={studentName}
+          setStudentName={setStudentName}
+        />
+      </div>
+      <TableContainer component={Paper}>
+        <Table className={classes.table} aria-label='merge requests table'>
+          <TableHead>
+            <TableRow>
+              <TableCellInstance>Date</TableCellInstance>
+              <TableCellInstance>Title</TableCellInstance>
+              <TableCellInstance>Created&nbsp;by</TableCellInstance>
+              <TableCellInstance>Score</TableCellInstance>
+              <TableCellInstance>
+                Number&nbsp;of&nbsp;comments
               </TableCellInstance>
-              <TableCellInstance>{row.createdBy}</TableCellInstance>
-              <TableCellInstance>{row.score}</TableCellInstance>
-              <TableCellInstance>{row.commentsNumber}</TableCellInstance>
             </TableRow>
-          ))}
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={6} />
+          </TableHead>
+          <TableBody>
+            {studentName != 'All students'
+              ? rows.filter((row) => (row.createdBy = studentName))
+              : rows}
+            {(rowsPerPage > 0
+              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : rows
+            ).map((row) => (
+              <TableRow key={row.id} onClick={() => handleRowClick(row.title)}>
+                <TableCellInstance>{row.date}</TableCellInstance>
+                <TableCellInstance style={{ fontWeight: 600 }}>
+                  {row.title}
+                </TableCellInstance>
+                <TableCellInstance>{row.createdBy}</TableCellInstance>
+                <TableCellInstance>{row.score}</TableCellInstance>
+                <TableCellInstance>{row.commentsNumber}</TableCellInstance>
+              </TableRow>
+            ))}
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 53 * emptyRows }}>
+                <TableCell colSpan={6} />
+              </TableRow>
+            )}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[10, 15, 25, { label: 'All', value: -1 }]}
+                count={rows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                SelectProps={{
+                  inputProps: { 'aria-label': 'rows per page' },
+                  native: true,
+                }}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActions}
+              />
             </TableRow>
-          )}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[10, 15, 25, { label: 'All', value: -1 }]}
-              count={rows.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              SelectProps={{
-                inputProps: { 'aria-label': 'rows per page' },
-                native: true,
-              }}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
-            />
-          </TableRow>
-        </TableFooter>
-      </Table>
-    </TableContainer>
+          </TableFooter>
+        </Table>
+      </TableContainer>
+    </>
   );
 };
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import MergeRequestsTable from '../../components/MergeRequestsTable';
-import StudentDropdownMenu from '../../components/DropdownMenu';
 import DefaultPageLayout from '../../components/DefaultPageLayout';
 
 const MergeRequestsListPage = () => {
@@ -8,12 +7,7 @@ const MergeRequestsListPage = () => {
     <>
       <DefaultPageLayout>
         <div>
-          <div style={{ float: 'right' }}>
-            <StudentDropdownMenu />
-          </div>
-          <div>
-            <MergeRequestsTable />
-          </div>
+          <MergeRequestsTable />
         </div>
       </DefaultPageLayout>
     </>

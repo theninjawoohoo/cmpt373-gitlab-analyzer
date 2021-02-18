@@ -5,6 +5,11 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
+interface StudentProps {
+  studentName: string;
+  setStudentName: React.Dispatch<React.SetStateAction<string>>;
+}
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     menu: {
@@ -26,12 +31,11 @@ const students = [
   { studentId: 'stinson', studentName: 'Barney Stinson' },
 ];
 
-const StudentDropdownMenu = () => {
+const StudentDropdownMenu: React.FC<StudentProps> = (StudentProps) => {
   const classes = useStyles();
-  const [studentName, setStudentName] = React.useState('All students');
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setStudentName(event.target.value as string);
+    StudentProps.setStudentName(event.target.value as string);
     alert(`${event.target.value} was selected.`); //TODO: Show results for the selected student accordingly
   };
 
@@ -44,7 +48,7 @@ const StudentDropdownMenu = () => {
         <Select
           labelId='student-dropdown-menu-input-label'
           id='student-dropdown-menu-options'
-          value={studentName}
+          value={StudentProps.studentName}
           onChange={handleChange}
           displayEmpty
           className={classes.selectLabel}
