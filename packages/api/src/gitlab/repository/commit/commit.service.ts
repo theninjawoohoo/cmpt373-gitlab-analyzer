@@ -1,6 +1,7 @@
 import { Commit } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AxiosResponse } from 'axios';
 import { Repository as TypeORMCommit } from 'typeorm';
 import { DiffService } from '../diff/diff.service';
 import { Repository } from '../repository.entity';
@@ -25,37 +26,58 @@ export class CommitService {
     let commits: Commit[] = [];
     let page = 1;
     do {
-      commits = await this.fetchByPage(token, page, repository);
-      const { created } = await this.createIfNotExists(repository, commits);
-      await Promise.all(
-        created
-          .map((commit) => ({ ...commit, repository }))
-          .map((commit) => this.diffService.syncForCommit(commit, token)),
-      );
+      commits = await this.fetchByPage(token, repository, page);
+      await this.syncForRepositoryPage(token, repository, commits);
       page++;
     } while (commits.length > 0);
   }
 
-  private async fetchByPage(
+  async syncForRepositoryPage(
     token: string,
-    page: number,
+    repository: Repository,
+    commits: Commit[],
+  ): Promise<void> {
+    const { created } = await this.createIfNotExists(repository, commits);
+    await Promise.all(
+      created
+        .map((commit) => ({ ...commit, repository }))
+        .map((commit) => this.diffService.syncForCommit(commit, token)),
+    );
+  }
+
+  async getTotalForRepository(token: string, repository: Repository) {
+    const axiosResponse = await this.fetchFromGitlab(token, repository, 0, 1);
+    console.log(axiosResponse.headers);
+    return parseInt(axiosResponse.headers['X-Total']);
+  }
+
+  async fetchByPage(
+    token: string,
     repo: Repository,
+    page: number,
   ): Promise<Commit[]> {
-    const axiosResponse = await this.httpService
-      .get<Commit[]>(
-        `projects/${repo.resource.id}/repository/commits?ref_name=master`,
-        {
-          headers: {
-            'PRIVATE-TOKEN': token,
-          },
-          params: {
-            per_page: 10,
-            page,
-          },
-        },
-      )
-      .toPromise();
+    const axiosResponse = await this.fetchFromGitlab(token, repo, page);
     return axiosResponse.data;
+  }
+
+  private async fetchFromGitlab(
+    token: string,
+    repo: Repository,
+    page: number,
+    pageSize = 10,
+  ): Promise<AxiosResponse<Commit[]>> {
+    return await this.httpService
+      .get<Commit[]>(`projects/${repo.resource.id}/repository/commits`, {
+        headers: {
+          'PRIVATE-TOKEN': token,
+        },
+        params: {
+          per_page: pageSize,
+          page,
+          ref_name: 'master',
+        },
+      })
+      .toPromise();
   }
 
   private async createIfNotExists(repository: Repository, commits: Commit[]) {

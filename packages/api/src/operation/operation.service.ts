@@ -18,9 +18,8 @@ export class OperationService {
       resource: {
         type,
         owner: user.id,
-        status: {
-          stage: Operation.Stage.PENDING,
-        },
+        status: Operation.Status.PENDING,
+        stages: [],
         input,
       },
     });
@@ -29,15 +28,14 @@ export class OperationService {
 
   getOldestPending() {
     return this.operationRepository
-      .createQueryBuilder()
+      .createQueryBuilder('operation')
       .where('resource @> :resource', {
         resource: {
-          status: {
-            stage: Operation.Stage.PENDING,
-          },
+          status: Operation.Status.PENDING,
         },
       })
       .orderBy('created_at', 'ASC')
+      .leftJoinAndSelect('operation.user', 'user')
       .getOne();
   }
 }
