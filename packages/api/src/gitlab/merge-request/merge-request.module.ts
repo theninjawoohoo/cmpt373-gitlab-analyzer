@@ -14,5 +14,6 @@ import { RepositoryModule } from '../repository/repository.module';
   ],
   providers: [MergeRequestService],
   controllers: [MergeRequestController],
+  exports: [MergeRequestService],
 })
 export class MergeRequestModule {}
