@@ -3,10 +3,15 @@ import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
 import { Repository as TypeORMRepository } from 'typeorm';
+import { BaseSearch, withDefaults } from '../../common/query-dto';
 import { CommitService } from '../repository/commit/commit.service';
 import { DiffService } from '../repository/diff/diff.service';
 import { Repository } from '../repository/repository.entity';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
+
+interface MergeRequestSearch extends BaseSearch {
+  repository: string;
+}
 
 @Injectable()
 export class MergeRequestService {
@@ -17,6 +22,17 @@ export class MergeRequestService {
     private readonly diffService: DiffService,
     private readonly commitService: CommitService,
   ) {}
+
+  async search(filters: MergeRequestSearch) {
+    const { repository, pageSize, page } = withDefaults(filters);
+    return this.repository
+      .createQueryBuilder('merge_request')
+      .where('merge_request.repository_id = :repository', { repository })
+      .orderBy("repository.resource #>> '{merged_at}'", 'DESC')
+      .limit(pageSize)
+      .offset(page)
+      .getManyAndCount();
+  }
 
   async findAllForRepository(repository: Repository) {
     return this.repository.find({ where: { repository } });

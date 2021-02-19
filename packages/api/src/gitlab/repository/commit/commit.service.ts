@@ -3,8 +3,10 @@ import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
 import { Repository as TypeORMCommit } from 'typeorm';
+import { withDefaults } from '../../../common/query-dto';
 import { DiffService } from '../diff/diff.service';
 import { Repository } from '../repository.entity';
+import { CommitQueryDto } from './commit-query.dto';
 import { Commit as CommitEntity } from './commit.entity';
 
 @Injectable()
@@ -15,6 +17,30 @@ export class CommitService {
     private readonly commitRepository: TypeORMCommit<CommitEntity>,
     private readonly diffService: DiffService,
   ) {}
+
+  async search(filters: CommitQueryDto) {
+    const query = this.commitRepository.createQueryBuilder('commit');
+    filters = withDefaults(filters);
+
+    if (filters.repository) {
+      query.andWhere('commit.repository_id = :repository', {
+        repository: filters.repository,
+      });
+    }
+
+    if (filters.merge_request) {
+      query.leftJoinAndSelect('commit.mergeRequests', 'merge_request');
+      query.andWhere('merge_request.id = :merge_request', {
+        merge_request: filters.merge_request,
+      });
+    }
+
+    return query
+      .orderBy("repository.resource #>> '{authored_date}'", 'DESC')
+      .limit(filters.pageSize)
+      .offset(filters.page)
+      .getManyAndCount();
+  }
 
   async findAllForRepository(repository: Repository) {
     return this.commitRepository.find({
