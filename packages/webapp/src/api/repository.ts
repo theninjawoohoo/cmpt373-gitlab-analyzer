@@ -1,8 +1,8 @@
-import { useApiMutation, useApiQuery } from './base';
+import { useApiMutation, useApiQuery, SearchResults } from './base';
 import { Repository } from '@ceres/types';
 
 export function useRepository() {
-  return useApiQuery<Repository[]>('/repository');
+  return useApiQuery<SearchResults<Repository>>('/repository');
 }
 
 export function usePostRepository() {

@@ -37,4 +37,13 @@ export namespace Operation {
   export interface SyncRepositoryPayload {
     repository_id: string;
   }
+
+  export function buildSyncRepositoryPayload(repositoryId: string) {
+    return {
+      type: Operation.Type.SYNC_REPOSITORY,
+      input: {
+        repository_id: repositoryId,
+      }
+    }
+  }
 }
