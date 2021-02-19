@@ -21,8 +21,9 @@ export class RepositoryService {
   async search(filters: RepositorySearch) {
     const { userId, pageSize, page } = withDefaults(filters);
     return this.repository
-      .createQueryBuilder()
-      .where('user_id = :userId', { userId })
+      .createQueryBuilder('repository')
+      .where('repository.user_id = :userId', { userId })
+      .orderBy("repository.resource #>> '{created_at}'", 'DESC')
       .limit(pageSize)
       .offset(page)
       .getManyAndCount();

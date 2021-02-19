@@ -1,12 +1,15 @@
 import React from 'react';
-import SettingsPageLayout from '../../components/SettingsPageLayout';
+import DefaultPageLayout from '../../components/DefaultPageLayout';
+import SettingsForm from '../../components/SettingsForm';
 
-const Home: React.FC = () => {
+const SettingsPage: React.FC = () => {
   return (
     <div>
-      <SettingsPageLayout />
+      <DefaultPageLayout>
+        <SettingsForm />
+      </DefaultPageLayout>
     </div>
   );
 };
 
-export default Home;
+export default SettingsPage;
