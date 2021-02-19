@@ -150,7 +150,7 @@ const MergeRequestsTable = () => {
     } else {
       setResults(rows);
     }
-  }, [studentName]);
+  }, [rows, studentName]);
 
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, results?.length - page * rowsPerPage);
