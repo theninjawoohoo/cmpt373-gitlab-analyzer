@@ -13,7 +13,7 @@ const Repository: React.FC = () => {
   }, []);
   const styles = useStyles();
   const message =
-    repos?.length == 0 ? (
+    repos?.total === 0 ? (
       <h3>You have no repositories on your profile</h3>
     ) : null;
 
@@ -26,7 +26,7 @@ const Repository: React.FC = () => {
       <h2>Projects</h2>
       {message}
       <div className={styles.grid}>
-        {repos?.map((repo) => (
+        {repos?.results?.map((repo) => (
           <div
             className={styles.item}
             key={repo.id.toString()}
