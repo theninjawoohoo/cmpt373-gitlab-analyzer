@@ -5,7 +5,10 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
+import { paginatedToResponse } from '../../common/pagination';
+import { MergeRequestQueryDto } from './merge-request-query.dto';
 import { MergeRequestService } from './merge-request.service';
 import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
 import { RepositoryService } from '../repository/repository.service';
@@ -17,6 +20,11 @@ export class MergeRequestController {
     private readonly mergeRequestService: MergeRequestService,
     private readonly repositoryService: RepositoryService,
   ) {}
+
+  @Get()
+  search(@Query() query: MergeRequestQueryDto) {
+    return paginatedToResponse(this.mergeRequestService.search(query));
+  }
 
   @Get('/repository/:id')
   async findAllForRepository(@Param() { id }: IdParam) {
