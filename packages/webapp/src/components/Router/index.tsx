@@ -22,7 +22,7 @@ export function Router() {
         <Route path='/settings' exact>
           <SettingsPageLayout />
         </Route>
-        <Route path='/test' exact>
+        <Route path='/merge/:id' exact>
           <MergeRequestsList />
         </Route>
       </Switch>

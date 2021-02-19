@@ -381,7 +381,11 @@ const MergeRequestsTable = () => {
                 )
               : results
             ).map((row) => (
-              <TableRow key={row.id} onClick={() => handleRowClick(row.title)}>
+              <TableRow
+                hover={true}
+                key={row.id}
+                onClick={() => handleRowClick(row.title)}
+              >
                 <TableCellInstance>{row.date}</TableCellInstance>
                 <TableCellInstance style={{ fontWeight: 600 }}>
                   {row.title}
