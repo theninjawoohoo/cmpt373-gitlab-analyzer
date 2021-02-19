@@ -36,7 +36,7 @@ export class CommitService {
     }
 
     return query
-      .orderBy("repository.resource #>> '{authored_date}'", 'DESC')
+      .orderBy("commit.resource #>> '{authored_date}'", 'DESC')
       .limit(filters.pageSize)
       .offset(filters.page)
       .getManyAndCount();
