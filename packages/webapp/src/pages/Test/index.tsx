@@ -1,10 +1,10 @@
 import React from 'react';
-import DefaultPageLayout from '../../components/DefaultPageLayout';
+import MergeRequestsTable from '../../components/MergeRequestsTable';
 
 const Home: React.FC = () => {
   return (
     <div>
-      <DefaultPageLayout />
+      <MergeRequestsTable />
     </div>
   );
 };

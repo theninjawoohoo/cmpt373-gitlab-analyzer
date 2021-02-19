@@ -1,10 +1,12 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import Home from '../../pages/Home';
+import RepositoryPage from '../../pages/Repository';
 import Login from '../../pages/Login';
 import SfuVerify from '../../pages/SfuVerify';
 import Graph from '../../pages/Graph';
-import Settings from '../../pages/Settings';
+// import Settings from '../../pages/Settings';
+import MergeRequestsList from '../../pages/MergeRequestList';
+import SettingsPageLayout from '../../components/SettingsPageLayout';
 
 export function Router() {
   return (
@@ -16,14 +18,17 @@ export function Router() {
         <Route path='/sfu' exact>
           <SfuVerify />
         </Route>
-        <Route path='/home' exact>
-          <Home />
+        <Route path='/repository' exact>
+          <RepositoryPage />
         </Route>
         <Route path='/graph' exact>
           <Graph />
         </Route>
         <Route path='/settings' exact>
-          <Settings />
+          <SettingsPageLayout />
+        </Route>
+        <Route path='/test' exact>
+          <MergeRequestsList />
         </Route>
       </Switch>
     </BrowserRouter>
