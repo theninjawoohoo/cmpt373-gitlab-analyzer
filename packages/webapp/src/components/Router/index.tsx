@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import RepositoryPage from '../../pages/Repository';
 import Login from '../../pages/Login';
 import SfuVerify from '../../pages/SfuVerify';
-import SettingsPageLayout from '../../components/SettingsPageLayout';
+import SettingsPage from '../../pages/Settings';
 
 export function Router() {
   return (
@@ -19,7 +19,7 @@ export function Router() {
           <RepositoryPage />
         </Route>
         <Route path='/settings' exact>
-          <SettingsPageLayout />
+          <SettingsPage />
         </Route>
       </Switch>
     </BrowserRouter>

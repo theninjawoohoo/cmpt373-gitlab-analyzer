@@ -58,13 +58,14 @@ const Form: React.FC = () => {
         onChange={changeApiKey}
         id='standard-basic'
         label='Enter API Key'
+        required
       />
       <Button
         type='submit'
         className={classes.button}
         variant='contained'
         color='primary'
-        disabled={message === 'Success!'}
+        disabled={message === 'Success!' || apiKey.length <= 0}
       >
         {message}
       </Button>

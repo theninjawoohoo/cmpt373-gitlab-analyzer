@@ -28,6 +28,7 @@ const Form: React.FC = () => {
   const [apiKey, setApiKey] = useState('');
   const { mutate } = usePostToken();
   const { invalidate: invalidateToken } = useVerifyToken();
+  const [message, setMessage] = useState('Submit');
 
   const changeApiKey = (event: any) => {
     setApiKey(event.target.value);
@@ -39,6 +40,7 @@ const Form: React.FC = () => {
       {
         onSuccess: () => {
           void invalidateToken();
+          setMessage('Success!');
         },
       },
     );
@@ -63,8 +65,9 @@ const Form: React.FC = () => {
         className={classes.button}
         variant='contained'
         color='primary'
+        disabled={message === 'Success!' || apiKey.length <= 0}
       >
-        Submit
+        {message}
       </Button>
     </form>
   );
