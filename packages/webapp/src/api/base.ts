@@ -25,3 +25,16 @@ export function useApiMutation<T, B>(route: string, method: Method) {
     return result.data;
   });
 }
+
+export type ApiResource<T> = T & {
+  meta: {
+    createdAt: string;
+    updatedAt: string;
+    id: string;
+  };
+};
+
+export interface SearchResults<T> {
+  results: ApiResource<T>[];
+  total: number;
+}
