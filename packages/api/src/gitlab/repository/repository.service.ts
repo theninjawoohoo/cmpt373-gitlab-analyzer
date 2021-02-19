@@ -1,9 +1,14 @@
 import { Repository } from '@ceres/types';
+import { BaseSearch, withDefaults } from '../../common/query-dto';
 import { Repository as RepositoryEntity } from './repository.entity';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository as TypeORMRepository } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
+
+interface RepositorySearch extends BaseSearch {
+  userId: string;
+}
 
 @Injectable()
 export class RepositoryService {
@@ -13,8 +18,14 @@ export class RepositoryService {
     private readonly repository: TypeORMRepository<RepositoryEntity>,
   ) {}
 
-  async findAllForUser(user: User) {
-    return this.repository.find({ where: { user } });
+  async search(filters: RepositorySearch) {
+    const { userId, pageSize, page } = withDefaults(filters);
+    return this.repository
+      .createQueryBuilder()
+      .where('user_id = :userId', { userId })
+      .limit(pageSize)
+      .offset(page)
+      .getManyAndCount();
   }
 
   async findOne(id: string) {
