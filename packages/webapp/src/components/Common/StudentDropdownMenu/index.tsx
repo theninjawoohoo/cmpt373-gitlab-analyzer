@@ -36,7 +36,7 @@ const StudentDropdownMenu: React.FC<StudentProps> = (StudentProps) => {
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     StudentProps.setStudentName(event.target.value as string);
-    alert(`${event.target.value} was selected.`); //TODO: Show results for the selected student accordingly
+    // alert(`${event.target.value} was selected.`); //TODO: Show results for the selected student accordingly
   };
 
   return (

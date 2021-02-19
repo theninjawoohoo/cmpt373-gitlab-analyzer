@@ -1,14 +1,28 @@
 // import { makeStyles } from '@material-ui/core/styles';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-
 import { data } from './sampleData';
+
+interface StudentProps {
+  studentName: string;
+  setStudentName: React.Dispatch<React.SetStateAction<string>>;
+}
 
 // const useStyles = makeStyles(() => ({}));
 
-const BarGraph: React.FC = () => {
-  const [graphData] = useState(data);
+const BarGraph: React.FC<StudentProps> = (StudentProps) => {
+  const [graphData, setGraphData] = useState(data);
+
   // const styles = useStyles();
+
+  useEffect(() => {
+    if (StudentProps.studentName != 'All students') {
+      setGraphData(data);
+    } else {
+      setGraphData(data);
+    }
+  }, [graphData]);
+
   return (
     <div>
       <BarChart width={1000} height={500} data={graphData}>
