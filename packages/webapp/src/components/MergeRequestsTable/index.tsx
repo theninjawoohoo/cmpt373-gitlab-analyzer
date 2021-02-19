@@ -21,7 +21,8 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import StudentDropdownMenu from '../Common/StudentDropdownMenu';
-
+import { useMergeRequest } from '../../api/mergerequests';
+import { useParams } from 'react-router-dom';
 const useBigTableStyles = makeStyles({
   table: {
     minWidth: 700,
@@ -50,188 +51,6 @@ const TableCellInstance = withStyles((theme: Theme) =>
     },
   }),
 )(TableCell);
-
-const createMergeRequestRow = (
-  id: string,
-  date: string,
-  title: string,
-  createdBy: string,
-  score: number,
-  commentsNumber: number,
-) => {
-  return { id, date, title, createdBy, score, commentsNumber };
-};
-
-const rows = [
-  createMergeRequestRow(
-    '0001',
-    'Dec 8, 2020',
-    'Change dark mode accent',
-    'Tracy McConnell',
-    24,
-    1,
-  ),
-  createMergeRequestRow(
-    '0002',
-    'Dec 8, 2020',
-    "Search by employees' names and skills on map",
-    'Ted Mosby',
-    38,
-    9,
-  ),
-  createMergeRequestRow(
-    '0003',
-    'Dec 7, 2020',
-    'Final UI touchups',
-    'Marshall Eriksen',
-    25,
-    2,
-  ),
-  createMergeRequestRow(
-    '0004',
-    'Dec 6, 2020',
-    "Auto link emergency information in employee's info",
-    'Marshall Eriksen',
-    10,
-    0,
-  ),
-  createMergeRequestRow(
-    '0005',
-    'Dec 6, 2020',
-    'Force portrait mode for the app',
-    'Lily Aldrin',
-    5,
-    0,
-  ),
-  createMergeRequestRow(
-    '0006',
-    'Dec 5, 2020',
-    'App internationalization',
-    'Robin Scherbatsky',
-    85,
-    3,
-  ),
-  createMergeRequestRow(
-    '0007',
-    'Dec 3, 2020',
-    'Fix crash in activity add day leave',
-    'Ted Mosby',
-    25,
-    1,
-  ),
-  createMergeRequestRow(
-    '0008',
-    'Dec 2, 2020',
-    'Finish up map and sidebar',
-    'Tracy McConnell',
-    45,
-    2,
-  ),
-  createMergeRequestRow(
-    '0009',
-    'Nov 25, 2020',
-    'Add new communication activity for each employee',
-    'Barney Stinson',
-    15,
-    0,
-  ),
-  createMergeRequestRow(
-    '0010',
-    'Nov 22, 2020',
-    'Live search on map',
-    'Tracy McConnell',
-    35,
-    0,
-  ),
-  createMergeRequestRow(
-    '0011',
-    'Nov 20, 2020',
-    'Site map Info UI',
-    'Ted Mosby',
-    55,
-    8,
-  ),
-  createMergeRequestRow(
-    '0012',
-    'Nov 18, 2020',
-    'Add feature change password for user',
-    'Lily Aldrin',
-    32,
-    1,
-  ),
-  createMergeRequestRow(
-    '0013',
-    'Nov 18, 2020',
-    'Add logout screen and functionality',
-    'Lily Aldrin',
-    33,
-    0,
-  ),
-  createMergeRequestRow(
-    '0014',
-    'Nov 16, 2020',
-    'Implement sidebar',
-    'Robin Scherbatsky',
-    48,
-    0,
-  ),
-  createMergeRequestRow(
-    '0015',
-    'Nov 16, 2020',
-    'Fix save user info button to save in SharedPreferences',
-    'Marshall Eriksen',
-    20,
-    6,
-  ),
-  createMergeRequestRow(
-    '0016',
-    'Nov 14, 2020',
-    'Refix Android back button to kill all activities on the stack.',
-    'Tracy McConnell',
-    16,
-    5,
-  ),
-  createMergeRequestRow(
-    '0017',
-    'Nov 9, 2020',
-    'Create database firebase for app',
-    'Ted Mosby',
-    93,
-    2,
-  ),
-  createMergeRequestRow(
-    '0018',
-    'Nov 9, 2020',
-    'Add bottom navigation bar for activities',
-    'Robin Scherbatsky',
-    68,
-    0,
-  ),
-  createMergeRequestRow(
-    '0019',
-    'Nov 8, 2020',
-    'Add Google map and OnClickListener for site recyclerView.',
-    'Tracy McConnell',
-    56,
-    0,
-  ),
-  createMergeRequestRow(
-    '0020',
-    'Nov 6, 2020',
-    'Created UserInfo UI + Fixed LoginInfoActivity Crash',
-    'Lily Aldrin',
-    44,
-    1,
-  ),
-  createMergeRequestRow(
-    '0021',
-    'Nov 3, 2020',
-    'Implement Communication Activity',
-    'Barney Stinson',
-    62,
-    10,
-  ),
-];
 
 interface TablePaginationProps {
   count: number;
@@ -321,18 +140,20 @@ const MergeRequestsTable = () => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [studentName, setStudentName] = React.useState('All students');
+  const { id } = useParams<{ id: string }>();
+  const { data: rows } = useMergeRequest(id);
   const [results, setResults] = React.useState(rows);
 
   useEffect(() => {
     if (studentName != 'All students') {
-      setResults(rows.filter((row) => row.createdBy == studentName));
+      setResults(rows.filter((row) => row.author.name == studentName));
     } else {
       setResults(rows);
     }
   }, [studentName]);
 
   const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, rows?.length - page * rowsPerPage);
+    rowsPerPage - Math.min(rowsPerPage, results?.length - page * rowsPerPage);
 
   const handleRowClick = (title: string) => {
     alert(`Merge request "${title}" was selected.`);
@@ -375,24 +196,31 @@ const MergeRequestsTable = () => {
           </TableHead>
           <TableBody>
             {(rowsPerPage > 0
-              ? results.slice(
+              ? results?.slice(
                   page * rowsPerPage,
                   page * rowsPerPage + rowsPerPage,
                 )
               : results
-            ).map((row) => (
+            )?.map((row) => (
               <TableRow
                 hover={true}
                 key={row.id}
                 onClick={() => handleRowClick(row.title)}
               >
-                <TableCellInstance>{row.date}</TableCellInstance>
+                <TableCellInstance>
+                  {row.created_at
+                    .toString()
+                    .slice(0, row.created_at.toString().indexOf('T'))}
+                </TableCellInstance>
                 <TableCellInstance style={{ fontWeight: 600 }}>
                   {row.title}
                 </TableCellInstance>
-                <TableCellInstance>{row.createdBy}</TableCellInstance>
-                <TableCellInstance>{row.score}</TableCellInstance>
-                <TableCellInstance>{row.commentsNumber}</TableCellInstance>
+                <TableCellInstance>{row.author.name}</TableCellInstance>
+                {
+                  // TODO: Add score below instead of upvotes
+                }
+                <TableCellInstance>{row.upvotes}</TableCellInstance>
+                <TableCellInstance>{row.user_notes_count}</TableCellInstance>
               </TableRow>
             ))}
             {emptyRows > 0 && (
@@ -405,7 +233,7 @@ const MergeRequestsTable = () => {
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={[10, 15, 25, { label: 'All', value: -1 }]}
-                count={rows.length}
+                count={results?.length || 0}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 SelectProps={{
