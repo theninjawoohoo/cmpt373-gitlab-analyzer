@@ -39,6 +39,18 @@ export class OperationService {
       );
     }
 
+    if (filters.type) {
+      query.andWhere("operation.resource #>> '{type}' IN (:...type)", {
+        type: alwaysArray(filters.type),
+      });
+    }
+
+    if (filters.status) {
+      query.andWhere("operation.resource #>> '{status}' IN (:...status)", {
+        status: alwaysArray(filters.status),
+      });
+    }
+
     return query
       .orderBy('operation.created_at', 'DESC')
       .limit(filters.pageSize)
