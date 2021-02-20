@@ -28,7 +28,7 @@ export class MergeRequestService {
     return this.repository
       .createQueryBuilder('merge_request')
       .where('merge_request.repository_id = :repository', { repository })
-      .orderBy("repository.resource #>> '{merged_at}'", 'DESC')
+      .orderBy("merge_request.resource #>> '{merged_at}'", 'DESC')
       .limit(pageSize)
       .offset(page)
       .getManyAndCount();
