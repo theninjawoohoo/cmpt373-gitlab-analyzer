@@ -1,37 +1,43 @@
 // import { makeStyles } from '@material-ui/core/styles';
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-import { data } from './sampleData';
-
-interface StudentProps {
-  studentName: string;
-  setStudentName: React.Dispatch<React.SetStateAction<string>>;
-}
+import { graphData } from './sampleData';
 
 // const useStyles = makeStyles(() => ({}));
 
-const BarGraph: React.FC<StudentProps> = (StudentProps) => {
-  const [graphData, setGraphData] = useState(data);
+interface DataProps {
+  startDate: number;
+  endDate: number;
+}
+
+const BarGraph: React.FC<DataProps> = (DataProps) => {
+  const { startDate, endDate } = DataProps;
+  const [data, setData] = useState(graphData);
 
   // const styles = useStyles();
 
   useEffect(() => {
-    if (StudentProps.studentName != 'All students') {
-      setGraphData(data);
+    if (startDate != 20210214 || endDate != 20210220) {
+      setData(
+        graphData.filter(
+          (graphData) =>
+            graphData.date >= startDate && graphData.date <= endDate,
+        ),
+      );
     } else {
-      setGraphData(data);
+      setData(graphData);
     }
   }, [graphData]);
 
   return (
     <div>
-      <BarChart width={1000} height={500} data={graphData}>
+      <BarChart width={1000} height={500} data={data}>
         <XAxis dataKey='date' />
         <YAxis />
         <Tooltip />
         <Legend />
         <Bar dataKey='commits' name='Commits' stackId='a' fill='#0A4D63' />
-        <Bar dataKey='mr' name='Merge Requests' stackId='a' fill='#e37500' />
+        <Bar dataKey='mrs' name='Merge Requests' stackId='a' fill='#e37500' />
       </BarChart>
     </div>
   );

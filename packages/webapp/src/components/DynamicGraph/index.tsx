@@ -1,5 +1,5 @@
 // import { makeStyles } from '@material-ui/core/styles';
-import React from 'react';
+import React, { useState } from 'react';
 import BarGraph from './BarGraph';
 import StudentDropdownMenu from '../Common/StudentDropdownMenu';
 
@@ -12,11 +12,11 @@ import StudentDropdownMenu from '../Common/StudentDropdownMenu';
 
 const DynamicGraph: React.FC = () => {
   // const styles = useStyles();
-  const [studentName, setStudentName] = React.useState('All students');
+  const [studentName, setStudentName] = useState('All students');
 
   return (
     <div>
-      <BarGraph studentName={studentName} setStudentName={setStudentName} />
+      <BarGraph startDate={20210214} endDate={20210220} />
       <StudentDropdownMenu
         studentName={studentName}
         setStudentName={setStudentName}
