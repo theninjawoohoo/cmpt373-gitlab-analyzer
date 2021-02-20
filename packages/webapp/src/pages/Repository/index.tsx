@@ -1,7 +1,7 @@
 import React from 'react';
 import DefaultPageLayout from '../../components/DefaultPageLayout';
-import Repository from '../../components/DefaultPageLayout/Repository';
-import APIKeyModal from '../../components/DefaultPageLayout/APIKeyModal';
+import Repository from '../../components/Repository';
+import APIKeyModal from '../../components/APIKeyModal';
 
 const RepositoryPage: React.FC = () => {
   return (

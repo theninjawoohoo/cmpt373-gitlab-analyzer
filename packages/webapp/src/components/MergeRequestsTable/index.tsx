@@ -21,8 +21,8 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import StudentDropdownMenu from '../Common/StudentDropdownMenu';
+import { useMergeRequest } from '../../api/mergerequests';
 import { useParams } from 'react-router-dom';
-import { useCommitsForMergeRequest } from '../../api/commit';
 
 const useBigTableStyles = makeStyles({
   table: {
@@ -136,27 +136,22 @@ const TablePaginationActions: React.FC<TablePaginationProps> = (
   );
 };
 
-const MergeRequestCommitList: React.FC = () => {
+const MergeRequestsTable = () => {
   const classes = useBigTableStyles();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [studentName, setStudentName] = React.useState('All students');
-
   const { id } = useParams<{ id: string }>();
-  console.log(id);
-  const { data: searchInterface } = useCommitsForMergeRequest(id);
-  console.log(searchInterface);
-  const rows = searchInterface?.results || [];
-
+  const { data: rows } = useMergeRequest(id);
   const [results, setResults] = React.useState(rows);
 
   useEffect(() => {
     if (studentName != 'All students') {
-      setResults(rows.filter((row) => row.author_name == studentName));
+      setResults(rows.filter((row) => row.author.name == studentName));
     } else {
       setResults(rows);
     }
-  }, [studentName, rows]);
+  }, [studentName]);
 
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, results?.length - page * rowsPerPage);
@@ -193,8 +188,11 @@ const MergeRequestCommitList: React.FC = () => {
             <TableRow>
               <TableCellInstance>Date</TableCellInstance>
               <TableCellInstance>Title</TableCellInstance>
-              <TableCellInstance>Commit Message</TableCellInstance>
               <TableCellInstance>Created&nbsp;by</TableCellInstance>
+              <TableCellInstance>Score</TableCellInstance>
+              <TableCellInstance>
+                Number&nbsp;of&nbsp;comments
+              </TableCellInstance>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -215,11 +213,15 @@ const MergeRequestCommitList: React.FC = () => {
                     .toString()
                     .slice(0, row.created_at.toString().indexOf('T'))}
                 </TableCellInstance>
-                <TableCellInstance>{row.title}</TableCellInstance>
                 <TableCellInstance style={{ fontWeight: 600 }}>
-                  {row.message}
+                  {row.title}
                 </TableCellInstance>
-                <TableCellInstance>{row.author_name}</TableCellInstance>
+                <TableCellInstance>{row.author.name}</TableCellInstance>
+                {
+                  // TODO: Add score below instead of upvotes
+                }
+                <TableCellInstance>{row.upvotes}</TableCellInstance>
+                <TableCellInstance>{row.user_notes_count}</TableCellInstance>
               </TableRow>
             ))}
             {emptyRows > 0 && (
@@ -251,4 +253,4 @@ const MergeRequestCommitList: React.FC = () => {
   );
 };
 
-export default MergeRequestCommitList;
+export default MergeRequestsTable;

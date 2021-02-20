@@ -3,6 +3,8 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import RepositoryPage from '../../pages/Repository';
 import Login from '../../pages/Login';
 import SfuVerify from '../../pages/SfuVerify';
+import MergeRequestsList from '../../pages/MergeRequestList';
+import MergeRequestCommitList from '../MergeRequestCommitList';
 import SettingsPage from '../../pages/Settings';
 
 export function Router() {
@@ -20,6 +22,12 @@ export function Router() {
         </Route>
         <Route path='/settings' exact>
           <SettingsPage />
+        </Route>
+        <Route path='/merge/:id' exact>
+          <MergeRequestsList />
+        </Route>
+        <Route path='/commits/:id' exact>
+          <MergeRequestCommitList />
         </Route>
       </Switch>
     </BrowserRouter>
