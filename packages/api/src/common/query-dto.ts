@@ -1,13 +1,15 @@
-import { IsOptional, IsPositive } from 'class-validator';
+import { IsNumber, IsOptional, Min } from 'class-validator';
 import { User } from '../user/entities/user.entity';
 
 export class QueryDto implements BaseSearch {
   @IsOptional()
-  @IsPositive()
+  @IsNumber()
+  @Min(0)
   pageSize?: number;
 
   @IsOptional()
-  @IsPositive()
+  @IsNumber()
+  @Min(0)
   page?: number;
 }
 
