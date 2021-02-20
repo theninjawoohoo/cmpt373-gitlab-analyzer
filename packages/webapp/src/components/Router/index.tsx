@@ -26,7 +26,7 @@ export function Router() {
         <Route path='/merge/:id' exact>
           <MergeRequestsList />
         </Route>
-        <Route path='/mergeCommit'>
+        <Route path='/commits/:id' exact>
           <MergeRequestCommitList />
         </Route>
       </Switch>
