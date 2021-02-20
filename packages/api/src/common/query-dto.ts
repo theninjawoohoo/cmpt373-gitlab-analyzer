@@ -1,4 +1,5 @@
 import { IsOptional, IsPositive } from 'class-validator';
+import { User } from '../user/entities/user.entity';
 
 export class QueryDto implements BaseSearch {
   @IsOptional()
@@ -14,6 +15,10 @@ export interface BaseSearch {
   pageSize?: number;
   page?: number;
 }
+
+export type WithUser<T> = T & {
+  user: User;
+};
 
 export function withDefaults<T extends BaseSearch>(query: T): T {
   return {

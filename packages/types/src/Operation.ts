@@ -11,6 +11,7 @@ export interface Operation {
     artifacts: any[];
   };
   input?: any;
+  subscribers?: string[];
 }
 
 export namespace Operation {
