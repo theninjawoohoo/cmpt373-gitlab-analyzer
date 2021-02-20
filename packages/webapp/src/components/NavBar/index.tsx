@@ -42,6 +42,7 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
           <ItemBox icon='merge' primary={'Merge Reqests'} url='/merge' />
           <ItemBox icon='commit' primary={'Commits'} url='/commits' />
           <ItemBox icon='setting' primary={'Settings'} url='/settings' />
+          <ItemBox icon='operation' primary={'Operations'} url='/operations' />
           <ItemBox icon='logout' primary={'Logout'} url='/logout' />
         </List>
       </div>
