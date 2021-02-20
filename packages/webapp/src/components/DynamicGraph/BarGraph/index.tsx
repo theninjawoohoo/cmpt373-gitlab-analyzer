@@ -17,7 +17,7 @@ const BarGraph: React.FC<DataProps> = (DataProps) => {
   // const styles = useStyles();
 
   useEffect(() => {
-    if (startDate != 20210214 || endDate != 20210220) {
+    if (startDate != 20210214 || endDate != 2021030) {
       setData(
         graphData.filter(
           (graphData) =>

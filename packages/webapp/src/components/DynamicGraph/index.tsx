@@ -16,7 +16,7 @@ const DynamicGraph: React.FC = () => {
 
   return (
     <div>
-      <BarGraph startDate={20210214} endDate={20210220} />
+      <BarGraph startDate={20210214} endDate={20210230} />
       <StudentDropdownMenu
         studentName={studentName}
         setStudentName={setStudentName}
