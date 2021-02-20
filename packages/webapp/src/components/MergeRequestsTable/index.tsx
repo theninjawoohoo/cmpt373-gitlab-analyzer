@@ -23,6 +23,7 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import StudentDropdownMenu from '../Common/StudentDropdownMenu';
 import { useMergeRequest } from '../../api/mergerequests';
 import { useParams } from 'react-router-dom';
+
 const useBigTableStyles = makeStyles({
   table: {
     minWidth: 700,
