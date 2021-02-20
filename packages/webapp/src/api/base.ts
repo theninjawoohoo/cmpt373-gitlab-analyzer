@@ -33,6 +33,7 @@ export function usePaginatedQuery<T>(
       });
       return response.data;
     },
+    { keepPreviousData: true },
   );
 }
 
