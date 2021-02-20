@@ -26,6 +26,7 @@ const useStyles = makeStyles((theme) => ({
 const Form: React.FC = () => {
   const classes = useStyles();
   const [apiKey, setApiKey] = useState('');
+  const [message, setMessage] = useState('Submit');
   const { mutate } = usePostToken();
   const { invalidate: invalidateToken } = useVerifyToken();
 
@@ -39,6 +40,7 @@ const Form: React.FC = () => {
       {
         onSuccess: () => {
           void invalidateToken();
+          setMessage('Success!');
         },
       },
     );
@@ -56,14 +58,16 @@ const Form: React.FC = () => {
         onChange={changeApiKey}
         id='standard-basic'
         label='Enter API Key'
+        required
       />
       <Button
         type='submit'
         className={classes.button}
         variant='contained'
         color='primary'
+        disabled={message === 'Success!' || apiKey.length <= 0}
       >
-        Submit
+        {message}
       </Button>
     </form>
   );
