@@ -6,6 +6,12 @@ import {
 const theme = createMuiTheme({
   typography: {
     fontFamily: 'Montserrat, sans-serif',
+    h1: {
+      fontSize: '3rem',
+    },
+    h2: {
+      fontSize: '2.5rem',
+    },
   },
 
   palette: {

@@ -15,6 +15,28 @@ export function useApiQuery<T>(route: string) {
   };
 }
 
+export function usePaginatedQuery<T>(
+  route: string,
+  params: any,
+  page = 0,
+  pageSize = 10,
+) {
+  return useQuery<SearchResults<T>>(
+    [route, params, page, pageSize],
+    async () => {
+      const response = await axios.get<SearchResults<T>>(route, {
+        params: {
+          ...params,
+          page,
+          pageSize,
+        },
+      });
+      return response.data;
+    },
+    { keepPreviousData: true },
+  );
+}
+
 export function useApiMutation<T, B>(route: string, method: Method) {
   return useMutation<T, any, B>(route, async (body?) => {
     const result = await axios.request<T>({
