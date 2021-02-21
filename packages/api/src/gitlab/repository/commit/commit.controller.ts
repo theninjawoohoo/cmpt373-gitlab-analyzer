@@ -2,10 +2,15 @@ import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
 import { paginatedToResponse } from '../../../common/pagination';
 import { CommitQueryDto } from './commit-query.dto';
 import { CommitService } from './commit.service';
+import { CommitDailyCounQueryDto } from './daily-count/daily-count-query.dto';
+import { CommitDailyCountService } from './daily-count/daily-count.service';
 
 @Controller('commit')
 export class CommitController {
-  constructor(private readonly commitService: CommitService) {}
+  constructor(
+    private readonly commitService: CommitService,
+    private readonly commitDailyCountService: CommitDailyCountService,
+  ) {}
 
   @Get()
   search(@Query() query: CommitQueryDto) {
@@ -16,5 +21,10 @@ export class CommitController {
       );
     }
     return paginatedToResponse(this.commitService.search(query));
+  }
+
+  @Get('daily_count')
+  dailyCountSearch(@Query() query: CommitDailyCounQueryDto) {
+    return paginatedToResponse(this.commitDailyCountService.search(query));
   }
 }

@@ -13,3 +13,11 @@ export interface Commit {
   committed_date: Date;
   web_url: string;
 }
+
+export namespace Commit {
+  export interface DailyCount {
+    author_email: string;
+    date: string;
+    count: number;
+  }
+}
