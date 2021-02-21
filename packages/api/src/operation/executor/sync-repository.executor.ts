@@ -129,10 +129,6 @@ export class SyncRepositoryExecutor {
         );
         if (!authorEntity) {
           const repositoryMember = this.members.find((member) => {
-            console.log({
-              member: member.resource.email,
-              author: author.author_email,
-            });
             return member.resource.name === author.author_name;
           });
           if (repositoryMember) {
