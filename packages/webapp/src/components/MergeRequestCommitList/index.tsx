@@ -23,6 +23,7 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import StudentDropdownMenu from '../Common/StudentDropdownMenu';
 import { useParams } from 'react-router-dom';
 import { useCommitsForMergeRequest } from '../../api/commit';
+import { useRepositoryMembers } from '../../api/repo_members';
 
 const useBigTableStyles = makeStyles({
   table: {
@@ -143,10 +144,9 @@ const MergeRequestCommitList: React.FC = () => {
   const [studentName, setStudentName] = React.useState('All students');
 
   const { id } = useParams<{ id: string }>();
-  console.log(id);
   const { data: searchInterface } = useCommitsForMergeRequest(id);
-  console.log(searchInterface);
   const rows = searchInterface?.results || [];
+  const { data: repoMembers } = useRepositoryMembers(id);
 
   const [results, setResults] = React.useState(rows);
 
@@ -156,7 +156,7 @@ const MergeRequestCommitList: React.FC = () => {
     } else {
       setResults(rows);
     }
-  }, [studentName, rows]);
+  }, [repoMembers, studentName, rows]);
 
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, results?.length - page * rowsPerPage);
@@ -183,6 +183,7 @@ const MergeRequestCommitList: React.FC = () => {
     <>
       <div style={{ float: 'right' }}>
         <StudentDropdownMenu
+          repoMembers={repoMembers}
           studentName={studentName}
           setStudentName={setStudentName}
         />
