@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MergeRequestService } from '../gitlab/merge-request/merge-request.service';
 import { CommitService } from '../gitlab/repository/commit/commit.service';
+import { CommitDailyCountService } from '../gitlab/repository/commit/daily-count/daily-count.service';
 import { RepositoryService } from '../gitlab/repository/repository.service';
 import { GitlabTokenService } from '../gitlab/services/gitlab-token.service';
 import { SyncRepositoryExecutor } from './executor/sync-repository.executor';
@@ -18,6 +19,7 @@ export class OperationExecutorService {
     private readonly commitService: CommitService,
     private readonly mergeRequestService: MergeRequestService,
     private readonly repositoryService: RepositoryService,
+    private readonly commitDailyCountService: CommitDailyCountService,
   ) {}
 
   async execute(operation: OperationEntity) {
@@ -53,6 +55,7 @@ export class OperationExecutorService {
       this.commitService,
       this.mergeRequestService,
       this.repositoryService,
+      this.commitDailyCountService,
     );
     await executor.run();
   }

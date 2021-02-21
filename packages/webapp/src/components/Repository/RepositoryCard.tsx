@@ -43,7 +43,7 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
                 color='secondary'
                 disabled={isSyncing}
                 component={Link}
-                to='/'
+                to={`/merge/${repository.meta.id}`}
               >
                 View
               </Button>
