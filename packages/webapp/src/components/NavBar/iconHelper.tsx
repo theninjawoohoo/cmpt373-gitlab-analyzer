@@ -7,6 +7,7 @@ import ErrorIcon from '@material-ui/icons/Error';
 import MergeType from '@material-ui/icons/MergeType';
 import InsertChart from '@material-ui/icons/InsertChart';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 
 export default function Icon(props: any) {
   switch (props.icon) {
@@ -26,6 +27,8 @@ export default function Icon(props: any) {
       return <MergeType />;
     case 'commit':
       return <ArrowUpwardIcon />;
+    case 'operation':
+      return <PlayArrowIcon />;
   }
   return <ErrorIcon />;
 }

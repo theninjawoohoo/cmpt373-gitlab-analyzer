@@ -3,8 +3,10 @@ import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
 import { Repository as TypeORMCommit } from 'typeorm';
+import { withDefaults } from '../../../common/query-dto';
 import { DiffService } from '../diff/diff.service';
 import { Repository } from '../repository.entity';
+import { CommitQueryDto } from './commit-query.dto';
 import { Commit as CommitEntity } from './commit.entity';
 
 @Injectable()
@@ -16,10 +18,49 @@ export class CommitService {
     private readonly diffService: DiffService,
   ) {}
 
+  async search(filters: CommitQueryDto) {
+    const query = this.commitRepository.createQueryBuilder('commit');
+    filters = withDefaults(filters);
+
+    if (filters.repository) {
+      query.andWhere('commit.repository_id = :repository', {
+        repository: filters.repository,
+      });
+    }
+
+    if (filters.merge_request) {
+      query.leftJoinAndSelect('commit.mergeRequests', 'merge_request');
+      query.andWhere('merge_request.id = :merge_request', {
+        merge_request: filters.merge_request,
+      });
+    }
+
+    return query
+      .orderBy("commit.resource #>> '{authored_date}'", 'DESC')
+      .limit(filters.pageSize)
+      .offset(filters.page)
+      .getManyAndCount();
+  }
+
   async findAllForRepository(repository: Repository) {
     return this.commitRepository.find({
       where: { repository: repository },
     });
+  }
+
+  async createDailyCache(repository: Repository): Promise<Commit.DailyCount[]> {
+    const rows = await this.commitRepository
+      .createQueryBuilder('commit')
+      .select("commit.resource #>>'{author_email}'", 'author_email')
+      .addSelect("DATE(commit.resource #>>'{created_at}')", 'date')
+      .addSelect('count(*)', 'count')
+      .where('commit.repository_id = :repositoryId', {
+        repositoryId: repository.id,
+      })
+      .groupBy('author_email')
+      .addGroupBy('date')
+      .getRawMany();
+    return rows.map((row) => ({ ...row, count: parseInt(row.count) }));
   }
 
   async fetchForRepository(repository: Repository, token: string) {

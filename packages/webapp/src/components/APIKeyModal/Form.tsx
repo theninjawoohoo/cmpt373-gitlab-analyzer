@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import { usePostToken, useVerifyToken } from '../../../api/token';
+import { usePostToken, useVerifyToken } from '../../api/token';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -28,6 +28,7 @@ const Form: React.FC = () => {
   const [apiKey, setApiKey] = useState('');
   const { mutate } = usePostToken();
   const { invalidate: invalidateToken } = useVerifyToken();
+  const [message, setMessage] = useState('Submit');
 
   const changeApiKey = (event: any) => {
     setApiKey(event.target.value);
@@ -39,6 +40,7 @@ const Form: React.FC = () => {
       {
         onSuccess: () => {
           void invalidateToken();
+          setMessage('Success!');
         },
       },
     );
@@ -63,8 +65,9 @@ const Form: React.FC = () => {
         className={classes.button}
         variant='contained'
         color='primary'
+        disabled={message === 'Success!' || apiKey.length <= 0}
       >
-        Submit
+        {message}
       </Button>
     </form>
   );

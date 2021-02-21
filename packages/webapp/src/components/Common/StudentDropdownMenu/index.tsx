@@ -4,8 +4,10 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import { RepositoryMember } from '@ceres/types';
 
 interface StudentProps {
+  repoMembers: RepositoryMember[];
   studentName: string;
   setStudentName: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -22,18 +24,8 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const students = [
-  { studentId: 'scherbatsky', studentName: 'Robin Scherbatsky' },
-  { studentId: 'mosby', studentName: 'Ted Mosby' },
-  { studentId: 'mcconnell', studentName: 'Tracy McConnell' },
-  { studentId: 'eriksen', studentName: 'Marshall Eriksen' },
-  { studentId: 'aldrin', studentName: 'Lily Aldrin' },
-  { studentId: 'stinson', studentName: 'Barney Stinson' },
-];
-
 const StudentDropdownMenu: React.FC<StudentProps> = (StudentProps) => {
   const classes = useStyles();
-
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     StudentProps.setStudentName(event.target.value as string);
     // alert(`${event.target.value} was selected.`); //TODO: Show results for the selected student accordingly
@@ -55,9 +47,9 @@ const StudentDropdownMenu: React.FC<StudentProps> = (StudentProps) => {
           autoWidth
         >
           <MenuItem value='All students'>All students</MenuItem>
-          {students.map((student) => (
-            <MenuItem key={student.studentId} value={student.studentName}>
-              {student.studentName}
+          {StudentProps.repoMembers?.map((student) => (
+            <MenuItem key={student.id} value={student.name}>
+              {student.name}
             </MenuItem>
           ))}
         </Select>

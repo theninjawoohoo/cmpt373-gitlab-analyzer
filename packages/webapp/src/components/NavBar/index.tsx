@@ -36,17 +36,14 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
           <ListItem button onClick={() => setOpen(!open)}>
             <ItemBox icon='collapse' primary={'Collapse'} url='nil' />
           </ListItem>
-          <ItemBox
-            icon='user'
-            primary={UserNameProps.username}
-            url='/repository'
-          />
+          <ItemBox icon='user' primary={UserNameProps.username} url='/' />
           <ItemBox icon='repo' primary={'Repository'} url='/repository' />
           <ItemBox icon='graph' primary={'Graph'} url='/graph' />
           <ItemBox icon='merge' primary={'Merge Reqests'} url='/merge' />
           <ItemBox icon='commit' primary={'Commits'} url='/commits' />
           <ItemBox icon='setting' primary={'Settings'} url='/settings' />
-          <ItemBox icon='logout' primary={'Logout'} url='/' />
+          <ItemBox icon='operation' primary={'Operations'} url='/operations' />
+          <ItemBox icon='logout' primary={'Logout'} url='/logout' />
         </List>
       </div>
     </>

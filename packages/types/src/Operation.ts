@@ -11,6 +11,7 @@ export interface Operation {
     artifacts: any[];
   };
   input?: any;
+  subscribers?: string[];
 }
 
 export namespace Operation {
@@ -36,5 +37,14 @@ export namespace Operation {
 
   export interface SyncRepositoryPayload {
     repository_id: string;
+  }
+
+  export function buildSyncRepositoryPayload(repositoryId: string) {
+    return {
+      type: Operation.Type.SYNC_REPOSITORY,
+      input: {
+        repository_id: repositoryId,
+      }
+    }
   }
 }
