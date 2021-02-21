@@ -8,6 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ApiResource } from '../../api/base';
+import { useRepositoryContext } from '../../contexts/RepositoryContext';
 
 interface RepositoryCardProps {
   repository: ApiResource<Repository>;
@@ -20,6 +21,10 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
   isSyncing,
   syncRepository,
 }) => {
+  const { setRepositoryId } = useRepositoryContext();
+  const handleClick = () => {
+    setRepositoryId(repository.meta.id);
+  };
   return (
     <Box component={Paper} my={3} p={3} bgcolor='#F3FCFF'>
       <Grid container justify='space-between' alignItems='center'>
@@ -43,7 +48,8 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
                 color='secondary'
                 disabled={isSyncing}
                 component={Link}
-                to='/'
+                onClick={handleClick}
+                to={`/merge/${repository.meta.id}`}
               >
                 View
               </Button>

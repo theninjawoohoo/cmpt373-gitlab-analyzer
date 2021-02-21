@@ -7,13 +7,15 @@ import SfuVerify from '../../pages/SfuVerify';
 import MergeRequestsList from '../../pages/MergeRequestList';
 import MergeRequestCommitList from '../MergeRequestCommitList';
 import SettingsPage from '../../pages/Settings';
+import { useAuthContext } from '../../contexts/AuthContext';
 
 export function Router() {
+  const { user } = useAuthContext();
   return (
     <BrowserRouter>
       <Switch>
         <Route path='/' exact>
-          <Login />
+          {user?.id ? <RepositoryPage /> : <Login />}
         </Route>
         <Route path='/sfu' exact>
           <SfuVerify />
@@ -32,6 +34,9 @@ export function Router() {
         </Route>
         <Route path='/operations' exact>
           <OperationsPage />
+        </Route>
+        <Route path='/logout' exact>
+          <Login />
         </Route>
       </Switch>
     </BrowserRouter>
