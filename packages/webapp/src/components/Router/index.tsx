@@ -25,7 +25,7 @@ export function Router() {
         <Route path='/repository' exact>
           <RepositoryPage />
         </Route>
-        <Route path='/graph' exact>
+        <Route path='/graph/:id' exact>
           <Graph />
         </Route>
         <Route path='/settings' exact>

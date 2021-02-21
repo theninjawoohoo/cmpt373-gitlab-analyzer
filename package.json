@@ -10,16 +10,8 @@
     "lint": "lerna run --parallel lint"
   },
   "devDependencies": {
-    "@types/chart.js": "^2.9.30",
     "lerna": "^3.22.1"
   },
   "dependencies": {
-    "@material-ui/icons": "^4.11.2",
-    "@material-ui/styles": "^4.11.3",
-    "@types/recharts": "^1.8.19",
-    "chart.js": "^2.9.4",
-    "react-chartjs-2": "^2.11.1",
-    "recharts": "^2.0.6",
-    "styled-components": "^5.2.1"
   }
 }
