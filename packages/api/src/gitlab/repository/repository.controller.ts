@@ -1,10 +1,13 @@
+import { RepositoryMember } from '@ceres/types';
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { IdParam } from '../../common/id-param';
@@ -67,6 +70,24 @@ export class RepositoryController {
   async findProjectAuthors(@Param() { id }: IdParam) {
     const repository = await this.repositoryService.findOne(id);
     return this.commitAuthorService.findAllForRepository(repository);
+  }
+
+  @Put('/author/:id/member')
+  async updateProjectAuthor(
+    @Param() { id }: IdParam,
+    @Body() member?: RepositoryMember,
+  ) {
+    let memberEntity;
+    if (member) {
+      memberEntity = await this.repositoryMemberService.findOne(
+        (member as any).meta.id,
+      );
+    }
+    const author = await this.commitAuthorService.findOne(id);
+    return this.commitAuthorService.updateRepositoryMember(
+      author,
+      memberEntity,
+    );
   }
 
   @Get('/:id/members')
