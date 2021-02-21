@@ -4,8 +4,8 @@ import RepositoryPage from '../../pages/Repository';
 import Login from '../../pages/Login';
 import OperationsPage from '../../pages/Operations';
 import SfuVerify from '../../pages/SfuVerify';
-import MergeRequestsList from '../../pages/MergeRequestList';
-import MergeRequestCommitList from '../MergeRequestCommitList';
+import ListMergeRequestPage from '../../pages/ListMergeRequestPage';
+import ListCommitsByMergeRequestPage from '../../pages/ListCommitsByMergeRequestPage';
 import SettingsPage from '../../pages/Settings';
 import { useAuthContext } from '../../contexts/AuthContext';
 
@@ -27,10 +27,10 @@ export function Router() {
           <SettingsPage />
         </Route>
         <Route path='/merge/:id' exact>
-          <MergeRequestsList />
+          <ListMergeRequestPage />
         </Route>
         <Route path='/commits/:id' exact>
-          <MergeRequestCommitList />
+          <ListCommitsByMergeRequestPage />
         </Route>
         <Route path='/operations' exact>
           <OperationsPage />

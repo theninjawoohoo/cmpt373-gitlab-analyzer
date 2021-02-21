@@ -22,7 +22,7 @@ import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import StudentDropdownMenu from '../Common/StudentDropdownMenu';
 import { useMergeRequest } from '../../api/mergerequests';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import {
   usePostRepositoryMembers,
   useRepositoryMembers,
@@ -147,23 +147,26 @@ const MergeRequestsTable = () => {
   const [studentName, setStudentName] = React.useState('All students');
   const { id } = useParams<{ id: string }>();
   const { data: rows } = useMergeRequest(id);
-  const [results, setResults] = React.useState(rows);
+  const [results, setResults] = React.useState(rows?.results);
   const { data: repoMembers } = useRepositoryMembers(id);
   const { mutate } = usePostRepositoryMembers(id);
+  const history = useHistory();
   useEffect(() => {
     mutate(null);
     if (studentName != 'All students') {
-      setResults(rows.filter((row) => row.author.name == studentName));
+      setResults(rows?.results.filter((row) => row.author.name == studentName));
     } else {
-      setResults(rows);
+      setResults(rows?.results);
     }
   }, [repoMembers, rows, studentName]);
 
+  console.log(rows);
+  console.log(rows?.results);
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, results?.length - page * rowsPerPage);
 
-  const handleRowClick = (title: string) => {
-    alert(`Merge request "${title}" was selected.`);
+  const handleRowClick = (id: string) => {
+    history.push(`/commits/${id}`);
   };
 
   const handleChangePage = (
@@ -213,7 +216,7 @@ const MergeRequestsTable = () => {
               <TableRow
                 hover={true}
                 key={row.id}
-                onClick={() => handleRowClick(row.title)}
+                onClick={() => handleRowClick(row.meta.id)}
               >
                 <TableCellInstance>
                   {row.created_at
