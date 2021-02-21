@@ -22,6 +22,7 @@ export namespace Commit {
   }
   export interface DailyCount {
     author_email: string;
+    author_name: string;
     date: string;
     count: number;
   }
