@@ -48,6 +48,21 @@ export class CommitService {
     });
   }
 
+  async createDailyCache(repository: Repository): Promise<Commit.DailyCount[]> {
+    const rows = await this.commitRepository
+      .createQueryBuilder('commit')
+      .select("commit.resource #>>'{author_email}'", 'author_email')
+      .addSelect("DATE(commit.resource #>>'{created_at}')", 'date')
+      .addSelect('count(*)', 'count')
+      .where('commit.repository_id = :repositoryId', {
+        repositoryId: repository.id,
+      })
+      .groupBy('author_email')
+      .addGroupBy('date')
+      .getRawMany();
+    return rows.map((row) => ({ ...row, count: parseInt(row.count) }));
+  }
+
   async fetchForRepository(repository: Repository, token: string) {
     let commits: Commit[] = [];
     let page = 1;
