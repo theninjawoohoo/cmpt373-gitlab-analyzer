@@ -2,6 +2,7 @@ import { Operation } from '@ceres/types';
 import { Repository as TypeORMRepository } from 'typeorm';
 import { MergeRequestService } from '../../gitlab/merge-request/merge-request.service';
 import { CommitService } from '../../gitlab/repository/commit/commit.service';
+import { CommitDailyCountService } from '../../gitlab/repository/commit/daily-count/daily-count.service';
 import { Repository } from '../../gitlab/repository/repository.entity';
 import { RepositoryService } from '../../gitlab/repository/repository.service';
 import { GitlabTokenService } from '../../gitlab/services/gitlab-token.service';
@@ -11,6 +12,7 @@ enum Stage {
   syncCommits = 'syncCommits',
   syncMergeRequests = 'syncMergeRequests',
   linkCommitsAndMergeRequests = 'linkCommitsAndMergeRequests',
+  createDailyCommitCaches = 'createDailyCommitCaches',
 }
 
 export class SyncRepositoryExecutor {
@@ -21,6 +23,7 @@ export class SyncRepositoryExecutor {
     private readonly commitService: CommitService,
     private readonly mergeRequestService: MergeRequestService,
     private readonly repositoryService: RepositoryService,
+    private readonly commitDailyCountService: CommitDailyCountService,
   ) {}
 
   private stages = {
@@ -28,6 +31,9 @@ export class SyncRepositoryExecutor {
     [Stage.syncMergeRequests]: this.createStage('Sync Merge Requests'),
     [Stage.linkCommitsAndMergeRequests]: this.createStage(
       'Link Commits and Merge Requests',
+    ),
+    [Stage.createDailyCommitCaches]: this.createStage(
+      'Create Daily Commit Caches',
     ),
   };
   private repository: Repository;
@@ -40,6 +46,7 @@ export class SyncRepositoryExecutor {
       this.syncResource(Stage.syncMergeRequests, this.mergeRequestService),
     ]);
     await this.linkCommitsAndMergeRequests();
+    await this.createDailyCommitCaches();
   }
 
   private async init() {
@@ -81,6 +88,19 @@ export class SyncRepositoryExecutor {
       this.repository,
     );
     await this.completeStage(Stage.linkCommitsAndMergeRequests);
+  }
+
+  private async createDailyCommitCaches() {
+    await this.startStage(Stage.createDailyCommitCaches);
+    const dailyCounts = await this.commitService.createDailyCache(
+      this.repository,
+    );
+    await this.commitDailyCountService.clear(this.repository.id);
+    await this.commitDailyCountService.createAll(
+      dailyCounts,
+      this.repository.id,
+    );
+    await this.completeStage(Stage.createDailyCommitCaches);
   }
 
   private createStage(name: string) {
