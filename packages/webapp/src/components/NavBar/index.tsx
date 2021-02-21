@@ -54,7 +54,7 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
           <ItemBox
             icon='commit'
             primary={'Commits'}
-            url={`/commit/${repositoryId}`}
+            url={`/commits?repository=${repositoryId}`}
           />
           <ItemBox icon='setting' primary={'Settings'} url='/settings' />
           <ItemBox icon='operation' primary={'Operations'} url='/operations' />

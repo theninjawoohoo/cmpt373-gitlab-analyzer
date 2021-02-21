@@ -166,7 +166,7 @@ const MergeRequestsTable = () => {
     rowsPerPage - Math.min(rowsPerPage, results?.length - page * rowsPerPage);
 
   const handleRowClick = (id: string) => {
-    history.push(`/commits/${id}`);
+    history.push(`/commits?merge_request=${id}`);
   };
 
   const handleChangePage = (

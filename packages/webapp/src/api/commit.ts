@@ -27,16 +27,15 @@ export function useCommitsForMergeRequest(mergeRequestId: string) {
   );
 }
 
-export function useCommitsForRepository(
-  repoId: string,
+interface CommitSearchParams {
+  repository?: string;
+  merge_request?: string;
+}
+
+export function useGetCommits(
+  params: CommitSearchParams,
   page?: number,
   pageSize?: number,
 ) {
-  console.log({ page });
-  return usePaginatedQuery<Commit>(
-    `/commit?repository=${repoId}`,
-    {},
-    page,
-    pageSize,
-  );
+  return usePaginatedQuery<Commit>(`/commit`, params, page, pageSize);
 }
