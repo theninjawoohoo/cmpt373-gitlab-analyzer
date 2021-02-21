@@ -28,7 +28,6 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
   const styles = useStyles(theme);
   const [open, setOpen] = useState(false);
   const { repositoryId } = useRepositoryContext();
-  console.log('repoid: ' + repositoryId);
   return (
     <>
       <div

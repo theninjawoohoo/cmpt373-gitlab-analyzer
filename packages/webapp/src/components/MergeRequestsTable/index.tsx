@@ -160,8 +160,6 @@ const MergeRequestsTable = () => {
     }
   }, [repoMembers, rows, studentName]);
 
-  console.log(rows);
-  console.log(rows?.results);
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, results?.length - page * rowsPerPage);
 
