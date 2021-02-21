@@ -9,7 +9,6 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import RepositoryCard from './RepositoryCard';
-import { useRepositoryContext } from '../../contexts/RepositoryContext';
 
 function hasPendingSync(operations: Operation[], id: string) {
   return (
@@ -21,7 +20,6 @@ function hasPendingSync(operations: Operation[], id: string) {
 const Repository: React.FC = () => {
   const { data: repos } = useRepository();
   const { mutate } = usePostRepository();
-  const { setRepositoryId } = useRepositoryContext();
   const {
     data: operationsData,
     invalidate: invalidateOperations,
@@ -34,7 +32,6 @@ const Repository: React.FC = () => {
   const progress = 0;
 
   useEffect(() => {
-    setRepositoryId('');
     mutate(null);
   }, []);
   const syncRepository = (id: string) => {
