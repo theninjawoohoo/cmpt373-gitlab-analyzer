@@ -5,10 +5,10 @@ import APIKeyModal from '../../components/APIKeyModal';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 
 const RepositoryPage: React.FC = () => {
-  const { setRepositoryId } = useRepositoryContext();
+  const { repositoryId, setRepositoryId } = useRepositoryContext();
   useEffect(() => {
     setRepositoryId('');
-  });
+  }, [repositoryId]);
   return (
     <div>
       <DefaultPageLayout>

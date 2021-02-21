@@ -8,10 +8,10 @@ import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import OperationGroup from './components/OperationGroup';
 
 const OperationsPage: React.FC = () => {
-  const { setRepositoryId } = useRepositoryContext();
+  const { repositoryId, setRepositoryId } = useRepositoryContext();
   useEffect(() => {
     setRepositoryId('');
-  });
+  }, [repositoryId]);
   return (
     <>
       <DefaultPageLayout>

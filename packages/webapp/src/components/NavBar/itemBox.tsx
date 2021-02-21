@@ -87,15 +87,6 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
         <ListItemText primary={ListItemBoxProps.primary} />
       </ListItem>
     );
-  } else if (ListItemBoxProps.icon == 'operation' && repositoryId == '') {
-    return (
-      <ListItem button disabled component={Link} to={ListItemBoxProps.url}>
-        <ListItemIcon>
-          <Icon icon={ListItemBoxProps.icon} />
-        </ListItemIcon>
-        <ListItemText primary={ListItemBoxProps.primary} />
-      </ListItem>
-    );
   } else if (ListItemBoxProps.icon == 'merge' && repositoryId == '') {
     return (
       <ListItem button disabled component={Link} to={ListItemBoxProps.url}>

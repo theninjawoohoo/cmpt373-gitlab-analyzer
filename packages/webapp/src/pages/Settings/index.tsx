@@ -4,10 +4,10 @@ import SettingsForm from '../../components/SettingsForm';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 
 const SettingsPage: React.FC = () => {
-  const { setRepositoryId } = useRepositoryContext();
+  const { repositoryId, setRepositoryId } = useRepositoryContext();
   useEffect(() => {
     setRepositoryId('');
-  });
+  }, [repositoryId]);
   return (
     <div>
       <DefaultPageLayout>
