@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiModule } from '../api/api.module';
+import { CommitAuthor } from './commit/author/commit-author.entity';
+import { CommitAuthorService } from './commit/author/commit-author.service';
 import { CommitDailyCount } from './commit/daily-count/daily-count.entity';
 import { CommitDailyCountService } from './commit/daily-count/daily-count.service';
 import { Diff } from './diff/diff.entity';
@@ -29,6 +31,7 @@ import { DiffController } from './diff/diff.controller';
       MergeRequest,
       MergeRequestParticipant,
       CommitDailyCount,
+      CommitAuthor,
     ]),
     ApiModule,
   ],
@@ -40,13 +43,16 @@ import { DiffController } from './diff/diff.controller';
     CommitService,
     DiffService,
     CommitDailyCountService,
+    CommitAuthorService,
   ],
   controllers: [RepositoryController, CommitController, DiffController],
   exports: [
     RepositoryService,
+    RepositoryMemberService,
     DiffService,
     CommitService,
     CommitDailyCountService,
+    CommitAuthorService,
   ],
 })
 export class RepositoryModule {}
