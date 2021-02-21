@@ -8,6 +8,7 @@ import { CommitService } from '../repository/commit/commit.service';
 import { DiffService } from '../repository/diff/diff.service';
 import { Repository } from '../repository/repository.entity';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
+import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
 
 interface MergeRequestSearch extends BaseSearch {
   repository: string;
@@ -21,6 +22,7 @@ export class MergeRequestService {
     private readonly repository: TypeORMRepository<MergeRequestEntity>,
     private readonly diffService: DiffService,
     private readonly commitService: CommitService,
+    private readonly participantService: MergeRequestParticipantService,
   ) {}
 
   async search(filters: MergeRequestSearch) {
@@ -32,6 +34,36 @@ export class MergeRequestService {
       .limit(pageSize)
       .offset(page)
       .getManyAndCount();
+  }
+
+  async fetchAllParticipantsForRepository(
+    repository: Repository,
+    token: string,
+  ) {
+    const mergeRequests = await this.findAllForRepository(repository);
+    const entities = await Promise.all(
+      mergeRequests.map(async (mergeRequest) => {
+        const participants = await this.participantService.syncForMergeRequest(
+          mergeRequest,
+          token,
+        );
+        return participants;
+      }),
+    );
+    return entities;
+  }
+
+  async findAllParticipantsForRepository(repository: Repository) {
+    const mergeRequests = await this.findAllForRepository(repository);
+    const entities = await Promise.all(
+      mergeRequests.map(async (mergeRequest) => {
+        const participant = await this.participantService.findAllForMergeRequest(
+          mergeRequest,
+        );
+        return participant;
+      }),
+    );
+    return entities;
   }
 
   async findAllForRepository(repository: Repository) {

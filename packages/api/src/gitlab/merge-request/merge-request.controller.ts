@@ -13,13 +13,39 @@ import { MergeRequestService } from './merge-request.service';
 import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
 import { RepositoryService } from '../repository/repository.service';
 import { IdParam } from 'src/common/id-param';
+import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
 
 @Controller('merge_request')
 export class MergeRequestController {
   constructor(
     private readonly mergeRequestService: MergeRequestService,
     private readonly repositoryService: RepositoryService,
+    private readonly mergeRequestParticipantService: MergeRequestParticipantService,
   ) {}
+
+  @Get(':id/participants')
+  async getMergeRequestParticipants(@Param() { id }: IdParam) {
+    const mergeRequest = await this.mergeRequestService.findOne(id);
+    if (mergeRequest) {
+      return await this.mergeRequestParticipantService.findAllForMergeRequest(
+        mergeRequest,
+      );
+    }
+    throw new NotFoundException(`no merge request with this id exists: ${id}`);
+  }
+
+  @Post(':id/participants')
+  @HttpCode(204)
+  async fetchMergeRequestParticipants(
+    @Param() { id }: IdParam,
+    @GitlabToken() token: string,
+  ) {
+    const mergeRequest = await this.mergeRequestService.findOne(id);
+    return await this.mergeRequestParticipantService.syncForMergeRequest(
+      mergeRequest,
+      token,
+    );
+  }
 
   @Get()
   search(@Query() query: MergeRequestQueryDto) {
