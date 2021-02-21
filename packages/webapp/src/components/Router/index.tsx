@@ -5,6 +5,7 @@ import RepositoryPage from '../../pages/Repository';
 import Login from '../../pages/Login';
 import OperationsPage from '../../pages/Operations';
 import SfuVerify from '../../pages/SfuVerify';
+import Graph from '../../pages/Graph';
 import ListMergeRequestPage from '../../pages/ListMergeRequestPage';
 import SettingsPage from '../../pages/Settings';
 import { useAuthContext } from '../../contexts/AuthContext';
@@ -23,6 +24,9 @@ export function Router() {
         </Route>
         <Route path='/repository' exact>
           <RepositoryPage />
+        </Route>
+        <Route path='/graph/:id' exact>
+          <Graph />
         </Route>
         <Route path='/settings' exact>
           <SettingsPage />
