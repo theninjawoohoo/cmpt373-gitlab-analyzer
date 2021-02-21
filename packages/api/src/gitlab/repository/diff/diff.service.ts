@@ -1,7 +1,9 @@
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { paginate, withDefaults } from '../../../common/query-dto';
 import { MergeRequest } from '../../merge-request/merge-request.entity';
 import { Commit } from '../commit/commit.entity';
+import { DiffQueryDto } from './diff-query.dto';
 import { Diff as DiffEntity } from './diff.entity';
 import { DeepPartial, Repository as TypeORMRepository } from 'typeorm';
 import { Diff } from '@ceres/types';
@@ -16,6 +18,24 @@ export class DiffService {
     @InjectRepository(DiffEntity)
     private readonly diffRepository: TypeORMRepository<DiffEntity>,
   ) {}
+
+  search(filters: DiffQueryDto) {
+    filters = withDefaults(filters);
+    const query = this.diffRepository.createQueryBuilder('diff');
+
+    if (filters.commit) {
+      query.andWhere('diff.commit_id = :commit', { commit: filters.commit });
+    }
+
+    if (filters.merge_request) {
+      query.andWhere('diff.merge_request_id = :mergeRequest', {
+        mergeRequest: filters.merge_request,
+      });
+    }
+
+    paginate(query, filters);
+    return query.getManyAndCount();
+  }
 
   async syncForCommit(commit: Commit, token: string) {
     let diffs: GitlabDiff[] = [];
