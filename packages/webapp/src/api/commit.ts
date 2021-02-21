@@ -37,6 +37,5 @@ export function useGetCommits(
   page?: number,
   pageSize?: number,
 ) {
-  console.log({ page });
   return usePaginatedQuery<Commit>(`/commit`, params, page, pageSize);
 }
