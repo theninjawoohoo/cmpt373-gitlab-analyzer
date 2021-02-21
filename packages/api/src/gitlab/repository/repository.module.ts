@@ -17,6 +17,7 @@ import { CommitService } from './commit/commit.service';
 import { Commit } from './commit/commit.entity';
 import { DiffService } from './diff/diff.service';
 import { CommitController } from './commit/commit.controller';
+import { DiffController } from './diff/diff.controller';
 
 @Module({
   imports: [
@@ -40,7 +41,7 @@ import { CommitController } from './commit/commit.controller';
     DiffService,
     CommitDailyCountService,
   ],
-  controllers: [RepositoryController, CommitController],
+  controllers: [RepositoryController, CommitController, DiffController],
   exports: [
     RepositoryService,
     DiffService,

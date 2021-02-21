@@ -4,7 +4,7 @@ import { DiffQueryDto } from './diff-query.dto';
 import { DiffService } from './diff.service';
 
 @Controller('diff')
-export class CommitController {
+export class DiffController {
   constructor(private readonly diffService: DiffService) {}
 
   @Get()
