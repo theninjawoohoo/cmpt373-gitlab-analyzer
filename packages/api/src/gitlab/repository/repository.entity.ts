@@ -3,6 +3,7 @@ import { Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../common/base-entity';
 import { User } from '../../user/entities/user.entity';
 import { MergeRequest } from '../merge-request/merge-request.entity';
+import { CommitAuthor } from './commit/author/commit-author.entity';
 import { RepositoryMember } from './repository-member/repository-member.entity';
 import { Commit } from './commit/commit.entity';
 
@@ -23,4 +24,7 @@ export class Repository extends BaseEntity<RepositoryResource> {
 
   @OneToMany(() => MergeRequest, (mergeRequest) => mergeRequest.repository)
   mergeRequests: MergeRequest[];
+
+  @OneToMany(() => CommitAuthor, (commitAuthor) => commitAuthor.repository)
+  commitAuthors: CommitAuthor[];
 }

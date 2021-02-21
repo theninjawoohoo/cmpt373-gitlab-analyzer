@@ -1,5 +1,6 @@
 import { Repository } from '@ceres/types';
 import { BaseSearch, paginate, withDefaults } from '../../common/query-dto';
+import { RepositoryMemberService } from './repository-member/repository-member.service';
 import { Repository as RepositoryEntity } from './repository.entity';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,6 +17,7 @@ export class RepositoryService {
     private readonly httpService: HttpService,
     @InjectRepository(RepositoryEntity)
     private readonly repository: TypeORMRepository<RepositoryEntity>,
+    private readonly repositoryMemberService: RepositoryMemberService,
   ) {}
 
   async search(filters: RepositorySearch) {
@@ -40,7 +42,12 @@ export class RepositoryService {
     let page = 1;
     do {
       repositories = await this.fetchByPage(token, page);
-      await this.createOrUpdate(user, repositories);
+      const entities = await this.createOrUpdate(user, repositories);
+      await Promise.all(
+        entities.map((entity) =>
+          this.repositoryMemberService.syncForRepository(entity, token),
+        ),
+      );
       page++;
     } while (repositories.length > 0);
   }
