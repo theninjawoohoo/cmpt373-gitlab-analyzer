@@ -84,16 +84,11 @@ const DynamicGraph: React.FC = () => {
         </Grid>
         <Grid item>
           <BarChart width={1000} height={500} data={commits}>
-            <XAxis dataKey={commits.keys} />
+            <XAxis dataKey='date' />
             <YAxis />
             <Tooltip />
             <Legend layout='vertical' align='right' verticalAlign='top' />
-            <Bar
-              dataKey={commits.values}
-              name='Commits'
-              stackId='a'
-              fill='#0A4D63'
-            />
+            <Bar dataKey='count' name='Commits' stackId='a' fill='#0A4D63' />
             {/* <Bar dataKey='mrs' name='Merge Requests' stackId='a' fill='#e37500' /> */}
           </BarChart>
         </Grid>
