@@ -1,3 +1,4 @@
+import { Hunk } from '@ceres/types';
 import {
   Accordion,
   AccordionSummary,
@@ -18,15 +19,6 @@ interface Line {
   type: 'added' | 'deleted' | 'unchanged' | 'blank';
   content?: string;
   lineNumber?: number;
-}
-
-export interface Hunk {
-  oldStart: number;
-  oldLines: number;
-  newStart: number;
-  newLines: number;
-  lines: string[];
-  linedelimiters: string[];
 }
 
 const LINE_COLOR_MAP = {

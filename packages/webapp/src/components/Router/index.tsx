@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import Diff from '../../pages/Diff';
 import RepositoryPage from '../../pages/Repository';
 import Login from '../../pages/Login';
 import OperationsPage from '../../pages/Operations';
@@ -34,6 +35,9 @@ export function Router() {
         </Route>
         <Route path='/operations' exact>
           <OperationsPage />
+        </Route>
+        <Route path='/diff' exact>
+          <Diff />
         </Route>
         <Route path='/logout' exact>
           <Login />
