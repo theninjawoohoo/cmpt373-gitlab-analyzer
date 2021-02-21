@@ -1,9 +1,11 @@
 //import { makeStyles } from '@material-ui/core/styles';
-import { Typography, Container, Accordion } from '@material-ui/core';
-import React from 'react';
+import { Typography, Container, Accordion, Box } from '@material-ui/core';
+import React, { useState } from 'react';
 import { AccordionSummary, AccordionDetails } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { getCommitsForRepository } from '../../api/commit';
+import { useParams } from 'react-router-dom';
+import Pagination from '@material-ui/lab/Pagination';
 
 // const useStyles = makeStyles(() => ({
 
@@ -11,9 +13,9 @@ import { getCommitsForRepository } from '../../api/commit';
 
 const CommitList: React.FC = () => {
   //const styles = useStyles();
-  const { data: commits } = getCommitsForRepository(
-    '4f80988c-e172-4fb7-9ffc-c260eee761ad',
-  );
+  const { id } = useParams<{ id: string }>();
+  const { data: commits } = getCommitsForRepository(id);
+  const [page, setPage] = useState(0);
 
   console.log(commits);
 
@@ -31,11 +33,18 @@ const CommitList: React.FC = () => {
               <Typography>{commit.title}</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography>{commit.message}</Typography>
+              <Typography>{'Message: ' + commit.message}</Typography>
             </AccordionDetails>
           </Accordion>
         );
       })}
+      <Box my={2} display='flex' justifyContent='center'>
+        <Pagination
+          page={page + 1}
+          count={Math.ceil(commits?.total / 10)}
+          onChange={(e, page) => setPage(page - 1)}
+        />
+      </Box>
     </Container>
   );
 };
