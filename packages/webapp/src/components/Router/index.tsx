@@ -8,6 +8,7 @@ import ListMergeRequestPage from '../../pages/ListMergeRequestPage';
 import ListCommitsByMergeRequestPage from '../../pages/ListCommitsByMergeRequestPage';
 import SettingsPage from '../../pages/Settings';
 import { useAuthContext } from '../../contexts/AuthContext';
+import CommitsPage from '../../pages/Commits';
 
 export function Router() {
   const { user } = useAuthContext();
@@ -25,6 +26,9 @@ export function Router() {
         </Route>
         <Route path='/settings' exact>
           <SettingsPage />
+        </Route>
+        <Route path='/commit/:id' exact>
+          <CommitsPage />
         </Route>
         <Route path='/merge/:id' exact>
           <ListMergeRequestPage />
