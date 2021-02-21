@@ -26,6 +26,14 @@ export class CommitAuthorService {
     return this.repository.save(entity);
   }
 
+  findAllForRepository(repository: Repository) {
+    return this.repository.find({
+      where: {
+        repository,
+      },
+    });
+  }
+
   findByDetails(resource: Commit.Author) {
     return this.repository
       .createQueryBuilder()

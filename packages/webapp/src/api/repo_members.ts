@@ -1,8 +1,10 @@
-import { useApiMutation, useApiQuery } from './base';
+import { ApiResource, useApiMutation, useApiQuery } from './base';
 import { RepositoryMember } from '@ceres/types';
 
 export function useRepositoryMembers(id: string) {
-  return useApiQuery<RepositoryMember[]>(`/repository/${id}/members`);
+  return useApiQuery<ApiResource<RepositoryMember>[]>(
+    `/repository/${id}/members`,
+  );
 }
 
 export function usePostRepositoryMembers(id: string) {

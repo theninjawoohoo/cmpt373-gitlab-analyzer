@@ -10,6 +10,7 @@ import ListMergeRequestPage from '../../pages/ListMergeRequestPage';
 import SettingsPage from '../../pages/Settings';
 import { useAuthContext } from '../../contexts/AuthContext';
 import CommitsPage from '../../pages/Commits';
+import Members from '../../pages/Members';
 
 export function Router() {
   const { user } = useAuthContext();
@@ -21,6 +22,9 @@ export function Router() {
         </Route>
         <Route path='/sfu' exact>
           <SfuVerify />
+        </Route>
+        <Route path='/repository/:id/members' exact>
+          <Members />
         </Route>
         <Route path='/repository' exact>
           <RepositoryPage />

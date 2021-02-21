@@ -10,6 +10,7 @@ import {
 import { IdParam } from '../../common/id-param';
 import { paginatedToResponse } from '../../common/pagination';
 import { QueryDto } from '../../common/query-dto';
+import { CommitAuthorService } from './commit/author/commit-author.service';
 import { RepositoryMemberService } from './repository-member/repository-member.service';
 import { RepositoryService } from './repository.service';
 import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
@@ -25,6 +26,7 @@ export class RepositoryController {
     private readonly repositoryService: RepositoryService,
     private readonly repositoryMemberService: RepositoryMemberService,
     private readonly mergeRequestService: MergeRequestService,
+    private readonly commitAuthorService: CommitAuthorService,
   ) {}
 
   @Get(':id/participants')
@@ -59,6 +61,12 @@ export class RepositoryController {
   ) {
     const repository = await this.repositoryService.findOne(id);
     await this.repositoryMemberService.syncForRepository(repository, token);
+  }
+
+  @Get('/:id/authors')
+  async findProjectAuthors(@Param() { id }: IdParam) {
+    const repository = await this.repositoryService.findOne(id);
+    return this.commitAuthorService.findAllForRepository(repository);
   }
 
   @Get('/:id/members')
