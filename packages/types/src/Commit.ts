@@ -15,6 +15,11 @@ export interface Commit {
 }
 
 export namespace Commit {
+  export interface Author {
+    author_name: string;
+    author_email: string;
+    repository_member_id?: string;
+  }
   export interface DailyCount {
     author_email: string;
     date: string;
