@@ -16,9 +16,7 @@ const Graph: React.FC = () => {
   return (
     <div className={classes.root}>
       <DefaultPageLayout>
-        <div>
-          <DynamicGraph />
-        </div>
+        <DynamicGraph />
       </DefaultPageLayout>
     </div>
   );

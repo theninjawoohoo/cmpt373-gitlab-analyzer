@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     tabs: {
       padding: '2rem',
-      width: '80vw',
+      width: '80vw', //TODO: fix tab bar layout
     },
   }),
 );
@@ -78,7 +78,12 @@ const DynamicGraph: React.FC = () => {
           </Grid>
         </Grid>
         <Grid item>
-          <BarGraph startDate={20210214} endDate={20210230} />
+          <BarGraph
+            repoID={id}
+            studentName={studentName}
+            startDate='2021-01-01'
+            endDate='2021-02-21'
+          />
         </Grid>
       </Grid>
     </>
