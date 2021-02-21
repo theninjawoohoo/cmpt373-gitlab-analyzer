@@ -2,7 +2,7 @@ import React from 'react';
 import MergeRequestsTable from '../../components/MergeRequestsTable';
 import DefaultPageLayout from '../../components/DefaultPageLayout';
 
-const MergeRequestsListPage = () => {
+const ListMergeRequestPage = () => {
   return (
     <>
       <DefaultPageLayout>
@@ -14,4 +14,4 @@ const MergeRequestsListPage = () => {
   );
 };
 
-export default MergeRequestsListPage;
+export default ListMergeRequestPage;

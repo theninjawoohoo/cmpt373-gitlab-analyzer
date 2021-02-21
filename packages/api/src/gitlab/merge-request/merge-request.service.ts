@@ -3,10 +3,11 @@ import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
 import { Repository as TypeORMRepository } from 'typeorm';
-import { BaseSearch, withDefaults } from '../../common/query-dto';
+import { BaseSearch, paginate, withDefaults } from '../../common/query-dto';
 import { CommitService } from '../repository/commit/commit.service';
 import { DiffService } from '../repository/diff/diff.service';
 import { Repository } from '../repository/repository.entity';
+import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
 
 interface MergeRequestSearch extends BaseSearch {
@@ -21,17 +22,44 @@ export class MergeRequestService {
     private readonly repository: TypeORMRepository<MergeRequestEntity>,
     private readonly diffService: DiffService,
     private readonly commitService: CommitService,
+    private readonly participantService: MergeRequestParticipantService,
   ) {}
 
   async search(filters: MergeRequestSearch) {
-    const { repository, pageSize, page } = withDefaults(filters);
-    return this.repository
+    filters = withDefaults(filters);
+    const { repository } = filters;
+    const query = this.repository
       .createQueryBuilder('merge_request')
       .where('merge_request.repository_id = :repository', { repository })
-      .orderBy("merge_request.resource #>> '{merged_at}'", 'DESC')
-      .limit(pageSize)
-      .offset(page)
-      .getManyAndCount();
+      .orderBy("merge_request.resource #>> '{merged_at}'", 'DESC');
+    paginate(query, filters);
+    return query.getManyAndCount();
+  }
+
+  async fetchAllParticipantsForRepository(
+    repository: Repository,
+    token: string,
+  ) {
+    const mergeRequests = await this.findAllForRepository(repository);
+    return await Promise.all(
+      mergeRequests.map(async (mergeRequest) => {
+        return await this.participantService.syncForMergeRequest(
+          mergeRequest,
+          token,
+        );
+      }),
+    );
+  }
+
+  async findAllParticipantsForRepository(repository: Repository) {
+    const mergeRequests = await this.findAllForRepository(repository);
+    return await Promise.all(
+      mergeRequests.map(async (mergeRequest) => {
+        return await this.participantService.findAllForMergeRequest(
+          mergeRequest,
+        );
+      }),
+    );
   }
 
   async findAllForRepository(repository: Repository) {
