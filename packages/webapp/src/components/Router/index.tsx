@@ -33,8 +33,6 @@ export function Router() {
         <Route path='/merge/:id' exact>
           <ListMergeRequestPage />
         </Route>
-        <Route path='/merge/commits/:id' exact>
-          <MergeRequestCommitList />
         <Route path='/commits/:id' exact>
           <ListCommitsByMergeRequestPage />
         </Route>

@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository } from 'typeorm';
 import alwaysArray from '../common/alwaysArray';
-import { WithUser } from '../common/query-dto';
+import { paginate, withDefaults, WithUser } from '../common/query-dto';
 import { User } from '../user/entities/user.entity';
 import { OperationQueryDto } from './dtos/operation-query.dto';
 import { Operation as OperationEntity } from './operation.entity';
@@ -16,6 +16,7 @@ export class OperationService {
   ) {}
 
   search(filters: WithUser<OperationQueryDto>) {
+    filters = withDefaults(filters);
     let query = this.operationRepository.createQueryBuilder('operation');
 
     if (filters.user) {
@@ -51,11 +52,9 @@ export class OperationService {
       });
     }
 
-    return query
-      .orderBy('operation.created_at', 'DESC')
-      .limit(filters.pageSize)
-      .offset(filters.page)
-      .getManyAndCount();
+    query.orderBy('operation.created_at', 'DESC');
+    paginate(query, filters);
+    return query.getManyAndCount();
   }
 
   create(user: User, type: Operation.Type, input: any) {

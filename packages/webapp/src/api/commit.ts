@@ -32,6 +32,7 @@ export function useCommitsForRepository(
   page?: number,
   pageSize?: number,
 ) {
+  console.log({ page });
   return usePaginatedQuery<Commit>(
     `/commit?repository=${repoId}`,
     {},

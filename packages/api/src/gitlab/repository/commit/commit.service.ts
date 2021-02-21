@@ -3,7 +3,7 @@ import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
 import { Repository as TypeORMCommit } from 'typeorm';
-import { withDefaults } from '../../../common/query-dto';
+import { paginate, withDefaults } from '../../../common/query-dto';
 import { DiffService } from '../diff/diff.service';
 import { Repository } from '../repository.entity';
 import { CommitQueryDto } from './commit-query.dto';
@@ -35,11 +35,9 @@ export class CommitService {
       });
     }
 
-    return query
-      .orderBy("commit.resource #>> '{authored_date}'", 'DESC')
-      .limit(filters.pageSize)
-      .offset(filters.page)
-      .getManyAndCount();
+    query.orderBy("commit.resource #>> '{authored_date}'", 'DESC');
+    paginate(query, filters);
+    return query.getManyAndCount();
   }
 
   async findAllForRepository(repository: Repository) {

@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import alwaysArray from '../../../../common/alwaysArray';
+import { paginate, withDefaults } from '../../../../common/query-dto';
 import { CommitDailyCounQueryDto } from './daily-count-query.dto';
 import { CommitDailyCount } from './daily-count.entity';
 
@@ -14,6 +15,7 @@ export class CommitDailyCountService {
   ) {}
 
   search(filters: CommitDailyCounQueryDto) {
+    filters = withDefaults(filters);
     const query = this.repository.createQueryBuilder('daily_count');
 
     if (filters.author_email) {
@@ -43,11 +45,9 @@ export class CommitDailyCountService {
       );
     }
 
-    return query
-      .orderBy("daily_count.resource #>> '{created_at}'")
-      .limit(filters.pageSize)
-      .offset(filters.page)
-      .getManyAndCount();
+    query.orderBy("daily_count.resource #>> '{created_at}'");
+    paginate(query, filters);
+    return query.getManyAndCount();
   }
 
   createAll(dailyCounts: Commit.DailyCount[], repositoryId: string) {

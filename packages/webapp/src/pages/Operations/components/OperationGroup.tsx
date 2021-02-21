@@ -12,9 +12,12 @@ interface OperationGroupProps {
 
 const OperationGroup: React.FC<OperationGroupProps> = ({ status }) => {
   const [page, setPage] = useState(0);
-  const { data, isLoading } = useGetOperations({
-    status,
-  });
+  const { data, isLoading } = useGetOperations(
+    {
+      status,
+    },
+    page,
+  );
   return (
     <>
       {isLoading ? (

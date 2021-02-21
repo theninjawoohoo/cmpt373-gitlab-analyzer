@@ -1,5 +1,5 @@
 import { Repository } from '@ceres/types';
-import { BaseSearch, withDefaults } from '../../common/query-dto';
+import { BaseSearch, paginate, withDefaults } from '../../common/query-dto';
 import { Repository as RepositoryEntity } from './repository.entity';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -19,14 +19,14 @@ export class RepositoryService {
   ) {}
 
   async search(filters: RepositorySearch) {
-    const { userId, pageSize, page } = withDefaults(filters);
-    return this.repository
+    filters = withDefaults(filters);
+    const { userId } = filters;
+    const query = this.repository
       .createQueryBuilder('repository')
       .where('repository.user_id = :userId', { userId })
-      .orderBy("repository.resource #>> '{created_at}'", 'DESC')
-      .limit(pageSize)
-      .offset(page)
-      .getManyAndCount();
+      .orderBy("repository.resource #>> '{created_at}'", 'DESC');
+    paginate(query, filters);
+    return query.getManyAndCount();
   }
 
   async findOne(id: string) {
