@@ -61,6 +61,19 @@ export class CommitService {
     return rows.map((row) => ({ ...row, count: parseInt(row.count) }));
   }
 
+  async getDistinctAuthors(repository: Repository) {
+    const rows = await this.commitRepository
+      .createQueryBuilder('commit')
+      .select("commit.resource #>>'{author_email}'", 'author_email')
+      .addSelect("commit.resource #>>'{author_name}'", 'author_name')
+      .distinct(true)
+      .where('commit.repository_id = :repositoryId', {
+        repositoryId: repository.id,
+      })
+      .getRawMany();
+    return rows as Commit.Author[];
+  }
+
   async fetchForRepository(repository: Repository, token: string) {
     let commits: Commit[] = [];
     let page = 1;

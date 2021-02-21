@@ -1,8 +1,11 @@
 import { Operation } from '@ceres/types';
 import { Repository as TypeORMRepository } from 'typeorm';
 import { MergeRequestService } from '../../gitlab/merge-request/merge-request.service';
+import { CommitAuthorService } from '../../gitlab/repository/commit/author/commit-author.service';
 import { CommitService } from '../../gitlab/repository/commit/commit.service';
 import { CommitDailyCountService } from '../../gitlab/repository/commit/daily-count/daily-count.service';
+import { RepositoryMember } from '../../gitlab/repository/repository-member/repository-member.entity';
+import { RepositoryMemberService } from '../../gitlab/repository/repository-member/repository-member.service';
 import { Repository } from '../../gitlab/repository/repository.entity';
 import { RepositoryService } from '../../gitlab/repository/repository.service';
 import { GitlabTokenService } from '../../gitlab/services/gitlab-token.service';
@@ -13,6 +16,7 @@ enum Stage {
   syncMergeRequests = 'syncMergeRequests',
   linkCommitsAndMergeRequests = 'linkCommitsAndMergeRequests',
   createDailyCommitCaches = 'createDailyCommitCaches',
+  linkAuthors = 'linkAuthors',
 }
 
 export class SyncRepositoryExecutor {
@@ -24,6 +28,8 @@ export class SyncRepositoryExecutor {
     private readonly mergeRequestService: MergeRequestService,
     private readonly repositoryService: RepositoryService,
     private readonly commitDailyCountService: CommitDailyCountService,
+    private readonly commitAuthorService: CommitAuthorService,
+    private readonly repositoryMemberService: RepositoryMemberService,
   ) {}
 
   private stages = {
@@ -35,9 +41,11 @@ export class SyncRepositoryExecutor {
     [Stage.createDailyCommitCaches]: this.createStage(
       'Create Daily Commit Caches',
     ),
+    [Stage.linkAuthors]: this.createStage('Link Authors'),
   };
   private repository: Repository;
   private token: string;
+  private members: RepositoryMember[] = [];
 
   async run() {
     await this.init();
@@ -45,8 +53,11 @@ export class SyncRepositoryExecutor {
       this.syncResource(Stage.syncCommits, this.commitService),
       this.syncResource(Stage.syncMergeRequests, this.mergeRequestService),
     ]);
-    await this.linkCommitsAndMergeRequests();
-    await this.createDailyCommitCaches();
+    await Promise.all([
+      this.linkCommitsAndMergeRequests(),
+      this.createDailyCommitCaches(),
+      this.linkAuthors(),
+    ]);
   }
 
   private async init() {
@@ -60,6 +71,9 @@ export class SyncRepositoryExecutor {
     );
     this.repository = repository;
     this.token = token;
+    this.members = await this.repositoryMemberService.findAllForRepository(
+      repository,
+    );
   }
 
   private async syncResource(
@@ -101,6 +115,38 @@ export class SyncRepositoryExecutor {
       this.repository.id,
     );
     await this.completeStage(Stage.createDailyCommitCaches);
+  }
+
+  private async linkAuthors() {
+    await this.startStage(Stage.linkAuthors);
+    const authors = await this.commitService.getDistinctAuthors(
+      this.repository,
+    );
+    await Promise.all(
+      authors.map(async (author) => {
+        const authorEntity = await this.commitAuthorService.findByDetails(
+          author,
+        );
+        if (!authorEntity) {
+          const repositoryMember = this.members.find((member) => {
+            console.log({
+              member: member.resource.email,
+              author: author.author_email,
+            });
+            return member.resource.name === author.author_name;
+          });
+          if (repositoryMember) {
+            author.repository_member_id = repositoryMember.id;
+          }
+          await this.commitAuthorService.create(
+            author,
+            this.repository,
+            repositoryMember,
+          );
+        }
+      }),
+    );
+    await this.completeStage(Stage.linkAuthors);
   }
 
   private createStage(name: string) {
