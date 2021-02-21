@@ -6,6 +6,8 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import BarGraph from './BarGraph';
 import StudentDropdownMenu from '../Common/StudentDropdownMenu';
+import { useParams } from 'react-router-dom';
+import { useRepositoryMembers } from '../../api/repo_members';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -31,6 +33,8 @@ const DynamicGraph: React.FC = () => {
   const classes = useStyles();
   const [studentName, setStudentName] = useState('All students');
   const [value, setValue] = React.useState(0);
+  const { id } = useParams<{ id: string }>();
+  const { data: repoMembers } = useRepositoryMembers(id);
 
   const handleChange = (
     event: React.ChangeEvent<unknown>,
@@ -67,6 +71,7 @@ const DynamicGraph: React.FC = () => {
           </Grid>
           <Grid item>
             <StudentDropdownMenu
+              repoMembers={repoMembers}
               studentName={studentName}
               setStudentName={setStudentName}
             />
