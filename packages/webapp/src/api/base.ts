@@ -21,8 +21,10 @@ export function usePaginatedQuery<T>(
   page = 0,
   pageSize = 10,
 ) {
-  return useQuery<SearchResults<T>>(
-    [route, params, page, pageSize],
+  const client = useQueryClient();
+  const key = [route, params, page, pageSize];
+  const result = useQuery<SearchResults<T>>(
+    key,
     async () => {
       const response = await axios.get<SearchResults<T>>(route, {
         params: {
@@ -35,6 +37,7 @@ export function usePaginatedQuery<T>(
     },
     { keepPreviousData: true },
   );
+  return { ...result, invalidate: () => client.invalidateQueries(key) };
 }
 
 export function useApiMutation<T, B>(route: string, method: Method) {
