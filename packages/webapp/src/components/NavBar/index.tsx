@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { ListItem, List } from '@material-ui/core';
 import ItemBox from './itemBox';
+import { useRepositoryContext } from '../../contexts/RepositoryContext';
 
 interface UserNameProps {
   username: string;
@@ -26,6 +27,8 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
   const theme = useTheme();
   const styles = useStyles(theme);
   const [open, setOpen] = useState(false);
+  const { repositoryId } = useRepositoryContext();
+  console.log(repositoryId);
   return (
     <>
       <div
@@ -39,7 +42,11 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
           <ItemBox icon='user' primary={UserNameProps.username} url='/' />
           <ItemBox icon='repo' primary={'Repository'} url='/repository' />
           <ItemBox icon='graph' primary={'Graph'} url='/graph' />
-          <ItemBox icon='merge' primary={'Merge Reqests'} url='/merge' />
+          <ItemBox
+            icon='merge'
+            primary={'Merge Reqests'}
+            url={`/merge/${repositoryId}`}
+          />
           <ItemBox icon='commit' primary={'Commits'} url='/commits' />
           <ItemBox icon='setting' primary={'Settings'} url='/settings' />
           <ItemBox icon='operation' primary={'Operations'} url='/operations' />
