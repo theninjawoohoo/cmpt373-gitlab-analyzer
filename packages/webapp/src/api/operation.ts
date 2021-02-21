@@ -1,4 +1,5 @@
 import { Operation } from '@ceres/types';
+import { MutateOptions } from 'react-query';
 import { useApiMutation, usePaginatedQuery } from './base';
 
 interface OperationInput {
@@ -7,8 +8,11 @@ interface OperationInput {
 
 export function useSyncRepository() {
   const mutation = useCreateOperation();
-  const sync = (id: string) => {
-    mutation.mutate(Operation.buildSyncRepositoryPayload(id));
+  const sync = (
+    id: string,
+    options?: MutateOptions<Operation, any, OperationInput>,
+  ) => {
+    mutation.mutate(Operation.buildSyncRepositoryPayload(id), options);
   };
   return {
     ...mutation,
