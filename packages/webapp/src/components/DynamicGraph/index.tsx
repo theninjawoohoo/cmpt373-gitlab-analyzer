@@ -4,10 +4,11 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import BarGraph from './BarGraph';
 import StudentDropdownMenu from '../Common/StudentDropdownMenu';
 import { useParams } from 'react-router-dom';
 import { useRepositoryMembers } from '../../api/repo_members';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import { useCommitDailyCounts } from '../../api/commit';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     tabs: {
       padding: '2rem',
-      width: '80vw', //TODO: fix tab bar layout
+      width: '65vw', //TODO: fix tab bar layout
     },
   }),
 );
@@ -35,6 +36,10 @@ const DynamicGraph: React.FC = () => {
   const [value, setValue] = React.useState(0);
   const { id } = useParams<{ id: string }>();
   const { data: repoMembers } = useRepositoryMembers(id);
+  const { data: commitCounts } = useCommitDailyCounts({
+    repository: id,
+  });
+  const commits = commitCounts?.results || [];
 
   const handleChange = (
     event: React.ChangeEvent<unknown>,
@@ -78,12 +83,19 @@ const DynamicGraph: React.FC = () => {
           </Grid>
         </Grid>
         <Grid item>
-          <BarGraph
-            repoID={id}
-            studentName={studentName}
-            startDate='2021-01-01'
-            endDate='2021-02-21'
-          />
+          <BarChart width={1000} height={500} data={commits}>
+            <XAxis dataKey={commits.keys} />
+            <YAxis />
+            <Tooltip />
+            <Legend layout='vertical' align='right' verticalAlign='top' />
+            <Bar
+              dataKey={commits.values}
+              name='Commits'
+              stackId='a'
+              fill='#0A4D63'
+            />
+            {/* <Bar dataKey='mrs' name='Merge Requests' stackId='a' fill='#e37500' /> */}
+          </BarChart>
         </Grid>
       </Grid>
     </>
