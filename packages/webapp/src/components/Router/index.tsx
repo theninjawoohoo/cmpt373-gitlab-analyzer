@@ -7,6 +7,7 @@ import SfuVerify from '../../pages/SfuVerify';
 import MergeRequestsList from '../../pages/MergeRequestList';
 import MergeRequestCommitList from '../MergeRequestCommitList';
 import SettingsPage from '../../pages/Settings';
+import CommitsPage from '../../pages/Commits';
 
 export function Router() {
   return (
@@ -24,10 +25,13 @@ export function Router() {
         <Route path='/settings' exact>
           <SettingsPage />
         </Route>
+        <Route path='/commit/:id' exact>
+          <CommitsPage />
+        </Route>
         <Route path='/merge/:id' exact>
           <MergeRequestsList />
         </Route>
-        <Route path='/commits/:id' exact>
+        <Route path='/merge/commits/:id' exact>
           <MergeRequestCommitList />
         </Route>
         <Route path='/operations' exact>
