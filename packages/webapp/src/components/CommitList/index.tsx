@@ -3,7 +3,7 @@ import { Typography, Container, Accordion, Box } from '@material-ui/core';
 import React, { useState } from 'react';
 import { AccordionSummary, AccordionDetails } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { getCommitsForRepository } from '../../api/commit';
+import { useCommitsForRepository } from '../../api/commit';
 import { useParams } from 'react-router-dom';
 import Pagination from '@material-ui/lab/Pagination';
 
@@ -14,8 +14,8 @@ import Pagination from '@material-ui/lab/Pagination';
 const CommitList: React.FC = () => {
   //const styles = useStyles();
   const { id } = useParams<{ id: string }>();
-  const { data: commits } = getCommitsForRepository(id);
   const [page, setPage] = useState(0);
+  const { data: commits } = useCommitsForRepository(id, page);
 
   console.log(commits);
 

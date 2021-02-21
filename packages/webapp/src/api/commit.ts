@@ -27,6 +27,15 @@ export function useCommitsForMergeRequest(mergeRequestId: string) {
   );
 }
 
-export function getCommitsForRepository(repoId: string) {
-  return useApiQuery<SearchResults<Commit>>(`/commit?repository=${repoId}`);
+export function useCommitsForRepository(
+  repoId: string,
+  page?: number,
+  pageSize?: number,
+) {
+  return usePaginatedQuery<Commit>(
+    `/commit?repository=${repoId}`,
+    {},
+    page,
+    pageSize,
+  );
 }
