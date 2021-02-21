@@ -15,6 +15,7 @@ import { RepositoryService } from './repository.service';
 import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { VerifiedUser } from '../../auth/types/VerifiedUser';
+import { MergeRequestService } from '../merge-request/merge-request.service';
 import { CommitService } from './commit/commit.service';
 
 @Controller('repository')
@@ -23,7 +24,32 @@ export class RepositoryController {
     private readonly commitService: CommitService,
     private readonly repositoryService: RepositoryService,
     private readonly repositoryMemberService: RepositoryMemberService,
+    private readonly mergeRequestService: MergeRequestService,
   ) {}
+
+  @Get(':id/participants')
+  async findMergeRequestParticipants(@Param('id') id: string) {
+    const repository = await this.repositoryService.findOne(id);
+    return await this.mergeRequestService.findAllParticipantsForRepository(
+      repository,
+    );
+  }
+
+  @Post(':id/participants/sync')
+  @HttpCode(204)
+  async syncMergeRequestParticipants(
+    @Param('id') id: string,
+    @GitlabToken() token: string,
+  ) {
+    const repository = await this.repositoryService.findOne(id);
+    if (repository) {
+      return await this.mergeRequestService.fetchAllParticipantsForRepository(
+        repository,
+        token,
+      );
+    }
+    throw new NotFoundException(`Could not find a repository with id: ${id}`);
+  }
 
   @Post(':id/members/sync')
   @HttpCode(204)
