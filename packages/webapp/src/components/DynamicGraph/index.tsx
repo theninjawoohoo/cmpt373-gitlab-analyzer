@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       height: '100vh',
       width: '100vw',
-      alignContent: 'center',
+      alignContent: 'flex-start',
     },
     title: {
       fontSize: '2rem',
@@ -37,6 +37,8 @@ const useStyles = makeStyles((theme: Theme) =>
 const DynamicGraph: React.FC = () => {
   const classes = useStyles();
   const [studentName, setStudentName] = useState('All students');
+  const [startDate] = useState(new Date('2020-03-01'));
+  const [endDate] = useState(new Date('2020-04-01'));
   const [value, setValue] = React.useState(0);
   const { id } = useParams<{ id: string }>();
   const { data: repoMembers } = useRepositoryMembers(id);
@@ -44,7 +46,33 @@ const DynamicGraph: React.FC = () => {
   const { data: commits } = useCommitDailyCounts({
     repository: id,
   });
-  const [graphData, setGraphData] = useState(commits?.results);
+
+  //TODO: create a { date, count } array ordered by date to be used by BarChart
+  const createGraphData = (date: Date) => {
+    let count = 0;
+    commits?.results.forEach((commit) =>
+      new Date(commit.date) == date ? (count = commit.count) : (count = 0),
+    );
+    date.toDateString();
+    return {
+      date,
+      count,
+    };
+  };
+
+  const sortByDate = () => {
+    const date = startDate;
+    const array = [];
+    do {
+      array.concat(createGraphData(date));
+      date.setDate(date.getDate() + 1);
+    } while (date <= endDate);
+
+    return array;
+  };
+
+  const [graphData, setGraphData] = useState(sortByDate());
+
   commits?.results.forEach(
     (commit) => (commit.date = new Date(commit.date).toDateString()),
   );
@@ -53,7 +81,7 @@ const DynamicGraph: React.FC = () => {
     mutate(null);
     if (studentName != 'All students') {
       setGraphData(
-        commits?.results.filter((commit) => commit.author_email == studentName),
+        commits?.results.filter((commit) => commit.author_name == studentName),
       );
     } else {
       setGraphData(commits?.results);
