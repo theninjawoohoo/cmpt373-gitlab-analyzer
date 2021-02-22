@@ -119,13 +119,18 @@ export class SyncRepositoryExecutor {
 
   private async linkAuthors() {
     await this.startStage(Stage.linkAuthors);
-    const authors = await this.commitService.getDistinctAuthors(
+    const uniqueAuthors = await this.commitService.getDistinctAuthors(
+      this.repository,
+    );
+    const storedAuthors = await this.commitAuthorService.findAllForRepository(
       this.repository,
     );
     await Promise.all(
-      authors.map(async (author) => {
-        const authorEntity = await this.commitAuthorService.findByDetails(
-          author,
+      uniqueAuthors.map(async (author) => {
+        const authorEntity = storedAuthors.find(
+          (a) =>
+            a.resource.author_name === author.author_name &&
+            a.resource.author_email === author.author_email,
         );
         if (!authorEntity) {
           const repositoryMember = this.members.find((member) => {

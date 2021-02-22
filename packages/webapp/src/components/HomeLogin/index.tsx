@@ -26,6 +26,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+const REDIRECT_URL =
+  process.env.REACT_APP_SFU_REDIRECT || 'http://localhost:3000/sfu';
+
 const HomeLogin: React.FC = () => {
   const classes = useStyles();
   return (
@@ -37,7 +40,7 @@ const HomeLogin: React.FC = () => {
         <Button
           variant='outlined'
           color='secondary'
-          href='https://cas.sfu.ca?service=http://localhost:3000/sfu'
+          href={`https://cas.sfu.ca?service=${REDIRECT_URL}`}
           className={classes.loginButton}
         >
           Log in via SFU
