@@ -54,10 +54,11 @@ export class CommitAuthorService {
     return this.repository.findOne({ where: { id } });
   }
 
-  findByDetails(resource: Commit.Author) {
+  findByDetails(resource: Commit.Author, repository: Repository) {
     return this.repository
       .createQueryBuilder()
       .where('resource @> :resource', { resource })
+      .andWhere('repository_id = :repository', { repository: repository.id })
       .getOne();
   }
 }
