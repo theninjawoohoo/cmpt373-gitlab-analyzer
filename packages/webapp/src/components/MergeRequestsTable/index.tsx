@@ -1,3 +1,4 @@
+import Button from '@material-ui/core/Button/Button';
 import React, { useEffect } from 'react';
 import {
   withStyles,
@@ -27,6 +28,7 @@ import {
   usePostRepositoryMembers,
   useRepositoryMembers,
 } from '../../api/repo_members';
+import Box from '@material-ui/core/Box';
 
 const useBigTableStyles = makeStyles({
   table: {
@@ -163,8 +165,12 @@ const MergeRequestsTable = () => {
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, results?.length - page * rowsPerPage);
 
-  const handleRowClick = (id: string) => {
+  const handleShowCommits = (id: string) => {
     history.push(`/commits?merge_request=${id}`);
+  };
+
+  const handleShowDiff = (id: string) => {
+    history.push(`/diff?merge_request=${id}`);
   };
 
   const handleChangePage = (
@@ -198,9 +204,7 @@ const MergeRequestsTable = () => {
               <TableCellInstance>Title</TableCellInstance>
               <TableCellInstance>Created&nbsp;by</TableCellInstance>
               <TableCellInstance>Score</TableCellInstance>
-              <TableCellInstance>
-                Number&nbsp;of&nbsp;comments
-              </TableCellInstance>
+              <TableCellInstance>Actions</TableCellInstance>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -211,11 +215,7 @@ const MergeRequestsTable = () => {
                 )
               : results
             )?.map((row) => (
-              <TableRow
-                hover={true}
-                key={row.id}
-                onClick={() => handleRowClick(row.meta.id)}
-              >
+              <TableRow hover={true} key={row.id}>
                 <TableCellInstance>
                   {row.created_at
                     .toString()
@@ -229,7 +229,22 @@ const MergeRequestsTable = () => {
                   // TODO: Add score below instead of upvotes
                 }
                 <TableCellInstance>{row.upvotes}</TableCellInstance>
-                <TableCellInstance>{row.user_notes_count}</TableCellInstance>
+                <TableCellInstance>
+                  <Box display='inline' mr={2}>
+                    <Button
+                      variant='contained'
+                      onClick={() => handleShowCommits(row.meta.id)}
+                    >
+                      Commits
+                    </Button>
+                  </Box>
+                  <Button
+                    variant='contained'
+                    onClick={() => handleShowDiff(row.meta.id)}
+                  >
+                    View Diff
+                  </Button>
+                </TableCellInstance>
               </TableRow>
             ))}
             {emptyRows > 0 && (
