@@ -1,15 +1,19 @@
+import { RepositoryMember } from '@ceres/types';
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { IdParam } from '../../common/id-param';
 import { paginatedToResponse } from '../../common/pagination';
 import { QueryDto } from '../../common/query-dto';
+import { CommitAuthorService } from './commit/author/commit-author.service';
 import { RepositoryMemberService } from './repository-member/repository-member.service';
 import { RepositoryService } from './repository.service';
 import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
@@ -25,6 +29,7 @@ export class RepositoryController {
     private readonly repositoryService: RepositoryService,
     private readonly repositoryMemberService: RepositoryMemberService,
     private readonly mergeRequestService: MergeRequestService,
+    private readonly commitAuthorService: CommitAuthorService,
   ) {}
 
   @Get(':id/participants')
@@ -59,6 +64,30 @@ export class RepositoryController {
   ) {
     const repository = await this.repositoryService.findOne(id);
     await this.repositoryMemberService.syncForRepository(repository, token);
+  }
+
+  @Get('/:id/authors')
+  async findProjectAuthors(@Param() { id }: IdParam) {
+    const repository = await this.repositoryService.findOne(id);
+    return this.commitAuthorService.findAllForRepository(repository);
+  }
+
+  @Put('/author/:id/member')
+  async updateProjectAuthor(
+    @Param() { id }: IdParam,
+    @Body() member?: RepositoryMember,
+  ) {
+    let memberEntity;
+    if (member) {
+      memberEntity = await this.repositoryMemberService.findOne(
+        (member as any).meta.id,
+      );
+    }
+    const author = await this.commitAuthorService.findOne(id);
+    return this.commitAuthorService.updateRepositoryMember(
+      author,
+      memberEntity,
+    );
   }
 
   @Get('/:id/members')

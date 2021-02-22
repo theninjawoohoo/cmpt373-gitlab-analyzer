@@ -30,6 +30,7 @@ export function useCommitsForMergeRequest(mergeRequestId: string) {
 interface CommitSearchParams {
   repository?: string;
   merge_request?: string;
+  author_email?: string[];
 }
 
 export function useGetCommits(

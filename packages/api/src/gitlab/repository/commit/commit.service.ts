@@ -3,6 +3,7 @@ import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
 import { Repository as TypeORMCommit } from 'typeorm';
+import alwaysArray from '../../../common/alwaysArray';
 import { paginate, withDefaults } from '../../../common/query-dto';
 import { DiffService } from '../diff/diff.service';
 import { Repository } from '../repository.entity';
@@ -33,6 +34,15 @@ export class CommitService {
       query.andWhere('merge_request.id = :merge_request', {
         merge_request: filters.merge_request,
       });
+    }
+
+    if (filters.author_email) {
+      query.andWhere(
+        "commit.resource #>> '{author_email}' IN (:...authorEmail)",
+        {
+          authorEmail: alwaysArray(filters.author_email),
+        },
+      );
     }
 
     query.orderBy("commit.resource #>> '{authored_date}'", 'DESC');

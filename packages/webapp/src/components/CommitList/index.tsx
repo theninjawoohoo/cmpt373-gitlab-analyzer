@@ -10,22 +10,41 @@ import { Link, useLocation } from 'react-router-dom';
 import Pagination from '@material-ui/lab/Pagination';
 import Button from '@material-ui/core/Button/Button';
 import Box from '@material-ui/core/Box';
+import { useRepositoryContext } from '../../contexts/RepositoryContext';
+import MemberDropdown from './components/MemberDropdown';
 
 const CommitList: React.FC = () => {
   const location = useLocation();
   const query = parse(location.search.replace(/^\?/, ''));
   const [page, setPage] = useState(0);
+  const [emails, setEmails] = useState<string[]>([]);
+  const { repositoryId } = useRepositoryContext();
   const { data: commits } = useGetCommits(
     {
       repository: query.repository as string,
       merge_request: query.merge_request as string,
+      author_email: emails,
     },
     page,
   );
 
   return (
     <Container>
-      <Typography variant='h1'>Commit list</Typography>
+      <Box my={4}>
+        <Grid container justify='space-between' alignItems='center'>
+          <Grid item>
+            <Typography variant='h1'>Commit list</Typography>
+          </Grid>
+          <Grid item>
+            <MemberDropdown
+              repositoryId={repositoryId}
+              onChange={(newEmails) => {
+                setEmails(newEmails);
+              }}
+            />
+          </Grid>
+        </Grid>
+      </Box>
       {commits?.results.map((commit) => {
         return (
           <Accordion key={commit.meta.id}>

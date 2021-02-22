@@ -24,6 +24,10 @@ export class RepositoryMemberService {
     });
   }
 
+  findOne(id: string) {
+    return this.memberRepository.findOne({ where: { id } });
+  }
+
   private async createOrUpdate(
     members: RepositoryMember[],
     repository: Repository,
