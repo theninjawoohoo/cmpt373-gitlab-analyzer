@@ -29,7 +29,7 @@ const OperationProgress: React.FC<OperationProgressProps> = ({ operation }) => {
             <Typography variant='body2'>
               {new Date(operation.meta.createdAt).toDateString()}
               {' - '}
-              {new Date(operation.start_time).toLocaleTimeString('en-US')}
+              {new Date(operation.meta.createdAt).toLocaleTimeString('en-US')}
             </Typography>
           </div>
           <Box>

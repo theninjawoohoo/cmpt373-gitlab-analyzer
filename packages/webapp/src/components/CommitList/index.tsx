@@ -53,7 +53,14 @@ const CommitList: React.FC = () => {
               aria-controls={commit.id + '-content'}
               id={commit.id + '-header'}
             >
-              <Typography>{commit.title}</Typography>
+              <div>
+                <Typography>{commit.title}</Typography>
+                <Typography variant='body2'>
+                  {new Date(commit.authored_date).toDateString()}
+                  {' - '}
+                  {new Date(commit.authored_date).toLocaleTimeString('en-US')}
+                </Typography>
+              </div>
             </AccordionSummary>
             <AccordionDetails>
               <Typography>{'Message: ' + commit.message + '\n'}</Typography>
