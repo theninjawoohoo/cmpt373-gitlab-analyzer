@@ -23,5 +23,5 @@
 
 
 ### Docker 
-This is not needed to development purposes and is used to run the webapp without any setup:
-Run `docker-compose up` in the project root. This will take a few minutes to download and build everything, but once it's done it'll tell you to visit `http://localhost:3000`. You'll find the webapp there.
+~~This is not needed to development purposes and is used to run the webapp without any setup:
+Run `docker-compose up` in the project root. This will take a few minutes to download and build everything, but once it's done it'll tell you to visit `http://localhost:3000`. You'll find the webapp there.~~ Docker needs to be updated since we introduced the `@ceres/types` package.
