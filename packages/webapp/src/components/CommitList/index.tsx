@@ -56,7 +56,10 @@ const CommitList: React.FC = () => {
               <Typography>{commit.title}</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography>{'Message: ' + commit.message}</Typography>
+              <Typography>{'Message: ' + commit.message + '\n'}</Typography>
+            </AccordionDetails>
+            <AccordionDetails>
+              <Typography>{'Author: ' + commit.author_name}</Typography>
             </AccordionDetails>
             <Divider />
             <AccordionSummary>
