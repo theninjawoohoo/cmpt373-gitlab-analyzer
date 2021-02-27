@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import Diff from '../../pages/Diff';
 import RepositoryPage from '../../pages/Repository';
 import Login from '../../pages/Login';
@@ -10,6 +10,7 @@ import ListMergeRequestPage from '../../pages/ListMergeRequestPage';
 import SettingsPage from '../../pages/Settings';
 import { useAuthContext } from '../../contexts/AuthContext';
 import CommitsPage from '../../pages/Commits';
+import Members from '../../pages/Members';
 
 export function Router() {
   const { user } = useAuthContext();
@@ -17,10 +18,13 @@ export function Router() {
     <BrowserRouter>
       <Switch>
         <Route path='/' exact>
-          {user?.id ? <RepositoryPage /> : <Login />}
+          {user?.id ? <Redirect to='/repository' /> : <Login />}
         </Route>
         <Route path='/sfu' exact>
           <SfuVerify />
+        </Route>
+        <Route path='/repository/:id/members' exact>
+          <Members />
         </Route>
         <Route path='/repository' exact>
           <RepositoryPage />

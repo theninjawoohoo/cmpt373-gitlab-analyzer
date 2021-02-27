@@ -10,6 +10,7 @@ interface ListItemBoxProps {
   icon: string;
   primary: string;
   url: string;
+  repositoryDependent?: boolean;
 }
 
 const useStyles = makeStyles(() => ({
@@ -69,25 +70,7 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
         <ListItemText primary={ListItemBoxProps.primary} />
       </ListItem>
     );
-  } else if (ListItemBoxProps.icon == 'commit' && repositoryId == '') {
-    return (
-      <ListItem button disabled component={Link} to={ListItemBoxProps.url}>
-        <ListItemIcon>
-          <Icon icon={ListItemBoxProps.icon} />
-        </ListItemIcon>
-        <ListItemText primary={ListItemBoxProps.primary} />
-      </ListItem>
-    );
-  } else if (ListItemBoxProps.icon == 'graph' && repositoryId == '') {
-    return (
-      <ListItem button disabled component={Link} to={ListItemBoxProps.url}>
-        <ListItemIcon>
-          <Icon icon={ListItemBoxProps.icon} />
-        </ListItemIcon>
-        <ListItemText primary={ListItemBoxProps.primary} />
-      </ListItem>
-    );
-  } else if (ListItemBoxProps.icon == 'merge' && repositoryId == '') {
+  } else if (ListItemBoxProps.repositoryDependent && repositoryId == '') {
     return (
       <ListItem button disabled component={Link} to={ListItemBoxProps.url}>
         <ListItemIcon>

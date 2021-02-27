@@ -28,7 +28,6 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
   const styles = useStyles(theme);
   const [open, setOpen] = useState(false);
   const { repositoryId } = useRepositoryContext();
-  console.log('repoid: ' + repositoryId);
   return (
     <>
       <div
@@ -45,16 +44,25 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
             icon='graph'
             primary={'Graph'}
             url={`/graph/${repositoryId}`}
+            repositoryDependent
           />
           <ItemBox
             icon='merge'
-            primary={'Merge Reqests'}
+            primary={'Merge Requests'}
             url={`/merge/${repositoryId}`}
+            repositoryDependent
           />
           <ItemBox
             icon='commit'
             primary={'Commits'}
             url={`/commits?repository=${repositoryId}`}
+            repositoryDependent
+          />
+          <ItemBox
+            icon='members'
+            primary={'Members'}
+            url={`/repository/${repositoryId}/members`}
+            repositoryDependent
           />
           <ItemBox icon='setting' primary={'Settings'} url='/settings' />
           <ItemBox icon='operation' primary={'Operations'} url='/operations' />
