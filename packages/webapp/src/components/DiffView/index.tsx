@@ -13,6 +13,8 @@ import Root from './components/root';
 interface DiffViewProps {
   fileName: string;
   hunks: Hunk[];
+  expanded?: boolean;
+  onSummaryClick?: () => void;
 }
 
 interface Line {
@@ -115,10 +117,15 @@ function computeLines(hunk: Hunk) {
   return lines;
 }
 
-const DiffView: React.FC<DiffViewProps> = ({ fileName, hunks }) => {
+const DiffView: React.FC<DiffViewProps> = ({
+  fileName,
+  hunks,
+  expanded,
+  onSummaryClick,
+}) => {
   return (
-    <Accordion>
-      <AccordionSummary expandIcon={<ExpandMore />}>
+    <Accordion expanded={expanded || false}>
+      <AccordionSummary expandIcon={<ExpandMore />} onClick={onSummaryClick}>
         <Typography style={{ fontFamily: 'monospace' }}>{fileName}</Typography>
       </AccordionSummary>
       <AccordionDetails>

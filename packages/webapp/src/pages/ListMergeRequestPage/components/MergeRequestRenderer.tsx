@@ -28,7 +28,7 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
   onClickSummary,
 }) => {
   return (
-    <Accordion expanded={active}>
+    <Accordion expanded={active} TransitionProps={{ timeout: 0 }}>
       <AccordionSummary expandIcon={<ExpandMore />} onClick={onClickSummary}>
         <Grid container>
           <Grid item xs={6}>
