@@ -124,7 +124,7 @@ const DiffView: React.FC<DiffViewProps> = ({
   onSummaryClick,
 }) => {
   return (
-    <Accordion expanded={expanded || false}>
+    <Accordion expanded={expanded || false} TransitionProps={{ timeout: 0 }}>
       <AccordionSummary expandIcon={<ExpandMore />} onClick={onSummaryClick}>
         <Typography style={{ fontFamily: 'monospace' }}>{fileName}</Typography>
       </AccordionSummary>
