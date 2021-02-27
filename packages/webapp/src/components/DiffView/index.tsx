@@ -6,7 +6,7 @@ import {
   Box,
   Typography,
 } from '@material-ui/core';
-import { ExpandMore } from '@material-ui/icons';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import React from 'react';
 import Root from './components/root';
 
