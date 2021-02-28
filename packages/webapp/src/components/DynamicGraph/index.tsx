@@ -6,13 +6,12 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import StudentDropdownMenu from '../Common/StudentDropdownMenu';
 import { useParams } from 'react-router-dom';
-import {
-  usePostRepositoryMembers,
-  useRepositoryMembers,
-} from '../../api/repo_members';
+import { useRepositoryMembers } from '../../api/repo_members';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { useCommitDailyCounts } from '../../api/commit';
 import { DateTime } from 'luxon';
+import { SearchResults } from '../../api/base';
+import { Commit } from '@ceres/types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -43,48 +42,52 @@ const DynamicGraph: React.FC = () => {
   const [value, setValue] = React.useState(0);
   const { id } = useParams<{ id: string }>();
   const { data: repoMembers } = useRepositoryMembers(id);
-  const { mutate } = usePostRepositoryMembers(id);
-  const { data: commits } = useCommitDailyCounts({
-    repository: id,
-  });
+  const { data: commits } = useCommitDailyCounts(
+    {
+      repository: id,
+    },
+    0,
+    9000,
+  );
+  const [graphData, setGraphData] = useState([]);
 
-  const createGraphData = (date: DateTime) => {
+  // useEffect(() => {
+  //   if (studentName != 'All students') {
+  //     setGraphData(
+  //       commits?.results.filter((commit) => commit.author_name == studentName),
+  //     );
+  //   } else {
+  //     setGraphData(commits?.results);
+  //   }
+  // }, [repoMembers, commits, studentName]);
+
+  const createGraphData = (
+    date: DateTime,
+    commits: SearchResults<Commit.DailyCount>,
+  ) => {
     let count = 0;
-    commits?.results.forEach((commit) =>
-      DateTime.fromISO(commit.date).hasSame(date, 'day')
-        ? (count = commit.count)
-        : (count = 0),
-    );
-    date.toString();
+    commits?.results.forEach((commit) => {
+      if (DateTime.fromISO(commit.date).hasSame(date, 'day')) {
+        count += commit.count;
+      }
+    });
     return {
-      date,
+      date: date.toLocaleString(DateTime.DATE_SHORT),
       count,
     };
   };
 
-  const sortByDate = () => {
-    const date = startDate;
-    const array = [];
-    do {
-      array.concat(createGraphData(date));
-      date.plus({ days: 1 });
-    } while (date <= endDate);
-
-    return [];
-  };
-
-  const [graphData, setGraphData] = useState(sortByDate());
-
   useEffect(() => {
-    mutate(null);
-    if (studentName != 'All students') {
-      setGraphData(
-        commits?.results.filter((commit) => commit.author_name == studentName),
-      );
-    } else {
-      setGraphData(commits?.results);
+    if (commits && startDate && endDate) {
+      let date = startDate;
+      const countsByDay = [];
+      do {
+        countsByDay.push(createGraphData(date, commits));
+        date = date.plus({ days: 1 });
+      } while (date <= endDate);
+      setGraphData(countsByDay);
     }
-  }, [repoMembers, commits, studentName]);
+  }, [commits, startDate, endDate]);
 
   const handleChange = (
     event: React.ChangeEvent<unknown>,
