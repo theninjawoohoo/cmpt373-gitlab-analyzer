@@ -50,8 +50,8 @@ interface Milestone {
     title: string;
     description: string;
     state: string;
-    created_at: Date;
-    updated_at: Date;
+    created_at: string;
+    updated_at: string;
     due_date: string;
     start_date: string;
     expired: boolean;
@@ -83,12 +83,12 @@ export interface MergeRequest {
     title: string;
     description: string;
     state: string;
-    created_at: Date;
-    updated_at: Date;
+    created_at: string;
+    updated_at: string;
     merged_by: MergedBy;
-    merged_at?: Date;
+    merged_at?: string;
     closed_by: ClosedBy;
-    closed_at?: Date;
+    closed_at?: string;
     target_branch: string;
     source_branch: string;
     user_notes_count: number;

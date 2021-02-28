@@ -22,7 +22,7 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import StudentDropdownMenu from '../Common/StudentDropdownMenu';
-import { useMergeRequest } from '../../api/mergerequests';
+import { useMergeRequest } from '../../api/mergeRequests';
 import { useParams, useHistory } from 'react-router-dom';
 import {
   usePostRepositoryMembers,
