@@ -1,4 +1,5 @@
-import { MergeRequest } from '@ceres/types';
+import { Commit, MergeRequest } from '@ceres/types';
+import Typography from '@material-ui/core/Typography';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ApiResource } from '../../api/base';
@@ -6,6 +7,7 @@ import { useGetMergeRequests } from '../../api/mergeRequests';
 import DefaultPageLayout from '../../components/DefaultPageLayout';
 import Container from '@material-ui/core/Container';
 import CodeView from './components/CodeView';
+import CommitList from './components/CommitList';
 import MergeRequestRenderer from './components/MergeRequestRenderer';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
@@ -15,6 +17,7 @@ const ListMergeRequestPage = () => {
   const [activeMergeRequest, setActiveMergeRequest] = useState<
     ApiResource<MergeRequest>
   >();
+  const [activeCommit, setActiveCommit] = useState<ApiResource<Commit>>();
   const { data: mergeRequests } = useGetMergeRequests({ repository: id });
   return (
     <>
@@ -22,16 +25,19 @@ const ListMergeRequestPage = () => {
         <Grid container>
           <Grid item xs={activeMergeRequest ? 5 : 12}>
             <Container>
-              <Box bgcolor='red' pr={6} pl={2}>
+              <Box my={2}>
+                <Typography variant='h1'>Merge Requests</Typography>
+              </Box>
+              <Box pr={6} pl={2} py={1}>
                 <Grid container>
                   <Grid item xs={6}>
-                    Title
+                    <Typography>Title</Typography>
                   </Grid>
                   <Grid item xs={3}>
-                    Author
+                    <Typography>Author</Typography>
                   </Grid>
                   <Grid item xs={3}>
-                    Date
+                    <Typography>Date</Typography>
                   </Grid>
                 </Grid>
               </Box>
@@ -44,16 +50,28 @@ const ListMergeRequestPage = () => {
                     mergeRequest={mergeRequest}
                     active={active}
                     onClickSummary={() => {
+                      setActiveCommit(undefined);
                       setActiveMergeRequest(active ? undefined : mergeRequest);
                     }}
-                  />
+                  >
+                    {active && (
+                      <CommitList
+                        mergeRequest={mergeRequest}
+                        activeCommit={activeCommit}
+                        setActiveCommit={setActiveCommit}
+                      />
+                    )}
+                  </MergeRequestRenderer>
                 );
               })}
             </Container>
           </Grid>
           {activeMergeRequest && (
             <Grid item xs={7}>
-              <CodeView mergeRequest={activeMergeRequest} />
+              <CodeView
+                mergeRequest={activeMergeRequest}
+                commit={activeCommit}
+              />
             </Grid>
           )}
         </Grid>

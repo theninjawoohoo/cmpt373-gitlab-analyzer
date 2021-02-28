@@ -1,4 +1,4 @@
-import { Diff, MergeRequest } from '@ceres/types';
+import { Commit, Diff, MergeRequest } from '@ceres/types';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button/Button';
 import Typography from '@material-ui/core/Typography';
@@ -9,7 +9,8 @@ import { useGetDiffs } from '../../../api/diff';
 import DiffView from '../../../components/DiffView';
 
 interface CodeViewProps {
-  mergeRequest: ApiResource<MergeRequest>;
+  mergeRequest?: ApiResource<MergeRequest>;
+  commit?: ApiResource<Commit>;
 }
 
 const Root = styled.div`
@@ -19,33 +20,26 @@ const Root = styled.div`
   overflow: scroll;
 `;
 
-const Header = styled.div`
-  position: fixed;
-  height: 8rem;
-  z-index: 100;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.85);
-`;
-
-const CodeView: React.FC<CodeViewProps> = ({ mergeRequest }) => {
-  const { data: diffs } = useGetDiffs({
-    merge_request: mergeRequest.meta.id,
-  });
+const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
+  const { data: diffs } = useGetDiffs(
+    commit
+      ? { commit: commit.meta.id }
+      : { merge_request: mergeRequest.meta.id },
+  );
   const [expandedDiffs, setExpandedDiffs] = useState<ApiResource<Diff>[]>([]);
   return (
     <Root>
-      <Header>
-        <Box my={2}>
-          <Typography variant='h2'>{mergeRequest.title}</Typography>
-        </Box>
-        <Box my={2}>
-          <Button onClick={() => setExpandedDiffs(diffs?.results || [])}>
-            Expand All
-          </Button>
-          <Button onClick={() => setExpandedDiffs([])}>Collapse All</Button>
-        </Box>
-      </Header>
-      <Box height='8rem' />
+      <Box my={2}>
+        <Typography variant='h2'>
+          {commit?.title || mergeRequest?.title}
+        </Typography>
+      </Box>
+      <Box my={2}>
+        <Button onClick={() => setExpandedDiffs(diffs?.results || [])}>
+          Expand All
+        </Button>
+        <Button onClick={() => setExpandedDiffs([])}>Collapse All</Button>
+      </Box>
       <Box overflow='scroll'>
         {diffs?.results.map((diff) => {
           const expanded = expandedDiffs.includes(diff);

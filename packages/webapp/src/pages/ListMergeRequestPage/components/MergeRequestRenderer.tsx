@@ -2,6 +2,7 @@ import { MergeRequest } from '@ceres/types';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
+import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import ExpandMore from '@material-ui/icons/ExpandMore';
@@ -26,6 +27,7 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
   active,
   mergeRequest,
   onClickSummary,
+  children,
 }) => {
   return (
     <Accordion expanded={active} TransitionProps={{ timeout: 0 }}>
@@ -44,7 +46,9 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
           </Grid>
         </Grid>
       </AccordionSummary>
-      <AccordionDetails>test</AccordionDetails>
+      <Box component={AccordionDetails} display='block'>
+        {children}
+      </Box>
     </Accordion>
   );
 };
