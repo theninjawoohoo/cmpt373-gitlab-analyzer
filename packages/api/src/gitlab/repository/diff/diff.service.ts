@@ -1,6 +1,7 @@
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { paginate, withDefaults } from '../../../common/query-dto';
+import { paginatedToResponse } from '../../../common/pagination';
 import { MergeRequest } from '../../merge-request/merge-request.entity';
 import { Commit } from '../commit/commit.entity';
 import { DiffQueryDto } from './diff-query.dto';
@@ -51,6 +52,42 @@ export class DiffService {
       page++;
     } while (diffs.length > 0);
   }
+
+  async calculateScore(filters: DiffQueryDto){
+    filters = withDefaults(filters);
+    const query = this.diffRepository.createQueryBuilder('diff');
+    var score = 0;
+    if (filters.commit) {
+      query.andWhere('diff.commit_id = :commit', { commit: filters.commit });
+    }
+    paginate(query, filters);
+    let diffs = query.getManyAndCount();
+    // await console.log(diffs);
+    diffs.then(function(result) {
+      // console.log(result[1])
+      for (var index = 0; index < result[1]; index++){
+        let diff = result[0][index].resource.hunks[0].lines;
+        console.log(diff);
+        diff.forEach(line => {
+          let reAdd = new RegExp('^\\+');
+          let reDelete = new RegExp('^\\-(.|\\s)*\S(.|\\s)*');
+          var matchAdd= line.match(reAdd);
+          console.log(matchAdd);
+          var matchDelete= line.match(reDelete);
+          if (matchAdd){
+            score+=1;
+          }
+          else if (matchDelete){
+            score+=0.2
+          }
+        });
+      }
+    });
+    return score;
+    
+    // return diffs;
+  }
+
 
   async syncForMergeRequest(mergeRequest: MergeRequest, token: string) {
     const diffs = await this.fetchForMergeRequest(mergeRequest, token);

@@ -2,6 +2,8 @@ import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
 import { paginatedToResponse } from '../../../common/pagination';
 import { DiffQueryDto } from './diff-query.dto';
 import { DiffService } from './diff.service';
+import { Commit } from '../commit/commit.entity';
+import { query } from 'express';
 
 @Controller('diff')
 export class DiffController {
@@ -14,5 +16,11 @@ export class DiffController {
       throw new BadRequestException('repository or commit must be provided');
     }
     return paginatedToResponse(this.diffService.search(query));
+  }
+
+  @Get('/score')
+  score(@Query() query: DiffQueryDto) {
+    const { merge_request, commit } = query;
+    return this.diffService.calculateScore(query);
   }
 }
