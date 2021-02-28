@@ -12,6 +12,7 @@ import {
 } from '../../api/repo_members';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { useCommitDailyCounts } from '../../api/commit';
+import { DateTime } from 'luxon';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -37,8 +38,8 @@ const useStyles = makeStyles((theme: Theme) =>
 const DynamicGraph: React.FC = () => {
   const classes = useStyles();
   const [studentName, setStudentName] = useState('All students');
-  const [startDate] = useState(new Date('2020-03-01'));
-  const [endDate] = useState(new Date('2020-04-01'));
+  const [startDate] = useState(DateTime.fromISO('2020-03-01'));
+  const [endDate] = useState(DateTime.fromISO('2020-04-01'));
   const [value, setValue] = React.useState(0);
   const { id } = useParams<{ id: string }>();
   const { data: repoMembers } = useRepositoryMembers(id);
@@ -47,13 +48,14 @@ const DynamicGraph: React.FC = () => {
     repository: id,
   });
 
-  //TODO: create a { date, count } array ordered by date to be used by BarChart
-  const createGraphData = (date: Date) => {
+  const createGraphData = (date: DateTime) => {
     let count = 0;
     commits?.results.forEach((commit) =>
-      new Date(commit.date) == date ? (count = commit.count) : (count = 0),
+      DateTime.fromISO(commit.date).hasSame(date, 'day')
+        ? (count = commit.count)
+        : (count = 0),
     );
-    date.toDateString();
+    date.toString();
     return {
       date,
       count,
@@ -65,17 +67,13 @@ const DynamicGraph: React.FC = () => {
     const array = [];
     do {
       array.concat(createGraphData(date));
-      date.setDate(date.getDate() + 1);
+      date.plus({ days: 1 });
     } while (date <= endDate);
 
-    return array;
+    return [];
   };
 
   const [graphData, setGraphData] = useState(sortByDate());
-
-  commits?.results.forEach(
-    (commit) => (commit.date = new Date(commit.date).toDateString()),
-  );
 
   useEffect(() => {
     mutate(null);
