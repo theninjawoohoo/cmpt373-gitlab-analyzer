@@ -5,6 +5,7 @@ import { AxiosResponse } from 'axios';
 import { Repository as TypeORMCommit } from 'typeorm';
 import alwaysArray from '../../../common/alwaysArray';
 import { paginate, withDefaults } from '../../../common/query-dto';
+import { DiffQueryDto } from '../diff/diff-query.dto';
 import { DiffService } from '../diff/diff.service';
 import { Repository } from '../repository.entity';
 import { CommitQueryDto } from './commit-query.dto';
@@ -204,5 +205,13 @@ export class CommitService {
         entities.filter(({ created }) => created).map(({ commit }) => commit),
       ),
     };
+  }
+
+  async storeScore(filters: DiffQueryDto){
+    var score = await this.diffService.calculateDiffScore(filters);
+    var commit = await this.commitRepository.createQueryBuilder('commit')
+    .andWhere('id = :commit', { commit: filters.commit }).getOne();
+    commit.score = score;
+    this.commitRepository.save(commit);
   }
 }
