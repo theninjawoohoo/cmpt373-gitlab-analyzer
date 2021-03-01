@@ -1,12 +1,15 @@
 import React from 'react';
-import MergeRequestsTable from '../../components/MergeRequestsTable';
+import CalendarFilter from '../../components/CalendarFilter';
+import DefaultPageLayout from '../../components/DefaultPageLayout';
 
-const Home: React.FC = () => {
+const Test: React.FC = () => {
   return (
-    <div>
-      <MergeRequestsTable />
-    </div>
+    <DefaultPageLayout>
+      <div>
+        <CalendarFilter />
+      </div>
+    </DefaultPageLayout>
   );
 };
 
-export default Home;
+export default Test;
