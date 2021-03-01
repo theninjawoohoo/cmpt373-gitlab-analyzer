@@ -21,4 +21,7 @@ export class CommitQueryDto extends QueryDto {
   @IsOptional()
   @IsDateString()
   end_date?: string;
+  
+  @IsString({ each: true })
+  score?: number;
 }

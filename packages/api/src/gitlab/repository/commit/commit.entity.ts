@@ -1,5 +1,5 @@
 import { Commit as CommitResource } from '@ceres/types';
-import { Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../../common/base-entity';
 import { MergeRequest } from '../../merge-request/merge-request.entity';
 import { Diff } from '../diff/diff.entity';
@@ -16,4 +16,7 @@ export class Commit extends BaseEntity<CommitResource> {
 
   @ManyToMany(() => MergeRequest, (mergeRequest) => mergeRequest.commits)
   mergeRequests: MergeRequest[];
+
+  @Column({nullable: true, type: "float"})
+  score: number;
 }
