@@ -1,4 +1,9 @@
-import { useApiQuery, SearchResults, usePaginatedQuery } from './base';
+import {
+  useApiQuery,
+  SearchResults,
+  usePaginatedQuery,
+  useDateApiQuery,
+} from './base';
 import { Commit } from '@ceres/types';
 
 interface DailyCommitSearchParams {
@@ -39,4 +44,14 @@ export function useGetCommits(
   pageSize?: number,
 ) {
   return usePaginatedQuery<Commit>(`/commit`, params, page, pageSize);
+}
+
+interface DateCommitSearchQuery {
+  repository?: string;
+  start_date?: string;
+  end_date?: string;
+}
+
+export function useDateFilterCommits(params: DateCommitSearchQuery) {
+  return useDateApiQuery<SearchResults<Commit>>(`/commit`, params);
 }

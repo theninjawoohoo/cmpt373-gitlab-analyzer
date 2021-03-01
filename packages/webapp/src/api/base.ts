@@ -15,6 +15,20 @@ export function useApiQuery<T>(route: string) {
   };
 }
 
+export function useDateApiQuery<T>(route: string, params: any) {
+  const client = useQueryClient();
+  const key = [route, params];
+  const result = useQuery<SearchResults<T>>(key, async () => {
+    const response = await axios.get<SearchResults<T>>(route, { params });
+    return response.data;
+  });
+  return {
+    ...result,
+    invalidate: () => client.invalidateQueries([route]),
+    remove: () => client.removeQueries([route]),
+  };
+}
+
 export function usePaginatedQuery<T>(
   route: string,
   params: any,
