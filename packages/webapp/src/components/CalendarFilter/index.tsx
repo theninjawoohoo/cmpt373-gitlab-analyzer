@@ -1,6 +1,6 @@
 import React from 'react';
 import 'date-fns';
-//import { useRepositoryContext } from '../../contexts/RepositoryContext';
+import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import { useDateFilterContext } from '../../contexts/DateFilterContext';
 import Grid from '@material-ui/core/Grid';
 import DateFnsUtils from '@date-io/date-fns';
@@ -9,7 +9,6 @@ import {
   KeyboardDatePicker,
 } from '@material-ui/pickers';
 import { useGetCommits } from '../../api/commit';
-import { useParams } from 'react-router-dom';
 
 interface DateProp {
   startDateIso?: string;
@@ -17,7 +16,7 @@ interface DateProp {
 }
 
 const CalendarFilter: React.FC<DateProp> = (DateProp) => {
-  const { id } = useParams<{ id: string }>();
+  const { repositoryId } = useRepositoryContext();
   const {
     setStartDateContext,
     setEndDateContext,
@@ -29,7 +28,7 @@ const CalendarFilter: React.FC<DateProp> = (DateProp) => {
   const [endDate, setEndDate] = React.useState(new Date(DateProp.endDateIso));
   const { data: commits } = useGetCommits(
     {
-      repository: id,
+      repository: repositoryId,
       start_date: startDate.toISOString(),
       end_date: endDate.toISOString(),
     },
