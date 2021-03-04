@@ -85,15 +85,17 @@ export class SyncRepositoryExecutor {
     let page = 1;
     do {
       try {
-              resources = await service.fetchByPage(this.token, this.repository, page);
-      await service.syncForRepositoryPage(
-        this.token,
-        this.repository,
-        resources,
-      );
-      } catch {
-
-      }
+        resources = await service.fetchByPage(
+          this.token,
+          this.repository,
+          page,
+        );
+        await service.syncForRepositoryPage(
+          this.token,
+          this.repository,
+          resources,
+        );
+      } catch {}
       page++;
     } while (resources.length > 0);
     await this.completeStage(name);
@@ -102,13 +104,11 @@ export class SyncRepositoryExecutor {
   private async linkCommitsAndMergeRequests() {
     await this.startStage(Stage.linkCommitsAndMergeRequests);
     try {
-          await this.mergeRequestService.linkCommitsForRepository(
-      this.token,
-      this.repository,
-    );
-    } catch {
-      
-    }
+      await this.mergeRequestService.linkCommitsForRepository(
+        this.token,
+        this.repository,
+      );
+    } catch {}
 
     await this.completeStage(Stage.linkCommitsAndMergeRequests);
   }

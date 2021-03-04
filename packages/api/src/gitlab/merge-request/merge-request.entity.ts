@@ -12,6 +12,7 @@ import { Commit } from '../repository/commit/commit.entity';
 import { Diff } from '../repository/diff/diff.entity';
 import { Repository } from '../repository/repository.entity';
 import { MergeRequestParticipant } from './merge-request-participant/merge-request-participant.entity';
+import { Note } from '../repository/notes/notes.entity';
 
 @Entity('merge_request')
 export class MergeRequest extends BaseEntity<MergeRequestResource> {
@@ -31,4 +32,7 @@ export class MergeRequest extends BaseEntity<MergeRequestResource> {
     (mergeRequestParticipant) => mergeRequestParticipant.mergeRequest,
   )
   participants: MergeRequestParticipant[];
+
+  @OneToMany(() => Note, (note) => note.mergeRequest)
+  notes: Note[];
 }
