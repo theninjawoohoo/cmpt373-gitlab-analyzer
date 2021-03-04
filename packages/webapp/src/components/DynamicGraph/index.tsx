@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -9,6 +9,9 @@ import { useParams } from 'react-router-dom';
 import { useRepositoryMembers } from '../../api/repo_members';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { useCommitDailyCounts } from '../../api/commit';
+import { DateTime } from 'luxon';
+// import { SearchResults } from '../../api/base';
+// import { Commit } from '@ceres/types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -17,6 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       height: '100vh',
       width: '100vw',
+      alignContent: 'flex-start',
     },
     title: {
       fontSize: '2rem',
@@ -33,13 +37,70 @@ const useStyles = makeStyles((theme: Theme) =>
 const DynamicGraph: React.FC = () => {
   const classes = useStyles();
   const [studentName, setStudentName] = useState('All students');
+  const [startDate, setStartDate] = useState(DateTime.now());
+  const [endDate, setEndDate] = useState(DateTime.now().plus({ days: 7 }));
   const [value, setValue] = React.useState(0);
   const { id } = useParams<{ id: string }>();
   const { data: repoMembers } = useRepositoryMembers(id);
-  const { data: commitCounts } = useCommitDailyCounts({
-    repository: id,
-  });
-  const commits = commitCounts?.results || [];
+  const { data: commits } = useCommitDailyCounts(
+    {
+      repository: id,
+    },
+    0,
+    9000,
+  );
+  const [commitResults, setCommitResults] = useState(commits?.results);
+  const [mergeResults, setMergeResults] = useState([]); // Empty until backend implements call
+  const [graphData, setGraphData] = useState([]);
+
+  useEffect(() => {
+    setStartDate(DateTime.fromISO('2020-03-01'));
+    setEndDate(DateTime.fromISO('2020-04-01'));
+  }, []);
+
+  useEffect(() => {
+    if (studentName != 'All students') {
+      setCommitResults(
+        commits?.results.filter((commit) => commit.author_name == studentName),
+      );
+      setMergeResults([]); // Empty until backend implements call
+    } else {
+      setCommitResults(commits?.results);
+      setMergeResults([]);
+    }
+  }, [repoMembers, studentName]);
+
+  const createGraphData = (date: DateTime, commits: any[], merges: any[]) => {
+    let commitCount = 0;
+    let mergeCount = 0;
+    for (const result of commits) {
+      if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
+        commitCount += result.count;
+      }
+    }
+    for (const result of merges) {
+      if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
+        mergeCount += result.count;
+      }
+    }
+    return {
+      date: date.toLocaleString(DateTime.DATE_SHORT),
+      commitCount,
+      mergeCount,
+    };
+  };
+
+  useEffect(() => {
+    if (commitResults && mergeResults && startDate && endDate) {
+      let date = startDate;
+      const countsByDay = [];
+      do {
+        countsByDay.push(createGraphData(date, commitResults, mergeResults));
+        date = date.plus({ days: 1 });
+      } while (date <= endDate);
+      setGraphData(countsByDay);
+    }
+  }, [commitResults, startDate, endDate]);
 
   const handleChange = (
     event: React.ChangeEvent<unknown>,
@@ -83,13 +144,23 @@ const DynamicGraph: React.FC = () => {
           </Grid>
         </Grid>
         <Grid item>
-          <BarChart width={1000} height={500} data={commits}>
+          <BarChart width={1000} height={500} data={graphData}>
             <XAxis dataKey='date' />
             <YAxis />
             <Tooltip />
             <Legend layout='vertical' align='right' verticalAlign='top' />
-            <Bar dataKey='count' name='Commits' stackId='a' fill='#0A4D63' />
-            {/* <Bar dataKey='mrs' name='Merge Requests' stackId='a' fill='#e37500' /> */}
+            <Bar
+              dataKey='commitCount'
+              name='Commits'
+              stackId='a'
+              fill='#0A4D63'
+            />
+            <Bar
+              dataKey='mergeCount'
+              name='Merge Requests'
+              stackId='a'
+              fill='#e37500'
+            />
           </BarChart>
         </Grid>
       </Grid>
