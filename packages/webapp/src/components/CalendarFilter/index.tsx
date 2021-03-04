@@ -1,39 +1,55 @@
 import React from 'react';
 import 'date-fns';
 //import { useRepositoryContext } from '../../contexts/RepositoryContext';
+import { useDateFilterContext } from '../../contexts/DateFilterContext';
 import Grid from '@material-ui/core/Grid';
 import DateFnsUtils from '@date-io/date-fns';
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from '@material-ui/pickers';
-//import { useDateFilterCommits } from '../../api/commit';
+import { useGetCommits } from '../../api/commit';
+import { useParams } from 'react-router-dom';
 
-const CalendarFilter: React.FC = () => {
-  //const { repositoryId } = useRepositoryContext();
-  const [startDate, setStartDate] = React.useState(new Date());
-  const [endDate, setEndDate] = React.useState(new Date());
+interface DateProp {
+  startDateIso?: string;
+  endDateIso?: string;
+}
+
+const CalendarFilter: React.FC<DateProp> = (DateProp) => {
+  const { id } = useParams<{ id: string }>();
+  const {
+    setStartDateContext,
+    setEndDateContext,
+    setArrayContext,
+  } = useDateFilterContext();
+  const [startDate, setStartDate] = React.useState(
+    new Date(DateProp.startDateIso),
+  );
+  const [endDate, setEndDate] = React.useState(new Date(DateProp.endDateIso));
+  const { data: commits } = useGetCommits(
+    {
+      repository: id,
+      start_date: startDate.toISOString(),
+      end_date: endDate.toISOString(),
+    },
+    0,
+    9000,
+  );
 
   const handleStartDateChange = (date) => {
+    date.setHours(0, 0, 0, 0);
     setStartDate(date);
-    // const DateCommitSearchQuery = {
-    //   repository: repositoryId,
-    //   start_date: startDate.toString(),
-    //   end_date: endDate.toString(),
-    // };
-    // const { data: commits } = useDateFilterCommits(DateCommitSearchQuery);
-    // console.log(commits);
+    setStartDateContext(date.toISOString());
+    console.log(commits.results);
+    setArrayContext(commits.results);
   };
 
   const handleEndDateChange = (date) => {
+    date.setHours(0, 0, 0, 0);
     setEndDate(date);
-    // const DateCommitSearchQuery = {
-    //   repository: repositoryId,
-    //   start_date: startDate.toString(),
-    //   end_date: endDate.toString(),
-    // };
-    // const { data: commits } = useDateFilterCommits(DateCommitSearchQuery);
-    // console.log(commits);
+    setEndDateContext(date.toISOString());
+    setArrayContext(commits.results);
   };
 
   return (
