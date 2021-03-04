@@ -20,7 +20,7 @@ import { Commit } from './commit/commit.entity';
 import { DiffService } from './diff/diff.service';
 import { CommitController } from './commit/commit.controller';
 import { DiffController } from './diff/diff.controller';
-import { IssuesEntity } from './issues/issues.entity';
+import { Issue } from './issues/issues.entity';
 
 @Module({
   imports: [
@@ -35,7 +35,7 @@ import { IssuesEntity } from './issues/issues.entity';
       CommitAuthor,
     ]),
     ApiModule,
-    IssuesEntity,
+    Issue,
   ],
   providers: [
     RepositoryService,
