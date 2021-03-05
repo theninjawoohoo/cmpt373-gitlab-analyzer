@@ -18,9 +18,10 @@ export class NotesController {
     private readonly repositoryService: RepositoryService,
   ) {}
 
-  @Get('/repository/:id')
+  @Get('repository/:id')
   async findAllForRepository(@Param() { id }: IdParam) {
     const repository = await this.repositoryService.findOne(id);
+    console.log('Can go inside findAllForRepository in notes');
     if (repository) {
       return this.noteService.findAllForRepository(repository);
     }
