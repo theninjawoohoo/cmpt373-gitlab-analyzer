@@ -7,13 +7,6 @@ import { Issue } from '../issues/issues.entity';
 
 @Entity('notes')
 export class Note extends BaseEntity<NotesResource> {
-  @ManyToOne(() => Repository, (repo) => repo.notes)
-  @JoinColumn({ name: 'repository_id' })
-  repository: Repository;
-
   @ManyToOne(() => MergeRequest, (mergeRequest) => mergeRequest.notes)
   mergeRequest: MergeRequest;
-
-  @ManyToOne(() => Issue, (issue) => issue.notes)
-  issue: Issue;
 }

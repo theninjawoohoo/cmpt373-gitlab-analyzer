@@ -7,6 +7,6 @@ import { Note } from '../notes/notes.entity';
 
 @Entity('issue')
 export class Issue extends BaseEntity<IssuesResource> {
-  @OneToMany(() => Note, (note) => note.issue)
-  notes: Note[];
+  // @OneToMany(() => Note, (note) => note.issue)
+  // notes: Note[];
 }

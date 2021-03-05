@@ -2,21 +2,22 @@ import { Note } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
-import { Repository as TypeORMCommit } from 'typeorm';
+import { Repository as TypeORMNote } from 'typeorm';
 import { Repository } from '../repository.entity';
 import { Note as NoteEntity } from './notes.entity';
+import { MergeRequest } from '../../merge-request/merge-request.entity';
 
 @Injectable()
 export class NoteService {
   constructor(
     private readonly httpService: HttpService,
     @InjectRepository(NoteEntity)
-    private readonly noteRepository: TypeORMCommit<NoteEntity>,
+    private readonly noteRepository: TypeORMNote<NoteEntity>,
   ) {}
 
-  async findAllForRepository(repository: Repository) {
+  async findAllForMergeRequest(mergeRequest: MergeRequest) {
     return this.noteRepository.find({
-      where: { repository: repository },
+      where: { mergeRequest: mergeRequest },
     });
   }
 
@@ -31,18 +32,8 @@ export class NoteService {
     let page = 1;
     do {
       notes = await this.fetchByPage(token, repository, page);
-      await this.syncForRepositoryPage(token, repository, notes);
       page++;
     } while (notes.length > 0);
-  }
-
-  async syncForRepositoryPage(
-    token: string,
-    repository: Repository,
-    notes: Note[],
-  ): Promise<void> {
-    const { created } = await this.createIfNotExists(repository, notes);
-    await Promise.all(created.map((note) => ({ ...note, repository })));
   }
 
   async fetchByPage(
@@ -80,41 +71,5 @@ export class NoteService {
         },
       })
       .toPromise();
-  }
-
-  private async createIfNotExists(repository: Repository, notes: Note[]) {
-    const entities = await Promise.all(
-      notes.map(async (note) => {
-        const found = await this.noteRepository
-          .createQueryBuilder()
-          .where('resource @> :resource', {
-            resource: {
-              id: note.id,
-            },
-          })
-          .andWhere('repository_id = :repositoryId', {
-            repositoryId: repository.id,
-          })
-          .getOne();
-        if (found) {
-          return { note: found, created: false };
-        }
-        return {
-          note: this.noteRepository.create({
-            repository: repository,
-            resource: note,
-          }),
-          created: true,
-        };
-      }),
-    );
-    return {
-      existing: entities
-        .filter(({ created }) => !created)
-        .map(({ note }) => note),
-      created: await this.noteRepository.save(
-        entities.filter(({ created }) => created).map(({ note }) => note),
-      ),
-    };
   }
 }

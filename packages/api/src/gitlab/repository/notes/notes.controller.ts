@@ -10,23 +10,25 @@ import { NoteService } from './notes.service';
 import { IdParam } from '../../../common/id-param';
 import { RepositoryService } from '../repository.service';
 import { GitlabToken } from '../../../auth/decorators/gitlab-token.decorator';
+import { MergeRequestService } from '../../merge-request/merge-request.service';
 
 @Controller('notes')
 export class NotesController {
   constructor(
     private readonly noteService: NoteService,
     private readonly repositoryService: RepositoryService,
+    private readonly mergeRequestService: MergeRequestService,
   ) {}
 
-  @Get('repository/:id')
-  async findAllForRepository(@Param() { id }: IdParam) {
-    const repository = await this.repositoryService.findOne(id);
-    console.log('Can go inside findAllForRepository in notes');
-    if (repository) {
-      return this.noteService.findAllForRepository(repository);
+  @Get('/merge_request/:id')
+  async findAllForMergeRequest(@Param() { id }: IdParam) {
+    console.log('Can go inside findAllForMergeRequest in notes controller');
+    const mergeRequest = await this.mergeRequestService.findOne(id);
+    if (mergeRequest) {
+      return this.noteService.findAllForMergeRequest(mergeRequest);
     }
     throw new NotFoundException(
-      `Could not find any notes for repository with id: ${id}`,
+      `Could not find any notes for merge request with id: ${id}`,
     );
   }
 

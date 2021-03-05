@@ -28,7 +28,4 @@ export class Repository extends BaseEntity<RepositoryResource> {
 
   @OneToMany(() => CommitAuthor, (commitAuthor) => commitAuthor.repository)
   commitAuthors: CommitAuthor[];
-
-  @OneToMany(() => Note, (note) => note.repository)
-  notes: Note[];
 }
