@@ -2,7 +2,7 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
 import Icon from './iconHelper';
-import { Link } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 
@@ -81,7 +81,12 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
     );
   }
   return (
-    <ListItem button component={Link} to={ListItemBoxProps.url}>
+    <ListItem
+      button
+      component={NavLink}
+      to={ListItemBoxProps.url}
+      activeStyle={{ color: 'red' }}
+    >
       <ListItemIcon>
         <Icon icon={ListItemBoxProps.icon} />
       </ListItemIcon>
