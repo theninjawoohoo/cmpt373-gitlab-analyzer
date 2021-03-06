@@ -117,7 +117,7 @@ function computeLines(hunk: Hunk) {
 
 const DiffView: React.FC<DiffViewProps> = ({ fileName, hunks }) => {
   return (
-    <Accordion>
+    <Accordion defaultExpanded={false}>
       <AccordionSummary expandIcon={<ExpandMore />}>
         <Typography style={{ fontFamily: 'monospace' }}>{fileName}</Typography>
       </AccordionSummary>

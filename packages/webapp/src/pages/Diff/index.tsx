@@ -17,9 +17,14 @@ const Diff: React.FC = () => {
     0,
     50,
   );
+  const expandAllAccordions = () => {
+    // get all accordions, set defaultExpanded to true
+  };
   return (
     <DefaultPageLayout>
       <Container>
+        <h1>Commit Diffs</h1>
+        <button onClick={expandAllAccordions}>Toggle All</button>
         {data?.results.map((diff) => (
           <DiffView
             key={diff.meta.id}
