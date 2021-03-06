@@ -2,10 +2,10 @@ import { Method } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import axios from '../util/axios';
 
-export function useApiQuery<T>(route: string) {
+export function useApiQuery<T>(route: string, params?: any) {
   const client = useQueryClient();
-  const result = useQuery<T>([route], async () => {
-    const response = await axios.get<T>(route);
+  const result = useQuery<T>([route, params], async () => {
+    const response = await axios.get<T>(route, { params });
     return response.data;
   });
   return {

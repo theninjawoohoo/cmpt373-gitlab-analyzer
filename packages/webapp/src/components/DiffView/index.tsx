@@ -6,13 +6,15 @@ import {
   Box,
   Typography,
 } from '@material-ui/core';
-import { ExpandMore } from '@material-ui/icons';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import React from 'react';
 import Root from './components/root';
 
 interface DiffViewProps {
   fileName: string;
   hunks: Hunk[];
+  expanded?: boolean;
+  onSummaryClick?: () => void;
 }
 
 interface Line {
@@ -115,10 +117,15 @@ function computeLines(hunk: Hunk) {
   return lines;
 }
 
-const DiffView: React.FC<DiffViewProps> = ({ fileName, hunks }) => {
+const DiffView: React.FC<DiffViewProps> = ({
+  fileName,
+  hunks,
+  expanded,
+  onSummaryClick,
+}) => {
   return (
-    <Accordion defaultExpanded={false}>
-      <AccordionSummary expandIcon={<ExpandMore />}>
+    <Accordion expanded={expanded || false} TransitionProps={{ timeout: 0 }}>
+      <AccordionSummary expandIcon={<ExpandMore />} onClick={onSummaryClick}>
         <Typography style={{ fontFamily: 'monospace' }}>{fileName}</Typography>
       </AccordionSummary>
       <AccordionDetails>
