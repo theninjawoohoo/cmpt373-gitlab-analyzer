@@ -38,7 +38,7 @@ const Accordion = withStyles({
       display: 'none',
     },
     '&$expanded': {
-      margin: 'auto',
+      margin: '0',
     },
   },
   expanded: {},
@@ -64,7 +64,7 @@ const AccordionSummary = withStyles({
 
 const AccordionDetails = withStyles((theme) => ({
   root: {
-    padding: theme.spacing(0),
+    padding: theme.spacing(0.1),
   },
 }))(MuiAccordionDetails);
 
@@ -91,7 +91,7 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
               aria-controls='panel1a-content'
               id='panel1a-header'
             >
-              <ItemBox icon='details' primary={'Details'} url='nil' />
+              <ItemBox icon='list' primary={'Details'} url='nil' />
             </AccordionSummary>
             <AccordionDetails>
               <ItemBox
