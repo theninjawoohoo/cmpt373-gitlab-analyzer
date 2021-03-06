@@ -13,6 +13,7 @@ import CommitList from './components/CommitList';
 import MergeRequestRenderer from './components/MergeRequestRenderer';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
+import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 
 const ListMergeRequestPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,9 +47,7 @@ const ListMergeRequestPage = () => {
         <Grid container>
           <Grid item xs={activeMergeRequest ? 5 : 12}>
             <Container>
-              <Box my={2}>
-                <Typography variant='h1'>Merge Requests</Typography>
-              </Box>
+              <DefaultPageTitleFormat>Merge Requests</DefaultPageTitleFormat>
               <Box pr={6} pl={2} py={1}>
                 <Grid container>
                   <Grid item xs={6}>

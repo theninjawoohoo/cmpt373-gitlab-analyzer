@@ -6,6 +6,7 @@ import React, { useEffect } from 'react';
 import DefaultPageLayout from '../../components/DefaultPageLayout';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import OperationGroup from './components/OperationGroup';
+import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 
 const OperationsPage: React.FC = () => {
   const { repositoryId, setRepositoryId } = useRepositoryContext();
@@ -16,7 +17,7 @@ const OperationsPage: React.FC = () => {
     <>
       <DefaultPageLayout>
         <Container>
-          <Typography variant='h1'>Operations</Typography>
+          <DefaultPageTitleFormat>Operations</DefaultPageTitleFormat>
           <Box my={2}>
             <Typography variant='h2'>In progress</Typography>
           </Box>

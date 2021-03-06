@@ -13,6 +13,7 @@ import Box from '@material-ui/core/Box';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import MemberDropdown from './components/MemberDropdown';
 import { useDateFilterContext } from '../../contexts/DateFilterContext';
+import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 
 const CommitList: React.FC = () => {
   const location = useLocation();
@@ -32,21 +33,19 @@ const CommitList: React.FC = () => {
   console.log(elements);
   return (
     <Container>
-      <Box my={4}>
-        <Grid container justify='space-between' alignItems='center'>
-          <Grid item>
-            <Typography variant='h1'>Commit list</Typography>
-          </Grid>
-          <Grid item>
-            <MemberDropdown
-              repositoryId={repositoryId}
-              onChange={(newEmails) => {
-                setEmails(newEmails);
-              }}
-            />
-          </Grid>
+      <Grid container justify='space-between' alignItems='center'>
+        <Grid item>
+          <DefaultPageTitleFormat>Commit List</DefaultPageTitleFormat>
         </Grid>
-      </Box>
+        <Grid item>
+          <MemberDropdown
+            repositoryId={repositoryId}
+            onChange={(newEmails) => {
+              setEmails(newEmails);
+            }}
+          />
+        </Grid>
+      </Grid>
       {commits?.results.map((commit) => {
         return (
           <Accordion key={commit.meta.id}>
