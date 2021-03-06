@@ -10,7 +10,7 @@ import { Diff, FileType } from '@ceres/types';
 import { parsePatch } from 'diff';
 import DiffInterpreter from './helpers/DiffInterpreter';
 
-type GitlabDiff = Omit<Diff, 'hunks'>;
+type GitlabDiff = Omit<Diff, 'hunks' | 'lines'>;
 
 @Injectable()
 export class DiffService {
