@@ -111,17 +111,17 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
             </AccordionDetails>
             <AccordionDetails>
               <ItemBox
-                icon='members'
-                primary={'Members'}
-                url={`/repository/${repositoryId}/members`}
+                icon='graph'
+                primary={'Graph'}
+                url={`/graph/${repositoryId}`}
                 repositoryDependent
               />
             </AccordionDetails>
             <AccordionDetails>
               <ItemBox
-                icon='graph'
-                primary={'Graph'}
-                url={`/graph/${repositoryId}`}
+                icon='members'
+                primary={'Members'}
+                url={`/repository/${repositoryId}/members`}
                 repositoryDependent
               />
             </AccordionDetails>
