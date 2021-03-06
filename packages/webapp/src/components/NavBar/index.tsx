@@ -1,12 +1,13 @@
 import React from 'react';
 import { useState } from 'react';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { ListItem, List, Accordion } from '@material-ui/core';
+import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
+import { ListItem, List } from '@material-ui/core';
 import ItemBox from './itemBox';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
+import MuiAccordion from '@material-ui/core/Accordion';
+import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
+import MuiAccordionDetails from '@material-ui/core/AccordionDetails';
 
 interface UserNameProps {
   username: string;
@@ -25,6 +26,47 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
   },
 }));
+
+const Accordion = withStyles({
+  root: {
+    border: '0px',
+    boxShadow: 'none',
+    '&:not(:last-child)': {
+      borderBottom: 0,
+    },
+    '&:before': {
+      display: 'none',
+    },
+    '&$expanded': {
+      margin: 'auto',
+    },
+  },
+  expanded: {},
+})(MuiAccordion);
+
+const AccordionSummary = withStyles({
+  root: {
+    backgroundColor: 'rgba(0, 0, 0, 0)',
+    borderBottom: '0px',
+    marginBottom: -1,
+    minHeight: 56,
+    '&$expanded': {
+      minHeight: 56,
+    },
+  },
+  content: {
+    '&$expanded': {
+      margin: '12px 0',
+    },
+  },
+  expanded: {},
+})(MuiAccordionSummary);
+
+const AccordionDetails = withStyles((theme) => ({
+  root: {
+    padding: theme.spacing(0),
+  },
+}))(MuiAccordionDetails);
 
 const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
   const theme = useTheme();
@@ -82,7 +124,6 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
             url={`/graph/${repositoryId}`}
             repositoryDependent
           />
-
           <ItemBox icon='setting' primary={'Settings'} url='/settings' />
           <ItemBox icon='operation' primary={'Operations'} url='/operations' />
           <ItemBox icon='logout' primary={'Logout'} url='/logout' />
