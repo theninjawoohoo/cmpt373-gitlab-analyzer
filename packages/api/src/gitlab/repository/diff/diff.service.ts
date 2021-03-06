@@ -6,8 +6,9 @@ import { Commit } from '../commit/commit.entity';
 import { DiffQueryDto } from './diff-query.dto';
 import { Diff as DiffEntity } from './diff.entity';
 import { DeepPartial, Repository as TypeORMRepository } from 'typeorm';
-import { Diff } from '@ceres/types';
+import { Diff, FileType } from '@ceres/types';
 import { parsePatch } from 'diff';
+import DiffInterpreter from './helpers/DiffInterpreter';
 
 type GitlabDiff = Omit<Diff, 'hunks'>;
 
@@ -43,17 +44,18 @@ export class DiffService {
     await this.diffRepository.delete({ commit: commit });
     do {
       diffs = await this.fetchPageForCommit(commit, token, page);
-      await this.createAll({ commit }, diffs.map(this.addParsedDefinitions));
+      const parsedDiffs = await Promise.all(
+        diffs.map(this.addParsedDefinitions),
+      );
+      await this.createAll({ commit }, parsedDiffs);
       page++;
     } while (diffs.length > 0);
   }
 
   async syncForMergeRequest(mergeRequest: MergeRequest, token: string) {
     const diffs = await this.fetchForMergeRequest(mergeRequest, token);
-    await this.createAll(
-      { mergeRequest },
-      diffs.map(this.addParsedDefinitions),
-    );
+    const parsedDiffs = await Promise.all(diffs.map(this.addParsedDefinitions));
+    await this.createAll({ mergeRequest }, parsedDiffs);
   }
 
   private async createAll(
@@ -69,10 +71,13 @@ export class DiffService {
     return this.diffRepository.save(entities);
   }
 
-  private addParsedDefinitions(diff: GitlabDiff): Diff {
+  private async addParsedDefinitions(diff: GitlabDiff): Promise<Diff> {
+    const hunks = parsePatch(diff.diff)[0].hunks;
+    const interpreter = new DiffInterpreter(hunks, FileType.typescript);
     return {
       ...diff,
-      hunks: parsePatch(diff.diff)[0].hunks,
+      hunks,
+      lines: await interpreter.parse(),
     };
   }
 

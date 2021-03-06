@@ -1,5 +1,7 @@
 // Generated from http://json2ts.com/
 // Hunk is not from Gitlab, it's the output of parsePatch from the diff package
+import { Line } from './Line';
+
 export interface Hunk {
   oldStart: number;
   oldLines: number;
@@ -19,4 +21,5 @@ export interface Diff {
   deleted_file: boolean;
   diff: string;
   hunks: Hunk[];
+  lines?: Line[];
 }
