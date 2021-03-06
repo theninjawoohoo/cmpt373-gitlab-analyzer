@@ -14,6 +14,7 @@ import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
 import { RepositoryService } from '../repository/repository.service';
 import { IdParam } from 'src/common/id-param';
 import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
+import { NoteService } from '../repository/notes/notes.service';
 
 @Controller('merge_request')
 export class MergeRequestController {
@@ -21,6 +22,7 @@ export class MergeRequestController {
     private readonly mergeRequestService: MergeRequestService,
     private readonly repositoryService: RepositoryService,
     private readonly mergeRequestParticipantService: MergeRequestParticipantService,
+    private readonly noteService: NoteService,
   ) {}
 
   @Get(':id/participants')
@@ -45,6 +47,25 @@ export class MergeRequestController {
       mergeRequest,
       token,
     );
+  }
+
+  @Get(':id/notes')
+  async getMergeRequestNotes(@Param() { id }: IdParam) {
+    const mergeRequest = await this.mergeRequestService.findOne(id);
+    if (mergeRequest) {
+      return await this.noteService.findAllForMergeRequest(mergeRequest);
+    }
+    throw new NotFoundException(`no notes found for merge request id: ${id}`);
+  }
+
+  @Post(':id/notes')
+  @HttpCode(204)
+  async fetchMergeRequestNotes(
+    @Param() { id }: IdParam,
+    @GitlabToken() token: string,
+  ) {
+    const mergeRequest = await this.mergeRequestService.findOne(id);
+    return await this.noteService.syncForMergeRequest(mergeRequest, token);
   }
 
   @Get()

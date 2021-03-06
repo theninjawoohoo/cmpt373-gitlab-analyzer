@@ -9,6 +9,7 @@ import { DiffService } from '../repository/diff/diff.service';
 import { Repository } from '../repository/repository.entity';
 import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
+import { NoteService } from '../repository/notes/notes.service';
 
 interface MergeRequestSearch extends BaseSearch {
   repository: string;
@@ -23,6 +24,7 @@ export class MergeRequestService {
     private readonly diffService: DiffService,
     private readonly commitService: CommitService,
     private readonly participantService: MergeRequestParticipantService,
+    private readonly noteService: NoteService,
   ) {}
 
   async search(filters: MergeRequestSearch) {
@@ -131,6 +133,11 @@ export class MergeRequestService {
         .map((mergeRequest) =>
           this.diffService.syncForMergeRequest(mergeRequest, token),
         ),
+    );
+    await Promise.all(
+      created.map((mergeRequest) =>
+        this.noteService.syncForMergeRequest(mergeRequest, token),
+      ),
     );
   }
 

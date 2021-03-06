@@ -40,17 +40,4 @@ export class NotesController {
     }
     throw new NotFoundException(`Could not find a note with id: ${id}`);
   }
-
-  @Post('/repository/:id')
-  @HttpCode(204)
-  async fetchNotes(@Param() { id }: IdParam, @GitlabToken() token: string) {
-    const repository = await this.repositoryService.findOne(id);
-    if (repository) {
-      await this.noteService.fetchForRepository(repository, token);
-    } else {
-      throw new NotFoundException(
-        `Could not fetch notes for repository with id: ${id}`,
-      );
-    }
-  }
 }

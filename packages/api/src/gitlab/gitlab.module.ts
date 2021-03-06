@@ -6,7 +6,6 @@ import { GitlabToken } from './entities/gitlab-token.entity';
 import { GitlabTokenController } from './token/gitlab-token.controller';
 import { RepositoryModule } from './repository/repository.module';
 import { MergeRequestModule } from './merge-request/merge-request.module';
-import { NotesModule } from './repository/notes/notes.module';
 
 @Module({
   imports: [
@@ -14,7 +13,6 @@ import { NotesModule } from './repository/notes/notes.module';
     ApiModule,
     RepositoryModule,
     MergeRequestModule,
-    NotesModule,
   ],
   controllers: [GitlabTokenController],
   providers: [GitlabTokenService],

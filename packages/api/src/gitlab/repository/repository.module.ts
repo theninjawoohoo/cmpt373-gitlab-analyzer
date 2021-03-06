@@ -20,7 +20,10 @@ import { Commit } from './commit/commit.entity';
 import { DiffService } from './diff/diff.service';
 import { CommitController } from './commit/commit.controller';
 import { DiffController } from './diff/diff.controller';
-import { Issue } from './issues/issues.entity';
+import { NoteService } from './notes/notes.service';
+import { NotesController } from './notes/notes.controller';
+import { Note } from './notes/notes.entity';
+// import { Issue } from './issues/issues.entity';
 
 @Module({
   imports: [
@@ -33,9 +36,10 @@ import { Issue } from './issues/issues.entity';
       MergeRequestParticipant,
       CommitDailyCount,
       CommitAuthor,
+      Note,
     ]),
     ApiModule,
-    Issue,
+    // Issue,
   ],
   providers: [
     RepositoryService,
@@ -46,8 +50,14 @@ import { Issue } from './issues/issues.entity';
     DiffService,
     CommitDailyCountService,
     CommitAuthorService,
+    NoteService,
   ],
-  controllers: [RepositoryController, CommitController, DiffController],
+  controllers: [
+    RepositoryController,
+    CommitController,
+    DiffController,
+    NotesController,
+  ],
   exports: [
     RepositoryService,
     RepositoryMemberService,
@@ -55,6 +65,7 @@ import { Issue } from './issues/issues.entity';
     CommitService,
     CommitDailyCountService,
     CommitAuthorService,
+    NoteService,
   ],
 })
 export class RepositoryModule {}

@@ -5,7 +5,7 @@ import { AxiosResponse } from 'axios';
 import { Repository as TypeORMNote } from 'typeorm';
 import { Repository } from '../repository.entity';
 import { Note as NoteEntity } from './notes.entity';
-import { MergeRequest } from '../../merge-request/merge-request.entity';
+import { MergeRequest as MergeRequestEntity } from '../../merge-request/merge-request.entity';
 
 @Injectable()
 export class NoteService {
@@ -15,7 +15,8 @@ export class NoteService {
     private readonly noteRepository: TypeORMNote<NoteEntity>,
   ) {}
 
-  async findAllForMergeRequest(mergeRequest: MergeRequest) {
+  async findAllForMergeRequest(mergeRequest: MergeRequestEntity) {
+    console.log(mergeRequest);
     return this.noteRepository.find({
       where: { mergeRequest: mergeRequest },
     });
@@ -27,13 +28,10 @@ export class NoteService {
     });
   }
 
-  async fetchForRepository(repository: Repository, token: string) {
-    let notes: Note[] = [];
-    let page = 1;
-    do {
-      notes = await this.fetchByPage(token, repository, page);
-      page++;
-    } while (notes.length > 0);
+  async syncForMergeRequest(mergeRequest: MergeRequestEntity, token: string) {
+    console.log('syncForMergeRequest inside notes service');
+    const note = await this.fetchForMergeRequest(mergeRequest, token);
+    return this.createOrUpdate(mergeRequest, note);
   }
 
   async fetchByPage(
@@ -42,6 +40,24 @@ export class NoteService {
     page: number,
   ): Promise<Note[]> {
     const axiosResponse = await this.fetchFromGitlab(token, repo, page);
+    return axiosResponse.data;
+  }
+
+  private async fetchForMergeRequest(
+    mergeRequest: MergeRequestEntity,
+    token: string,
+  ) {
+    const url = `/projects/${mergeRequest.resource.project_id}/merge_requests/${mergeRequest.resource.iid}/notes`;
+    const axiosResponse = await this.httpService
+      .get<Note[]>(url, {
+        headers: {
+          'PRIVATE-TOKEN': token,
+        },
+        params: {
+          per_page: 50,
+        },
+      })
+      .toPromise();
     return axiosResponse.data;
   }
 
@@ -71,5 +87,33 @@ export class NoteService {
         },
       })
       .toPromise();
+  }
+
+  async createOrUpdate(mergeRequest: MergeRequestEntity, notes: Note[]) {
+    const entities = await Promise.all(
+      notes.map(async (note) => {
+        let entity = await this.noteRepository
+          .createQueryBuilder()
+          .where('resource @> :resource', {
+            resource: {
+              id: note.id,
+            },
+          })
+          .andWhere('merge_request_id = :mr_Id', {
+            mr_Id: mergeRequest.id,
+          })
+          .getOne();
+        if (!entity) {
+          entity = this.noteRepository.create({
+            mergeRequest: mergeRequest,
+            resource: note,
+          });
+        } else {
+          entity.resource = note;
+        }
+        return entity;
+      }),
+    );
+    return this.noteRepository.save(entities);
   }
 }
