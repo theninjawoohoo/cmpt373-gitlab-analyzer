@@ -84,6 +84,7 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
     <ListItem
       button
       component={NavLink}
+      exact
       to={ListItemBoxProps.url}
       activeStyle={{ color: 'red' }}
     >
