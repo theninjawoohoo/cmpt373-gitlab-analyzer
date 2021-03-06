@@ -68,7 +68,11 @@ export default class DiffInterpreter {
       lines,
       currentLine,
     );
-    const addedLines = this.getAddedLines(rightLineNumber, lines, currentLine);
+    const addedLines = this.getAddedLines(
+      rightLineNumber,
+      lines,
+      currentLine + deletedLines.length,
+    );
     return { deletedLines, addedLines };
   }
 
