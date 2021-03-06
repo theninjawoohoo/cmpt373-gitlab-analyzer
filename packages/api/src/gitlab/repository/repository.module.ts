@@ -20,9 +20,9 @@ import { Commit } from './commit/commit.entity';
 import { DiffService } from './diff/diff.service';
 import { CommitController } from './commit/commit.controller';
 import { DiffController } from './diff/diff.controller';
-import { NoteService } from './notes/notes.service';
-import { NotesController } from './notes/notes.controller';
-import { Note } from './notes/notes.entity';
+import { NoteService } from './note/note.service';
+import { NoteController } from './note/note.controller';
+import { Note } from './note/note.entity';
 // import { Issue } from './issues/issues.entity';
 
 @Module({
@@ -56,7 +56,7 @@ import { Note } from './notes/notes.entity';
     RepositoryController,
     CommitController,
     DiffController,
-    NotesController,
+    NoteController,
   ],
   exports: [
     RepositoryService,

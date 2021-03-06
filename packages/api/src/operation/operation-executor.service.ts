@@ -11,7 +11,7 @@ import { GitlabTokenService } from '../gitlab/services/gitlab-token.service';
 import { SyncRepositoryExecutor } from './executor/sync-repository.executor';
 import { Operation as OperationEntity } from './operation.entity';
 import { Injectable } from '@nestjs/common';
-import { NoteService } from '../gitlab/repository/notes/notes.service';
+import { NoteService } from '../gitlab/repository/note/note.service';
 
 @Injectable()
 export class OperationExecutorService {

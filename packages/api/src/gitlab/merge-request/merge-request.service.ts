@@ -9,8 +9,8 @@ import { DiffService } from '../repository/diff/diff.service';
 import { Repository } from '../repository/repository.entity';
 import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
-import { NoteService } from '../repository/notes/notes.service';
-import { Note } from '../repository/notes/notes.entity';
+import { NoteService } from '../repository/note/note.service';
+import { Note } from '../repository/note/note.entity';
 
 interface MergeRequestSearch extends BaseSearch {
   repository: string;

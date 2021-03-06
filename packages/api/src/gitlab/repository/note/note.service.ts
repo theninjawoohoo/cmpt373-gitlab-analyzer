@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
 import { Repository as TypeORMNote } from 'typeorm';
 import { Repository } from '../repository.entity';
-import { Note as NoteEntity } from './notes.entity';
+import { Note as NoteEntity } from './note.entity';
 import { MergeRequest as MergeRequestEntity } from '../../merge-request/merge-request.entity';
 import { paginate, withDefaults } from '../../../common/query-dto';
 import alwaysArray from '../../../common/alwaysArray';
@@ -63,7 +63,7 @@ export class NoteService {
   }
 
   async syncForMergeRequest(mergeRequest: MergeRequestEntity, token: string) {
-    console.log('syncForMergeRequest inside notes service');
+    console.log('syncForMergeRequest inside note service');
     const note = await this.fetchForMergeRequest(mergeRequest, token);
     return this.createOrUpdate(mergeRequest, note);
   }

@@ -10,7 +10,7 @@ import { Repository } from '../../gitlab/repository/repository.entity';
 import { RepositoryService } from '../../gitlab/repository/repository.service';
 import { GitlabTokenService } from '../../gitlab/services/gitlab-token.service';
 import { Operation as OperationEntity } from '../operation.entity';
-import { NoteService } from '../../gitlab/repository/notes/notes.service';
+import { NoteService } from '../../gitlab/repository/note/note.service';
 
 enum Stage {
   syncCommits = 'syncCommits',

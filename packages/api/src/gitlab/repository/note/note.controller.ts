@@ -1,11 +1,11 @@
 import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
-import { NoteService } from './notes.service';
+import { NoteService } from './note.service';
 import { IdParam } from '../../../common/id-param';
 import { RepositoryService } from '../repository.service';
 import { MergeRequestService } from '../../merge-request/merge-request.service';
 
 @Controller('notes')
-export class NotesController {
+export class NoteController {
   constructor(
     private readonly noteService: NoteService,
     private readonly repositoryService: RepositoryService,
@@ -14,7 +14,7 @@ export class NotesController {
 
   @Get('/merge_request/:id')
   async findAllForMergeRequest(@Param() { id }: IdParam) {
-    console.log('Can go inside findAllForMergeRequest in notes controller');
+    console.log('Can go inside findAllForMergeRequest in note controller');
     const mergeRequest = await this.mergeRequestService.findOne(id);
     console.log(mergeRequest);
     if (mergeRequest) {
