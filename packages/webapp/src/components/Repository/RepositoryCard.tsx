@@ -6,9 +6,9 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { ApiResource } from '../../api/base';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
+import UndecoratedLink from '../UndecoratedLink';
 
 interface RepositoryCardProps {
   repository: ApiResource<Repository>;
@@ -26,54 +26,63 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
     setRepositoryId(repository.meta.id);
   };
   return (
-    <Box component={Paper} my={3} p={3} bgcolor='#F3FCFF'>
-      <Grid container justify='space-between' alignItems='center'>
-        <Grid item>
-          <Grid alignItems='center' spacing={5} container>
+    <Box my={3} position='relative'>
+      <UndecoratedLink
+        onClick={handleClick}
+        to={`/merge/${repository.meta.id}`}
+      >
+        <Box component={Paper} p={3} bgcolor='#F3FCFF'>
+          <Grid container justify='space-between' alignItems='center'>
             <Grid item>
-              <Box height='5rem' width='5rem' bgcolor='#DBD6FF' />
+              <Grid alignItems='center' spacing={5} container>
+                <Grid item>
+                  <Box height='5rem' width='5rem' bgcolor='#DBD6FF' />
+                </Grid>
+                <Grid item>
+                  <Typography variant='h4'>
+                    {repository.namespace.path} /{' '}
+                    <strong>{repository.name}</strong>
+                  </Typography>
+                </Grid>
+              </Grid>
             </Grid>
             <Grid item>
-              <Typography variant='h4'>
-                {repository.namespace.path} / <strong>{repository.name}</strong>
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item>
-          <Grid alignItems='center' spacing={5} container>
-            <Grid item>
-              <Button
-                variant='contained'
-                color='secondary'
-                disabled={isSyncing}
-                component={Link}
-                onClick={handleClick}
-                to={`/merge/${repository.meta.id}`}
-              >
-                View
-              </Button>
-            </Grid>
-            <Grid item>
-              <Box position='relative'>
-                <Button
-                  variant='contained'
-                  color='secondary'
-                  disabled={isSyncing}
-                  onClick={() => syncRepository(repository.meta.id)}
-                >
-                  Sync
-                </Button>
-                {isSyncing && (
-                  <Box position='absolute' top='.5rem' left='1.25rem'>
-                    <CircularProgress size={25} />
-                  </Box>
-                )}
-              </Box>
+              <Grid alignItems='center' spacing={5} container>
+                <Grid item />
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </Grid>
+        </Box>
+      </UndecoratedLink>
+      <Box position='absolute' right='4rem' top='3rem'>
+        {!isSyncing && (
+          <Button
+            variant='contained'
+            color='secondary'
+            disabled={isSyncing}
+            onClick={() => syncRepository(repository.meta.id)}
+          >
+            Sync
+          </Button>
+        )}
+      </Box>
+      {isSyncing && (
+        <Box
+          position='absolute'
+          zIndex={100}
+          top='0'
+          left='0'
+          bottom='0'
+          right='0'
+          bgcolor='rgba(0, 0, 0, 0.3)'
+        >
+          <Box position='relative'>
+            <Box position='absolute' top='3.5rem' left='50%'>
+              <CircularProgress size={25} />
+            </Box>
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 };
