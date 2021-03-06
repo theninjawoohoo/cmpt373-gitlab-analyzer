@@ -56,7 +56,7 @@ const AccordionSummary = withStyles({
   },
   content: {
     '&$expanded': {
-      margin: '12px 0',
+      margin: '0 auto',
     },
   },
   expanded: {},
@@ -64,7 +64,7 @@ const AccordionSummary = withStyles({
 
 const AccordionDetails = withStyles((theme) => ({
   root: {
-    padding: theme.spacing(0.1),
+    padding: theme.spacing(0),
   },
 }))(MuiAccordionDetails);
 
@@ -117,13 +117,15 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
                 repositoryDependent
               />
             </AccordionDetails>
+            <AccordionDetails>
+              <ItemBox
+                icon='graph'
+                primary={'Graph'}
+                url={`/graph/${repositoryId}`}
+                repositoryDependent
+              />
+            </AccordionDetails>
           </Accordion>
-          <ItemBox
-            icon='graph'
-            primary={'Graph'}
-            url={`/graph/${repositoryId}`}
-            repositoryDependent
-          />
           <ItemBox icon='setting' primary={'Settings'} url='/settings' />
           <ItemBox icon='operation' primary={'Operations'} url='/operations' />
           <ItemBox icon='logout' primary={'Logout'} url='/logout' />
