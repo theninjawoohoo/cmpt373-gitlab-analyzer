@@ -3,19 +3,19 @@ import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
 import { Repository as TypeORMNote } from 'typeorm';
-import { Repository } from '../repository.entity';
-import { Note as NoteEntity } from './note.entity';
-import { MergeRequest as MergeRequestEntity } from '../../merge-request/merge-request.entity';
-import { paginate, withDefaults } from '../../../common/query-dto';
-import alwaysArray from '../../../common/alwaysArray';
-import { MergeRequestNoteQueryDto } from './note-query.dto';
+import { Repository } from '../../repository.entity';
+import { MergeRequestNote as MergeRequestNoteEntity } from './merge-request-note.entity';
+import { MergeRequest as MergeRequestEntity } from '../../../merge-request/merge-request.entity';
+import { paginate, withDefaults } from '../../../../common/query-dto';
+import alwaysArray from '../../../../common/alwaysArray';
+import { MergeRequestNoteQueryDto } from './merge-request-note-query.dto';
 
 @Injectable()
-export class NoteService {
+export class MergeRequestNoteService {
   constructor(
     private readonly httpService: HttpService,
-    @InjectRepository(NoteEntity)
-    private readonly noteRepository: TypeORMNote<NoteEntity>,
+    @InjectRepository(MergeRequestNoteEntity)
+    private readonly noteRepository: TypeORMNote<MergeRequestNoteEntity>,
   ) {}
 
   async search(filters: MergeRequestNoteQueryDto) {

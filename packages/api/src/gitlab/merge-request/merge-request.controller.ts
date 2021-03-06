@@ -14,7 +14,7 @@ import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
 import { RepositoryService } from '../repository/repository.service';
 import { IdParam } from 'src/common/id-param';
 import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
-import { NoteService } from '../repository/note/note.service';
+import { MergeRequestNoteService } from '../repository/note/merge-request-note/merge-request-note.service';
 
 @Controller('merge_request')
 export class MergeRequestController {
@@ -22,7 +22,7 @@ export class MergeRequestController {
     private readonly mergeRequestService: MergeRequestService,
     private readonly repositoryService: RepositoryService,
     private readonly mergeRequestParticipantService: MergeRequestParticipantService,
-    private readonly noteService: NoteService,
+    private readonly noteService: MergeRequestNoteService,
   ) {}
 
   @Get(':id/participants')

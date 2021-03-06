@@ -11,7 +11,7 @@ import { GitlabTokenService } from '../gitlab/services/gitlab-token.service';
 import { SyncRepositoryExecutor } from './executor/sync-repository.executor';
 import { Operation as OperationEntity } from './operation.entity';
 import { Injectable } from '@nestjs/common';
-import { NoteService } from '../gitlab/repository/note/note.service';
+import { MergeRequestNoteService } from '../gitlab/repository/note/merge-request-note/merge-request-note.service';
 
 @Injectable()
 export class OperationExecutorService {
@@ -20,7 +20,7 @@ export class OperationExecutorService {
     private readonly operationRepository: Repository<OperationEntity>,
     private readonly tokenService: GitlabTokenService,
     private readonly commitService: CommitService,
-    private readonly noteService: NoteService,
+    private readonly noteService: MergeRequestNoteService,
     private readonly mergeRequestService: MergeRequestService,
     private readonly repositoryService: RepositoryService,
     private readonly commitDailyCountService: CommitDailyCountService,

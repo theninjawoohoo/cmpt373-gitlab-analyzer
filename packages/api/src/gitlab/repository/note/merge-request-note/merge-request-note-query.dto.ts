@@ -1,5 +1,5 @@
 import { IsOptional, IsString, IsUUID } from 'class-validator';
-import { QueryDto } from '../../../common/query-dto';
+import { QueryDto } from '../../../../common/query-dto';
 
 export class MergeRequestNoteQueryDto extends QueryDto {
   @IsOptional()

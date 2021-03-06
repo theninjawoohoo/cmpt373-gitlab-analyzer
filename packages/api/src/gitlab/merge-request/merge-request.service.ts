@@ -9,8 +9,8 @@ import { DiffService } from '../repository/diff/diff.service';
 import { Repository } from '../repository/repository.entity';
 import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
-import { NoteService } from '../repository/note/note.service';
-import { Note } from '../repository/note/note.entity';
+import { MergeRequestNoteService } from '../repository/note/merge-request-note/merge-request-note.service';
+import { MergeRequestNote } from '../repository/note/merge-request-note/merge-request-note.entity';
 
 interface MergeRequestSearch extends BaseSearch {
   repository: string;
@@ -25,7 +25,7 @@ export class MergeRequestService {
     private readonly diffService: DiffService,
     private readonly commitService: CommitService,
     private readonly participantService: MergeRequestParticipantService,
-    private readonly noteService: NoteService,
+    private readonly noteService: MergeRequestNoteService,
   ) {}
 
   async search(filters: MergeRequestSearch) {
@@ -256,7 +256,7 @@ export class MergeRequestService {
     mergeRequest: MergeRequest,
   ) {
     const axiosResponse = await this.httpService
-      .get<Note[]>(
+      .get<MergeRequestNote[]>(
         `projects/${repository.resource.id}/merge_requests/${mergeRequest.iid}/notes`,
         {
           headers: {
