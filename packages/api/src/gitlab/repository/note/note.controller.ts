@@ -14,9 +14,7 @@ export class NoteController {
 
   @Get('/merge_request/:id')
   async findAllForMergeRequest(@Param() { id }: IdParam) {
-    console.log('Can go inside findAllForMergeRequest in note controller');
     const mergeRequest = await this.mergeRequestService.findOne(id);
-    console.log(mergeRequest);
     if (mergeRequest) {
       return this.noteService.findAllForMergeRequest(mergeRequest);
     }

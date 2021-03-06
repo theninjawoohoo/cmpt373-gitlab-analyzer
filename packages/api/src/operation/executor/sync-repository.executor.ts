@@ -14,7 +14,6 @@ import { NoteService } from '../../gitlab/repository/note/note.service';
 
 enum Stage {
   syncCommits = 'syncCommits',
-  syncMergeRequestNotes = 'syncMergeRequestNotes',
   syncMergeRequests = 'syncMergeRequests',
   linkCommitsAndMergeRequests = 'linkCommitsAndMergeRequests',
   linkNotesAndMergeRequests = 'linkNotesAndMergeRequests',
@@ -39,7 +38,6 @@ export class SyncRepositoryExecutor {
   private stages = {
     [Stage.syncCommits]: this.createStage('Sync Commits'),
     [Stage.syncMergeRequests]: this.createStage('Sync Merge Requests'),
-    [Stage.syncMergeRequestNotes]: this.createStage('Sync Merge Request Notes'),
     [Stage.linkCommitsAndMergeRequests]: this.createStage(
       'Link Commits and Merge Requests',
     ),

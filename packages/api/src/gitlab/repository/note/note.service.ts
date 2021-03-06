@@ -56,7 +56,6 @@ export class NoteService {
   }
 
   async findAllForMergeRequest(mergeRequest: MergeRequestEntity) {
-    console.log(mergeRequest);
     return this.noteRepository.find({
       where: { mergeRequest: mergeRequest },
     });
