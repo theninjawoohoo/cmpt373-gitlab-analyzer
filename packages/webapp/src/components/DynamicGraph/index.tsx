@@ -3,15 +3,14 @@ import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import StudentDropdownMenu from '../Common/StudentDropdownMenu';
+// import StudentDropdownMenu from '../Common/StudentDropdownMenu';
 import { useParams } from 'react-router-dom';
-import { useRepositoryMembers } from '../../api/repo_members';
+// import { useRepositoryMembers } from '../../api/repo_members';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { useCommitDailyCounts } from '../../api/commit';
 import { DateTime } from 'luxon';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
-// import { SearchResults } from '../../api/base';
-// import { Commit } from '@ceres/types';
+import MemberDropdown from '../CommitList/components/MemberDropdown';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,19 +28,40 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     tabs: {
       padding: '2rem',
-      width: '65vw', //TODO: fix tab bar layout
+      width: '80vw', //TODO: fix tab bar layout
     },
   }),
 );
 
+const createGraphData = (date: DateTime, commits: any[], merges: any[]) => {
+  let commitCount = 0;
+  let mergeCount = 0;
+  for (const result of commits) {
+    if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
+      commitCount += result.count;
+    }
+  }
+  for (const result of merges) {
+    if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
+      mergeCount += result.count;
+    }
+  }
+  return {
+    date: date.toLocaleString(DateTime.DATE_SHORT),
+    commitCount,
+    mergeCount,
+  };
+};
+
 const DynamicGraph: React.FC = () => {
   const classes = useStyles();
-  const [studentName, setStudentName] = useState('All students');
+  const [studentName] = useState('All students');
   const [startDate, setStartDate] = useState(DateTime.now());
   const [endDate, setEndDate] = useState(DateTime.now().plus({ days: 7 }));
   const [value, setValue] = React.useState(0);
   const { id } = useParams<{ id: string }>();
-  const { data: repoMembers } = useRepositoryMembers(id);
+  // const { data: repoMembers } = useRepositoryMembers(id);
+  const [emails, setEmails] = useState<string[]>([]);
   const { data: commits } = useCommitDailyCounts(
     {
       repository: id,
@@ -68,27 +88,7 @@ const DynamicGraph: React.FC = () => {
       setCommitResults(commits?.results);
       setMergeResults([]);
     }
-  }, [repoMembers, studentName]);
-
-  const createGraphData = (date: DateTime, commits: any[], merges: any[]) => {
-    let commitCount = 0;
-    let mergeCount = 0;
-    for (const result of commits) {
-      if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
-        commitCount += result.count;
-      }
-    }
-    for (const result of merges) {
-      if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
-        mergeCount += result.count;
-      }
-    }
-    return {
-      date: date.toLocaleString(DateTime.DATE_SHORT),
-      commitCount,
-      mergeCount,
-    };
-  };
+  }, [emails]);
 
   useEffect(() => {
     if (commitResults && mergeResults && startDate && endDate) {
@@ -136,10 +136,11 @@ const DynamicGraph: React.FC = () => {
             </Tabs>
           </Grid>
           <Grid item>
-            <StudentDropdownMenu
-              repoMembers={repoMembers}
-              studentName={studentName}
-              setStudentName={setStudentName}
+            <MemberDropdown
+              repositoryId={id}
+              onChange={(newEmails) => {
+                setEmails(newEmails);
+              }}
             />
           </Grid>
         </Grid>
