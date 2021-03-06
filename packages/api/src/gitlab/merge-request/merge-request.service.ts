@@ -3,14 +3,16 @@ import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
 import { Repository as TypeORMRepository } from 'typeorm';
-import alwaysArray from '../../common/alwaysArray';
 import { BaseSearch, paginate, withDefaults } from '../../common/query-dto';
 import { CommitService } from '../repository/commit/commit.service';
 import { DiffService } from '../repository/diff/diff.service';
 import { Repository } from '../repository/repository.entity';
 import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
-import { MergeRequestQueryDto } from './merge-request-query.dto';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
+
+interface MergeRequestSearch extends BaseSearch {
+  repository: string;
+}
 
 @Injectable()
 export class MergeRequestService {
@@ -23,30 +25,13 @@ export class MergeRequestService {
     private readonly participantService: MergeRequestParticipantService,
   ) {}
 
-  async search(filters: MergeRequestQueryDto) {
+  async search(filters: MergeRequestSearch) {
     filters = withDefaults(filters);
     const { repository } = filters;
     const query = this.repository
       .createQueryBuilder('merge_request')
-      .where('merge_request.repository_id = :repository', { repository });
-
-    if (filters.commit_author_email) {
-      query.andWhere(
-        `
-        merge_request.id IN  (
-          SELECT "mrc"."mergeRequestId"
-          FROM merge_request_commits_commit mrc
-          INNER JOIN (
-            SELECT * FROM commit
-            WHERE commit.resource #>> '{author_email}' IN (:...authorEmail)
-          ) c ON c.id = "mrc"."commitId"
-        )
-      `,
-        { authorEmail: alwaysArray(filters.commit_author_email) },
-      );
-    }
-
-    query.orderBy("merge_request.resource #>> '{merged_at}'", 'DESC');
+      .where('merge_request.repository_id = :repository', { repository })
+      .orderBy("merge_request.resource #>> '{merged_at}'", 'DESC');
     paginate(query, filters);
     return query.getManyAndCount();
   }
