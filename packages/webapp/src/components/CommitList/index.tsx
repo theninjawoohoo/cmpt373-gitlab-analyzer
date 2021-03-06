@@ -12,6 +12,7 @@ import Button from '@material-ui/core/Button/Button';
 import Box from '@material-ui/core/Box';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import MemberDropdown from './components/MemberDropdown';
+import { useDateFilterContext } from '../../contexts/DateFilterContext';
 
 const CommitList: React.FC = () => {
   const location = useLocation();
@@ -27,7 +28,8 @@ const CommitList: React.FC = () => {
     },
     page,
   );
-
+  const { elements } = useDateFilterContext();
+  console.log(elements);
   return (
     <Container>
       <Box my={4}>
