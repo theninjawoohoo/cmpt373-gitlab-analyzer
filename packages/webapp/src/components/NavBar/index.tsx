@@ -1,9 +1,12 @@
 import React from 'react';
 import { useState } from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { ListItem, List } from '@material-ui/core';
+import { ListItem, List, Accordion } from '@material-ui/core';
 import ItemBox from './itemBox';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
 
 interface UserNameProps {
   username: string;
@@ -40,30 +43,46 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
           </ListItem>
           <ItemBox icon='user' primary={UserNameProps.username} url='/' />
           <ItemBox icon='repo' primary={'Repository'} url='/repository' />
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls='panel1a-content'
+              id='panel1a-header'
+            >
+              <ItemBox icon='details' primary={'Details'} url='nil' />
+            </AccordionSummary>
+            <AccordionDetails>
+              <ItemBox
+                icon='merge'
+                primary={'Merge Requests'}
+                url={`/merge/${repositoryId}`}
+                repositoryDependent
+              />
+            </AccordionDetails>
+            <AccordionDetails>
+              <ItemBox
+                icon='commit'
+                primary={'Commits'}
+                url={`/commits?repository=${repositoryId}`}
+                repositoryDependent
+              />
+            </AccordionDetails>
+            <AccordionDetails>
+              <ItemBox
+                icon='members'
+                primary={'Members'}
+                url={`/repository/${repositoryId}/members`}
+                repositoryDependent
+              />
+            </AccordionDetails>
+          </Accordion>
           <ItemBox
             icon='graph'
             primary={'Graph'}
             url={`/graph/${repositoryId}`}
             repositoryDependent
           />
-          <ItemBox
-            icon='merge'
-            primary={'Merge Requests'}
-            url={`/merge/${repositoryId}`}
-            repositoryDependent
-          />
-          <ItemBox
-            icon='commit'
-            primary={'Commits'}
-            url={`/commits?repository=${repositoryId}`}
-            repositoryDependent
-          />
-          <ItemBox
-            icon='members'
-            primary={'Members'}
-            url={`/repository/${repositoryId}/members`}
-            repositoryDependent
-          />
+
           <ItemBox icon='setting' primary={'Settings'} url='/settings' />
           <ItemBox icon='operation' primary={'Operations'} url='/operations' />
           <ItemBox icon='logout' primary={'Logout'} url='/logout' />
