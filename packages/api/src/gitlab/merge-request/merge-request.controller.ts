@@ -50,7 +50,7 @@ export class MergeRequestController {
   }
 
   @Get(':id/notes')
-  async getMergeRequestNotes(@Param() { id }: IdParam) {
+  async getAllMergeRequestNotes(@Param() { id }: IdParam) {
     const mergeRequest = await this.mergeRequestService.findOne(id);
     if (mergeRequest) {
       return await this.noteService.findAllForMergeRequest(mergeRequest);

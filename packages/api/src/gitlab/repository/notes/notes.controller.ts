@@ -1,15 +1,7 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  NotFoundException,
-  Param,
-  Post,
-} from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import { NoteService } from './notes.service';
 import { IdParam } from '../../../common/id-param';
 import { RepositoryService } from '../repository.service';
-import { GitlabToken } from '../../../auth/decorators/gitlab-token.decorator';
 import { MergeRequestService } from '../../merge-request/merge-request.service';
 
 @Controller('notes')
@@ -24,6 +16,7 @@ export class NotesController {
   async findAllForMergeRequest(@Param() { id }: IdParam) {
     console.log('Can go inside findAllForMergeRequest in notes controller');
     const mergeRequest = await this.mergeRequestService.findOne(id);
+    console.log(mergeRequest);
     if (mergeRequest) {
       return this.noteService.findAllForMergeRequest(mergeRequest);
     }

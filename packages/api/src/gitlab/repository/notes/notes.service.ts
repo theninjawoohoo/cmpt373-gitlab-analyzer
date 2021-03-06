@@ -6,6 +6,9 @@ import { Repository as TypeORMNote } from 'typeorm';
 import { Repository } from '../repository.entity';
 import { Note as NoteEntity } from './notes.entity';
 import { MergeRequest as MergeRequestEntity } from '../../merge-request/merge-request.entity';
+import { paginate, withDefaults } from '../../../common/query-dto';
+import alwaysArray from '../../../common/alwaysArray';
+import { MergeRequestNoteQueryDto } from './note-query.dto';
 
 @Injectable()
 export class NoteService {
@@ -15,16 +18,47 @@ export class NoteService {
     private readonly noteRepository: TypeORMNote<NoteEntity>,
   ) {}
 
-  async findAllForMergeRequest(mergeRequest: MergeRequestEntity) {
-    console.log(mergeRequest);
-    return this.noteRepository.find({
-      where: { mergeRequest: mergeRequest },
-    });
+  async search(filters: MergeRequestNoteQueryDto) {
+    const query = this.noteRepository.createQueryBuilder('note');
+    filters = withDefaults(filters);
+
+    if (filters.repository) {
+      query.andWhere('note.repository_id = :repository', {
+        repository: filters.repository,
+      });
+    }
+
+    if (filters.merge_request) {
+      query.leftJoinAndSelect('note.mergeRequests', 'merge_request');
+      query.andWhere('merge_request.id = :merge_request', {
+        merge_request: filters.merge_request,
+      });
+    }
+
+    if (filters.author_email) {
+      query.andWhere(
+        "note.resource #>> '{author_email}' IN (:...authorEmail)",
+        {
+          authorEmail: alwaysArray(filters.author_email),
+        },
+      );
+    }
+
+    query.orderBy("note.resource #>> '{authored_date}'", 'DESC');
+    paginate(query, filters);
+    return query.getManyAndCount();
   }
 
   async findOne(id: string) {
     return this.noteRepository.findOne({
       where: { id },
+    });
+  }
+
+  async findAllForMergeRequest(mergeRequest: MergeRequestEntity) {
+    console.log(mergeRequest);
+    return this.noteRepository.find({
+      where: { mergeRequest: mergeRequest },
     });
   }
 

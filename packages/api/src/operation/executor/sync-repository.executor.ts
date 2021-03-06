@@ -10,11 +10,14 @@ import { Repository } from '../../gitlab/repository/repository.entity';
 import { RepositoryService } from '../../gitlab/repository/repository.service';
 import { GitlabTokenService } from '../../gitlab/services/gitlab-token.service';
 import { Operation as OperationEntity } from '../operation.entity';
+import { NoteService } from '../../gitlab/repository/notes/notes.service';
 
 enum Stage {
   syncCommits = 'syncCommits',
+  syncMergeRequestNotes = 'syncMergeRequestNotes',
   syncMergeRequests = 'syncMergeRequests',
   linkCommitsAndMergeRequests = 'linkCommitsAndMergeRequests',
+  linkNotesAndMergeRequests = 'linkNotesAndMergeRequests',
   createDailyCommitCaches = 'createDailyCommitCaches',
   linkAuthors = 'linkAuthors',
 }
@@ -25,6 +28,7 @@ export class SyncRepositoryExecutor {
     private readonly operationRepository: TypeORMRepository<OperationEntity>,
     private readonly tokenService: GitlabTokenService,
     private readonly commitService: CommitService,
+    private readonly noteService: NoteService,
     private readonly mergeRequestService: MergeRequestService,
     private readonly repositoryService: RepositoryService,
     private readonly commitDailyCountService: CommitDailyCountService,
@@ -35,8 +39,12 @@ export class SyncRepositoryExecutor {
   private stages = {
     [Stage.syncCommits]: this.createStage('Sync Commits'),
     [Stage.syncMergeRequests]: this.createStage('Sync Merge Requests'),
+    [Stage.syncMergeRequestNotes]: this.createStage('Sync Merge Request Notes'),
     [Stage.linkCommitsAndMergeRequests]: this.createStage(
       'Link Commits and Merge Requests',
+    ),
+    [Stage.linkNotesAndMergeRequests]: this.createStage(
+      'Link Notes and Merge Requests',
     ),
     [Stage.createDailyCommitCaches]: this.createStage(
       'Create Daily Commit Caches',
@@ -55,6 +63,7 @@ export class SyncRepositoryExecutor {
     ]);
     await Promise.all([
       this.linkCommitsAndMergeRequests(),
+      this.linkNotesAndMergeRequests(),
       this.createDailyCommitCaches(),
       this.linkAuthors(),
     ]);
@@ -111,6 +120,18 @@ export class SyncRepositoryExecutor {
     } catch {}
 
     await this.completeStage(Stage.linkCommitsAndMergeRequests);
+  }
+
+  private async linkNotesAndMergeRequests() {
+    await this.startStage(Stage.linkNotesAndMergeRequests);
+    try {
+      await this.mergeRequestService.linkNotesForRepository(
+        this.token,
+        this.repository,
+      );
+    } catch {}
+
+    await this.completeStage(Stage.linkNotesAndMergeRequests);
   }
 
   private async createDailyCommitCaches() {
