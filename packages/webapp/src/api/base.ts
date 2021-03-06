@@ -1,5 +1,10 @@
 import { Method } from 'axios';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from 'react-query';
 import axios from '../util/axios';
 
 export function useApiQuery<T>(route: string, params?: any) {
@@ -38,6 +43,40 @@ export function usePaginatedQuery<T>(
     { keepPreviousData: true },
   );
   return { ...result, invalidate: () => client.invalidateQueries(key) };
+}
+
+export function useApiInfiniteQuery<T>(
+  route: string,
+  params: any,
+  pageSize = 10,
+) {
+  const client = useQueryClient();
+  const key = [route, pageSize, params];
+  const result = useInfiniteQuery(
+    key,
+    async ({ pageParam = 0 }) => {
+      const response = await axios.get<SearchResults<T>>(route, {
+        params: {
+          ...params,
+          pageSize,
+          page: pageParam,
+        },
+      });
+      return response.data;
+    },
+    {
+      getNextPageParam: (lastPage, allPages) => {
+        if (lastPage.results.length !== pageSize) {
+          return false;
+        }
+        return allPages.length;
+      },
+    },
+  );
+  return {
+    ...result,
+    invalidate: () => client.invalidateQueries(key),
+  };
 }
 
 export function useApiMutation<T, B>(route: string, method: Method) {

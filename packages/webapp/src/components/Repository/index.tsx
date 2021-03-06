@@ -1,6 +1,4 @@
 import { Operation } from '@ceres/types';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
 import React, { useEffect } from 'react';
 import { useGetOperations, useSyncRepository } from '../../api/operation';
 import { useRepository, usePostRepository } from '../../api/repository';
@@ -9,6 +7,7 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import RepositoryCard from './RepositoryCard';
+import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 
 function hasPendingSync(operations: Operation[], id: string) {
   return (
@@ -48,18 +47,16 @@ const Repository: React.FC = () => {
 
   return (
     <Container>
-      <Box my={4}>
-        <Grid container justify='space-between' alignItems='center'>
-          <Grid item>
-            <Typography variant='h1'>Projects</Typography>
-          </Grid>
-          <Grid item>
-            <Button variant='contained' color='primary' size='large'>
-              Fetch
-            </Button>
-          </Grid>
+      <Grid container justify='space-between' alignItems='center'>
+        <Grid item>
+          <DefaultPageTitleFormat>Projects</DefaultPageTitleFormat>
         </Grid>
-      </Box>
+        <Grid item>
+          <Button variant='contained' color='primary' size='large'>
+            Fetch
+          </Button>
+        </Grid>
+      </Grid>
       {message}
       {openCircularProgress && <ProgressCircle progress={progress} />}
       {repos?.results.map((repo) => {

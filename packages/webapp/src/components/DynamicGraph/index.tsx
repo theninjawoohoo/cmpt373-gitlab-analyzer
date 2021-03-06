@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import StudentDropdownMenu from '../Common/StudentDropdownMenu';
@@ -10,6 +9,7 @@ import { useRepositoryMembers } from '../../api/repo_members';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { useCommitDailyCounts } from '../../api/commit';
 import { DateTime } from 'luxon';
+import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 // import { SearchResults } from '../../api/base';
 // import { Commit } from '@ceres/types';
 
@@ -113,7 +113,7 @@ const DynamicGraph: React.FC = () => {
     <>
       <Grid container direction='column' spacing={2} className={classes.root}>
         <Grid item>
-          <Typography className={classes.title}>Contribution Graph</Typography>
+          <DefaultPageTitleFormat>Contribution Graph</DefaultPageTitleFormat>
         </Grid>
         <Grid
           item
