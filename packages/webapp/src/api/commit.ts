@@ -31,6 +31,8 @@ interface CommitSearchParams {
   repository?: string;
   merge_request?: string;
   author_email?: string[];
+  start_date?: string;
+  end_date?: string;
 }
 
 export function useGetCommits(

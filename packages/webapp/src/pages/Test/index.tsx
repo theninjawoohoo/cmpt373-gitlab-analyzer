@@ -1,12 +1,21 @@
 import React from 'react';
-import MergeRequestsTable from '../../components/MergeRequestsTable';
+import CalendarFilter from '../../components/CalendarFilter';
+import DefaultPageLayout from '../../components/DefaultPageLayout';
 
-const Home: React.FC = () => {
+const Test: React.FC = () => {
+  const startDate = new Date();
+  const endDate = new Date();
+
   return (
-    <div>
-      <MergeRequestsTable />
-    </div>
+    <DefaultPageLayout>
+      <div>
+        <CalendarFilter
+          startDateIso={startDate.toISOString()}
+          endDateIso={endDate.toISOString()}
+        />
+      </div>
+    </DefaultPageLayout>
   );
 };
 
-export default Home;
+export default Test;
