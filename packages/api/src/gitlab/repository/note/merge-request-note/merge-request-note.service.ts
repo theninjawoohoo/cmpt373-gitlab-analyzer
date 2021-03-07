@@ -22,27 +22,17 @@ export class MergeRequestNoteService {
     const query = this.noteRepository.createQueryBuilder('note');
     filters = withDefaults(filters);
 
-    if (filters.repository) {
-      query.andWhere('note.repository_id = :repository', {
-        repository: filters.repository,
-      });
-    }
-
     if (filters.merge_request) {
-      query.leftJoinAndSelect('note.mergeRequests', 'merge_request');
-      query.andWhere('merge_request.id = :merge_request', {
+      query.where('merge_request.id = :merge_request', {
         merge_request: filters.merge_request,
       });
     }
 
-    if (filters.author_email) {
-      query.andWhere(
-        "note.resource #>> '{author_email}' IN (:...authorEmail)",
-        {
-          authorEmail: alwaysArray(filters.author_email),
-        },
-      );
-    }
+    // if (filters.author) {
+    //   query.andWhere("note.resource #>> '{author}' IN (:...author)", {
+    //     author: alwaysArray(filters.author),
+    //   });
+    // }
 
     query.orderBy("note.resource #>> '{authored_date}'", 'DESC');
     paginate(query, filters);
@@ -76,10 +66,7 @@ export class MergeRequestNoteService {
     return axiosResponse.data;
   }
 
-  private async fetchForMergeRequest(
-    mergeRequest: MergeRequestEntity,
-    token: string,
-  ) {
+  async fetchForMergeRequest(mergeRequest: MergeRequestEntity, token: string) {
     const url = `/projects/${mergeRequest.resource.project_id}/merge_requests/${mergeRequest.resource.iid}/notes`;
     const axiosResponse = await this.httpService
       .get<Note[]>(url, {
@@ -94,7 +81,7 @@ export class MergeRequestNoteService {
     return axiosResponse.data;
   }
 
-  async findByGitlabId(repository: Repository, id: string) {
+  async findByGitlabId(repository: Repository, id: number) {
     return this.noteRepository
       .createQueryBuilder()
       .where('repository_id = :repositoryId', { repositoryId: repository.id })

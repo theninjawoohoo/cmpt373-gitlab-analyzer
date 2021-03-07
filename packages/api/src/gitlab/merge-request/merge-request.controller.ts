@@ -58,16 +58,6 @@ export class MergeRequestController {
     throw new NotFoundException(`no notes found for merge request id: ${id}`);
   }
 
-  @Post(':id/note')
-  @HttpCode(204)
-  async fetchMergeRequestNotes(
-    @Param() { id }: IdParam,
-    @GitlabToken() token: string,
-  ) {
-    const mergeRequest = await this.mergeRequestService.findOne(id);
-    return await this.noteService.syncForMergeRequest(mergeRequest, token);
-  }
-
   @Get()
   search(@Query() query: MergeRequestQueryDto) {
     return paginatedToResponse(this.mergeRequestService.search(query));

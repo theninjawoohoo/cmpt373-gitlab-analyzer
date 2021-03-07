@@ -21,3 +21,11 @@ export interface Note {
     resolvable: boolean;
     confidential: boolean;
 }
+
+export namespace Note {
+    export interface Author {
+        author_name: string;
+        author_email: string;
+        repository_member_id?: string;
+    }
+}

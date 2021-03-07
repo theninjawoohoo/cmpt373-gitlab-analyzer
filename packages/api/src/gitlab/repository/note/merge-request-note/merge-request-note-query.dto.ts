@@ -1,16 +1,13 @@
-import { IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsOptional, IsUUID } from 'class-validator';
 import { QueryDto } from '../../../../common/query-dto';
+// import { Note } from '@ceres/types';
+// import Author = Note.Author;
 
 export class MergeRequestNoteQueryDto extends QueryDto {
   @IsOptional()
   @IsUUID()
   merge_request?: string;
 
-  @IsOptional()
-  @IsUUID()
-  repository?: string;
-
-  @IsOptional()
-  @IsString({ each: true })
-  author_email?: string;
+  // @IsOptional()
+  // author: Author;
 }

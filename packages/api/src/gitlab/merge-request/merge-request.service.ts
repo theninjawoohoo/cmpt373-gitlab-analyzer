@@ -10,7 +10,6 @@ import { Repository } from '../repository/repository.entity';
 import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
 import { MergeRequestNoteService } from '../repository/note/merge-request-note/merge-request-note.service';
-import { MergeRequestNote } from '../repository/note/merge-request-note/merge-request-note.entity';
 
 interface MergeRequestSearch extends BaseSearch {
   repository: string;
@@ -146,10 +145,9 @@ export class MergeRequestService {
     repository: Repository,
     mergeRequest: MergeRequestEntity,
   ) {
-    const notes = await this.fetchNotesFromGitlab(
+    const notes = await this.noteService.fetchForMergeRequest(
+      mergeRequest,
       token,
-      repository,
-      mergeRequest.resource,
     );
     mergeRequest.notes = await Promise.all(
       notes.map((note) => this.noteService.findByGitlabId(repository, note.id)),
@@ -240,24 +238,6 @@ export class MergeRequestService {
     const axiosResponse = await this.httpService
       .get<Commit[]>(
         `projects/${repository.resource.id}/merge_requests/${mergeRequest.iid}/commits`,
-        {
-          headers: {
-            'PRIVATE-TOKEN': token,
-          },
-        },
-      )
-      .toPromise();
-    return axiosResponse.data;
-  }
-
-  async fetchNotesFromGitlab(
-    token: string,
-    repository: Repository,
-    mergeRequest: MergeRequest,
-  ) {
-    const axiosResponse = await this.httpService
-      .get<MergeRequestNote[]>(
-        `projects/${repository.resource.id}/merge_requests/${mergeRequest.iid}/notes`,
         {
           headers: {
             'PRIVATE-TOKEN': token,
