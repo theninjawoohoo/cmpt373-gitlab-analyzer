@@ -57,6 +57,7 @@ export default class DiffInterpreter {
     return hunkLines;
   }
 
+  // First read all consecutively deleted lines, and then read all the consecutively added lines
   private findGroupedChange(
     lines: string[],
     currentLine: number,
@@ -76,6 +77,9 @@ export default class DiffInterpreter {
     return { deletedLines, addedLines };
   }
 
+  // In the case when deletions are followed directly by an addition, we want to render
+  // the deletion on the left side and the addition on the right side on the same line.
+  // This helpers function creates the left and right side on the same line.
   private linkLines(deletedLines: LineContent[], addedLines: LineContent[]) {
     const max = Math.max(deletedLines.length, addedLines.length);
     const changes: Line[] = [];
@@ -100,6 +104,7 @@ export default class DiffInterpreter {
     return changes;
   }
 
+  // Read all consecutive deletes so we can group them. Helper for `findGroupedChange`
   private getDeletedLines(
     leftLineNumber: number,
     lines: string[],
@@ -118,6 +123,7 @@ export default class DiffInterpreter {
     return deletedLines;
   }
 
+  // Read all consecutive adds so we can group them. Helper for `findGroupedChange`
   private getAddedLines(
     rightLineNumber: number,
     lines: string[],
@@ -149,6 +155,8 @@ export default class DiffInterpreter {
         lineContent: line,
       },
     };
+    // If this line was added at the same time as a line was deleted, store
+    // the deleted line as the left side.
     if (deletedLine && deletedLineNumber) {
       definition.left = {
         lineContent: deletedLine,
