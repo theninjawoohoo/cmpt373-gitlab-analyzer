@@ -12,6 +12,7 @@ export interface Commit {
   committer_email: string;
   committed_date: string;
   web_url: string;
+  score: number;
 }
 
 export namespace Commit {

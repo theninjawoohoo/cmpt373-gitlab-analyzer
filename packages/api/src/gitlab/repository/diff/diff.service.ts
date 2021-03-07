@@ -67,15 +67,12 @@ export class DiffService {
     }
     paginate(query, filters);
     let diffs = query.getManyAndCount();
-    // await console.log(diffs);
     await diffs.then(function(result) {
-      // console.log(result[1])
       for (var index = 0; index < result[1]; index++){
         var diff = result[0][index].resource.hunks[0].lines;
-        // console.log(diff);
         var commentFlag = false;
         diff.forEach(line => {
-          console.log(line)
+          // console.log(line)
           if (line.match('^\\+\\/\\*')){
             commentFlag = true;
             return;
@@ -89,27 +86,23 @@ export class DiffService {
           }
           if (line.match('^\\+.')){
             if (line.match('[a-zA-Z1-9]') && commentFlag == false){
-              console.log("add");
+              // console.log("add");
               score+=1;
             }
             else if (commentFlag == false){
-              console.log("syntax");
+              // console.log("syntax");
               score+=0.2;
             }
           }
           else if (line.match('^\\-.') && commentFlag == false){
-            console.log("delete");
+            // console.log("delete");
             score+=0.2
           }
         });
       }
-
-      // console.log(score);
     });
-    console.log(score);
+    // console.log(score);
     return score;
-    
-    // return diffs;
   }
 
   async syncForMergeRequest(mergeRequest: MergeRequest, token: string) {

@@ -21,6 +21,6 @@ export class DiffController {
   @Get('/score')
   score(@Query() query: DiffQueryDto) {
     const { merge_request, commit } = query;
-    return this.diffService.calculateScore(query);
+    return this.diffService.calculateDiffScore(query);
   }
 }

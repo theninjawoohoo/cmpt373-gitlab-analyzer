@@ -5,7 +5,6 @@ import { AxiosResponse } from 'axios';
 import { Repository as TypeORMCommit } from 'typeorm';
 import alwaysArray from '../../../common/alwaysArray';
 import { paginate, withDefaults } from '../../../common/query-dto';
-import { DiffQueryDto } from '../diff/diff-query.dto';
 import { DiffService } from '../diff/diff.service';
 import { Repository } from '../repository.entity';
 import { CommitQueryDto } from './commit-query.dto';
@@ -207,11 +206,24 @@ export class CommitService {
     };
   }
 
-  async storeScore(filters: DiffQueryDto){
-    var score = await this.diffService.calculateDiffScore(filters);
-    var commit = await this.commitRepository.createQueryBuilder('commit')
-    .andWhere('id = :commit', { commit: filters.commit }).getOne();
+  async storeScore(commit: Commit){
+    var score = await this.diffService.calculateDiffScore({commit: commit.id});
+    // var commit = await this.commitRepository.createQueryBuilder('commit')
+    // .andWhere('id = :commit', { commit: filters.commit }).getOne();
     commit.score = score;
     this.commitRepository.save(commit);
+  }
+
+  async fetchAllScore(repository: Repository){
+    var commits = await this.commitRepository.createQueryBuilder('commit')
+    .andWhere('repository_id = :repositoryId', {
+      repositoryId: repository.id,
+    })
+    .getMany();
+    // const entities = await Promise.all(
+    //   commits.map(async (commit) => {
+    //     await this.storeScore((commit));
+    //   }),
+    // );
   }
 }

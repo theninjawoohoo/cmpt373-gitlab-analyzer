@@ -35,4 +35,8 @@ export class MergeRequest extends BaseEntity<MergeRequestResource> {
 
   @OneToMany(() => MergeRequestNote, (note) => note.mergeRequest)
   notes: MergeRequestNote[];
+  
+  diffScore: number;
+
+  commitScore: number;
 }
