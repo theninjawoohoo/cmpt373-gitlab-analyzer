@@ -6,7 +6,7 @@ import { Commit } from '../commit/commit.entity';
 import { DiffQueryDto } from './diff-query.dto';
 import { Diff as DiffEntity } from './diff.entity';
 import { DeepPartial, Repository as TypeORMRepository } from 'typeorm';
-import { Diff, FileType } from '@ceres/types';
+import { Diff, FileType, Line } from '@ceres/types';
 import { parsePatch } from 'diff';
 import DiffInterpreter from './helpers/DiffInterpreter';
 
@@ -74,10 +74,16 @@ export class DiffService {
   private async addParsedDefinitions(diff: GitlabDiff): Promise<Diff> {
     const hunks = parsePatch(diff.diff)[0].hunks;
     const interpreter = new DiffInterpreter(hunks, FileType.typescript);
+    const lines = await interpreter.parse();
+    const summary = {};
+    Object.values(Line.Type).forEach((lineType) => {
+      summary[lineType] = lines.filter((line) => line.type === lineType).length;
+    });
     return {
       ...diff,
       hunks,
-      lines: await interpreter.parse(),
+      lines,
+      summary,
     };
   }
 

@@ -22,4 +22,5 @@ export interface Diff {
   diff: string;
   hunks: Hunk[];
   lines?: Line[];
+  summary?: { [key in Line.Type]?: number };
 }
