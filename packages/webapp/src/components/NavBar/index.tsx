@@ -129,6 +129,7 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
           </Accordion>
           <ItemBox icon='setting' primary={'Settings'} url='/settings' />
           <ItemBox icon='operation' primary={'Operations'} url='/operations' />
+          <ItemBox icon='scoring' primary={'Scoring'} url='/scoring' />
           <ItemBox icon='logout' primary={'Logout'} url='/logout' />
         </List>
       </div>
