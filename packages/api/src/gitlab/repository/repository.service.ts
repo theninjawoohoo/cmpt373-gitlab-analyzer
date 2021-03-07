@@ -1,4 +1,4 @@
-import { Repository } from '@ceres/types';
+import { Extensions, Repository } from '@ceres/types';
 import { BaseSearch, paginate, withDefaults } from '../../common/query-dto';
 import { RepositoryMemberService } from './repository-member/repository-member.service';
 import { Repository as RepositoryEntity } from './repository.entity';
@@ -37,6 +37,13 @@ export class RepositoryService {
     });
   }
 
+  async updateLastSync(repository: RepositoryEntity, timestamp = new Date()) {
+    repository.resource = Extensions.updateExtensions(repository.resource, {
+      lastSync: timestamp.toISOString(),
+    });
+    return this.repository.save(repository);
+  }
+
   async fetchForUser(user: User, token: string) {
     let repositories: Repository[] = [];
     let page = 1;
@@ -70,7 +77,7 @@ export class RepositoryService {
             resource: repo,
           });
         } else {
-          found.resource = repo;
+          found.resource = Extensions.updateResource(found.resource, repo);
         }
         return found;
       }),
