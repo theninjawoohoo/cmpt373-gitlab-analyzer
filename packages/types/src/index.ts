@@ -8,3 +8,4 @@ export * from './RepositoryMember';
 export * from './User';
 export * from './MergeRequest';
 export * from './MergeRequestParticipant';
+export * from './WithExtensions';

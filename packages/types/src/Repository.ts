@@ -1,4 +1,6 @@
 // Generated using: http://json2ts.com/
+import { WithExtensions } from './WithExtensions';
+
 interface Namespace {
   id: number;
   name: string;
@@ -54,7 +56,11 @@ interface Permissions {
   group_access: GroupAccess;
 }
 
-export interface Repository {
+interface RepositoryExtensions {
+  lastSync?: string;
+}
+
+export interface Repository extends WithExtensions<RepositoryExtensions> {
   id: number;
   description: string;
   name: string;

@@ -9,6 +9,7 @@ import InsertChart from '@material-ui/icons/InsertChart';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PeopleIcon from '@material-ui/icons/People';
+import ListIcon from '@material-ui/icons/List';
 
 export default function Icon(props: any) {
   switch (props.icon) {
@@ -32,6 +33,8 @@ export default function Icon(props: any) {
       return <PlayArrowIcon />;
     case 'members':
       return <PeopleIcon />;
+    case 'list':
+      return <ListIcon />;
   }
   return <ErrorIcon />;
 }
