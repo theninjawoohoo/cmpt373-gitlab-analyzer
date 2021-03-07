@@ -10,7 +10,6 @@ import { Repository } from '../../gitlab/repository/repository.entity';
 import { RepositoryService } from '../../gitlab/repository/repository.service';
 import { GitlabTokenService } from '../../gitlab/services/gitlab-token.service';
 import { Operation as OperationEntity } from '../operation.entity';
-import { MergeRequestNoteService } from '../../gitlab/repository/note/merge-request-note/merge-request-note.service';
 
 enum Stage {
   syncCommits = 'syncCommits',
@@ -27,7 +26,6 @@ export class SyncRepositoryExecutor {
     private readonly operationRepository: TypeORMRepository<OperationEntity>,
     private readonly tokenService: GitlabTokenService,
     private readonly commitService: CommitService,
-    private readonly noteService: MergeRequestNoteService,
     private readonly mergeRequestService: MergeRequestService,
     private readonly repositoryService: RepositoryService,
     private readonly commitDailyCountService: CommitDailyCountService,
@@ -40,9 +38,6 @@ export class SyncRepositoryExecutor {
     [Stage.syncMergeRequests]: this.createStage('Sync Merge Requests'),
     [Stage.linkCommitsAndMergeRequests]: this.createStage(
       'Link Commits and Merge Requests',
-    ),
-    [Stage.linkNotesAndMergeRequests]: this.createStage(
-      'Link Notes and Merge Requests',
     ),
     [Stage.createDailyCommitCaches]: this.createStage(
       'Create Daily Commit Caches',
@@ -61,7 +56,6 @@ export class SyncRepositoryExecutor {
     ]);
     await Promise.all([
       this.linkCommitsAndMergeRequests(),
-      this.linkNotesAndMergeRequests(),
       this.createDailyCommitCaches(),
       this.linkAuthors(),
     ]);
@@ -118,18 +112,6 @@ export class SyncRepositoryExecutor {
     } catch {}
 
     await this.completeStage(Stage.linkCommitsAndMergeRequests);
-  }
-
-  private async linkNotesAndMergeRequests() {
-    await this.startStage(Stage.linkNotesAndMergeRequests);
-    try {
-      await this.mergeRequestService.linkNotesForRepository(
-        this.token,
-        this.repository,
-      );
-    } catch {}
-
-    await this.completeStage(Stage.linkNotesAndMergeRequests);
   }
 
   private async createDailyCommitCaches() {

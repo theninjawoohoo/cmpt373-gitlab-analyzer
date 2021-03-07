@@ -59,7 +59,6 @@ export class OperationExecutorService {
       this.operationRepository,
       this.tokenService,
       this.commitService,
-      this.noteService,
       this.mergeRequestService,
       this.repositoryService,
       this.commitDailyCountService,

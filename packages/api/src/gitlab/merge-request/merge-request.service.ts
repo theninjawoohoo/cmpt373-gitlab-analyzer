@@ -103,25 +103,6 @@ export class MergeRequestService {
     } while (mergeRequests.length > 0);
   }
 
-  async linkNotesForRepository(token: string, repository: Repository) {
-    let page = 0;
-    let mergeRequests = [];
-    do {
-      mergeRequests = await this.repository.find({
-        where: { repository },
-        take: 10,
-        skip: page,
-        order: { id: 'ASC' },
-      });
-      await Promise.all(
-        mergeRequests.map((mergeRequest) =>
-          this.linkNotesForMergeRequest(token, repository, mergeRequest),
-        ),
-      );
-      page++;
-    } while (mergeRequests.length > 0);
-  }
-
   private async linkCommitsForMergeRequest(
     token: string,
     repository: Repository,
@@ -136,21 +117,6 @@ export class MergeRequestService {
       commits.map((commit) =>
         this.commitService.findByGitlabId(repository, commit.id),
       ),
-    );
-    await this.repository.save(mergeRequest);
-  }
-
-  private async linkNotesForMergeRequest(
-    token: string,
-    repository: Repository,
-    mergeRequest: MergeRequestEntity,
-  ) {
-    const notes = await this.noteService.fetchForMergeRequest(
-      mergeRequest,
-      token,
-    );
-    mergeRequest.notes = await Promise.all(
-      notes.map((note) => this.noteService.findByGitlabId(repository, note.id)),
     );
     await this.repository.save(mergeRequest);
   }
