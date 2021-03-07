@@ -11,6 +11,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 interface GlobScale {
   glob: string;
@@ -22,16 +24,35 @@ interface Config {
   config: GlobScale[];
 }
 
+const validationSchema = yup.object().shape({
+  name: yup.string().required('A scoring config requires a name'),
+  config: yup
+    .array()
+    .required()
+    .of(
+      yup.object().shape({
+        glob: yup.string().required('Glob is required'),
+        weight: yup
+          .number()
+          .required('Weight is required')
+          .min(0, 'Weight cannot be below 0'),
+      }),
+    ),
+});
+
 const Form: React.FC = () => {
-  const { control, handleSubmit, register } = useForm<Config>({
+  const { control, handleSubmit, register, errors } = useForm<Config>({
     defaultValues: {
       config: [{}], // give one empty glob config to start
     },
+    resolver: yupResolver(validationSchema),
   });
   const { fields, append, remove, swap, insert } = useFieldArray<GlobScale>({
     control,
     name: 'config',
   });
+
+  console.log({ errors });
 
   const onSubmit = (values: Config) => {
     console.log({ values });
@@ -50,6 +71,8 @@ const Form: React.FC = () => {
           label='Name'
           inputRef={register}
           variant='outlined'
+          error={!!errors?.name}
+          helperText={errors?.name?.message}
         />
       </Box>
       <Typography variant='h2'>Filetype Scaling</Typography>
@@ -63,6 +86,8 @@ const Form: React.FC = () => {
                   name={`config[${index}].glob`}
                   variant='outlined'
                   inputRef={register()}
+                  error={!!errors?.config?.[index]?.glob}
+                  helperText={errors?.config?.[index]?.glob?.message}
                   fullWidth
                 />
               </Grid>
@@ -72,6 +97,8 @@ const Form: React.FC = () => {
                   name={`config[${index}].weight`}
                   variant='outlined'
                   inputRef={register()}
+                  error={!!errors?.config?.[index]?.weight}
+                  helperText={errors?.config?.[index]?.weight?.message}
                   fullWidth
                 />
               </Grid>
