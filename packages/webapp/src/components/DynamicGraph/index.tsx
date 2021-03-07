@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 // import StudentDropdownMenu from '../Common/StudentDropdownMenu';
@@ -13,6 +12,7 @@ import { DateTime } from 'luxon';
 import MemberDropdown from '../CommitList/components/MemberDropdown';
 import { useDateFilterContext } from '../../contexts/DateFilterContext';
 import CalendarFilter from '../CalendarFilter';
+import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -109,7 +109,7 @@ const DynamicGraph: React.FC = () => {
     <>
       <Grid container direction='column' spacing={2} className={classes.root}>
         <Grid item>
-          <Typography className={classes.title}>Contribution Graph</Typography>
+          <DefaultPageTitleFormat>Contribution Graph</DefaultPageTitleFormat>
         </Grid>
         <Grid item>
           <CalendarFilter startDateIso={startDate} endDateIso={endDate} />

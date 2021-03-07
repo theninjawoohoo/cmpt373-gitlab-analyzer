@@ -2,6 +2,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
 import { useVerifyToken } from '../../api/token';
 import Form from './Form';
+import Container from '@material-ui/core/Container';
+import Box from '@material-ui/core/Box';
+import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
+
 const useStyles = makeStyles(() => ({
   title: {
     flexGrow: 1,
@@ -27,12 +31,15 @@ const SettingsForm: React.FC = () => {
     ? 'You have a valid API Key. To update your API Key, enter a new one below:'
     : 'You have an invalid API Key. Please enter a valid API Key below:';
   return (
-    <>
-      <div className={styles.form}>
-        <h2>{message}</h2>
-        <Form />
-      </div>
-    </>
+    <Container>
+      <DefaultPageTitleFormat>Settings</DefaultPageTitleFormat>
+      <Box my={15}>
+        <div className={styles.form}>
+          <h2>{message}</h2>
+          <Form />
+        </div>
+      </Box>
+    </Container>
   );
 };
 
