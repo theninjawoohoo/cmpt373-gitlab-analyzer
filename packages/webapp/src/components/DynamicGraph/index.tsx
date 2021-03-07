@@ -8,7 +8,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { useCommitDailyCounts } from '../../api/commit';
 import { DateTime } from 'luxon';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
-import MemberDropdown from '../CommitList/components/MemberDropdown';
+import MemberDropdown from '../MemberDropdown';
 import { useDateFilterContext } from '../../contexts/DateFilterContext';
 import CalendarFilter from '../CalendarFilter';
 
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     tabs: {
       padding: '2rem',
-      width: '80vw', //TODO: fix tab bar layout
+      width: '70vw', //TODO: fix tab bar layout
     },
   }),
 );
@@ -57,7 +57,6 @@ const DynamicGraph: React.FC = () => {
   const { startDate, endDate } = useDateFilterContext();
   const [value, setValue] = React.useState(0);
   const { id } = useParams<{ id: string }>();
-  // const { data: repoMembers } = useRepositoryMembers(id);
   const [emails, setEmails] = useState<string[]>([]);
   const { data: commits } = useCommitDailyCounts(
     {
@@ -69,18 +68,6 @@ const DynamicGraph: React.FC = () => {
   );
   const [mergeResults] = useState([]); // Empty until backend implements call
   const [graphData, setGraphData] = useState([]);
-
-  // useEffect(() => {
-  //   if (studentName != 'All students') {
-  //     setCommitResults(
-  //       commits?.results.filter((commit) => commit.author_name == studentName),
-  //     );
-  //     setMergeResults([]); // Empty until backend implements call
-  //   } else {
-  //     setCommitResults(commits?.results);
-  //     setMergeResults([]);
-  //   }
-  // }, [emails]);
 
   useEffect(() => {
     if (mergeResults && startDate && endDate) {
