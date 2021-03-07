@@ -17,7 +17,6 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       padding: '2rem',
       display: 'flex',
-      height: '100vh',
       width: '100vw',
       alignContent: 'flex-start',
     },
@@ -55,7 +54,6 @@ const createGraphData = (date: DateTime, commits: any[], merges: any[]) => {
 
 const DynamicGraph: React.FC = () => {
   const classes = useStyles();
-  const [studentName] = useState('All students');
   const { startDate, endDate } = useDateFilterContext();
   const [value, setValue] = React.useState(0);
   const { id } = useParams<{ id: string }>();
@@ -64,37 +62,39 @@ const DynamicGraph: React.FC = () => {
   const { data: commits } = useCommitDailyCounts(
     {
       repository: id,
+      author_email: emails,
     },
     0,
     9000,
   );
-  const [commitResults, setCommitResults] = useState(commits?.results);
-  const [mergeResults, setMergeResults] = useState([]); // Empty until backend implements call
+  const [mergeResults] = useState([]); // Empty until backend implements call
   const [graphData, setGraphData] = useState([]);
 
-  useEffect(() => {
-    if (studentName != 'All students') {
-      setCommitResults(
-        commits?.results.filter((commit) => commit.author_name == studentName),
-      );
-      setMergeResults([]); // Empty until backend implements call
-    } else {
-      setCommitResults(commits?.results);
-      setMergeResults([]);
-    }
-  }, [emails]);
+  // useEffect(() => {
+  //   if (studentName != 'All students') {
+  //     setCommitResults(
+  //       commits?.results.filter((commit) => commit.author_name == studentName),
+  //     );
+  //     setMergeResults([]); // Empty until backend implements call
+  //   } else {
+  //     setCommitResults(commits?.results);
+  //     setMergeResults([]);
+  //   }
+  // }, [emails]);
 
   useEffect(() => {
-    if (commitResults && mergeResults && startDate && endDate) {
+    if (mergeResults && startDate && endDate) {
       let date = DateTime.fromISO(startDate);
       const countsByDay = [];
       do {
-        countsByDay.push(createGraphData(date, commitResults, mergeResults));
+        countsByDay.push(
+          createGraphData(date, commits?.results || [], mergeResults),
+        );
         date = date.plus({ days: 1 });
       } while (date <= DateTime.fromISO(endDate));
       setGraphData(countsByDay);
     }
-  }, [commitResults, startDate, endDate]);
+  }, [commits?.results, startDate, endDate]);
 
   const handleChange = (
     event: React.ChangeEvent<unknown>,
