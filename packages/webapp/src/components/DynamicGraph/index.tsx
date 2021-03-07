@@ -58,8 +58,6 @@ const createGraphData = (date: DateTime, commits: any[], merges: any[]) => {
 const DynamicGraph: React.FC = () => {
   const classes = useStyles();
   const [studentName] = useState('All students');
-  // const [startDate, setStartDate] = useState(DateTime.now());
-  // const [endDate, setEndDate] = useState(DateTime.now().plus({ days: 7 }));
   const { startDate, endDate } = useDateFilterContext();
   const [value, setValue] = React.useState(0);
   const { id } = useParams<{ id: string }>();
@@ -75,11 +73,6 @@ const DynamicGraph: React.FC = () => {
   const [commitResults, setCommitResults] = useState(commits?.results);
   const [mergeResults, setMergeResults] = useState([]); // Empty until backend implements call
   const [graphData, setGraphData] = useState([]);
-
-  // useEffect(() => {
-  //   setStartDate(DateTime.fromISO('2020-03-01'));
-  //   setEndDate(DateTime.fromISO('2020-04-01'));
-  // }, []);
 
   useEffect(() => {
     if (studentName != 'All students') {
