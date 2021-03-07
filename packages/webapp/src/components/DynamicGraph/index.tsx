@@ -3,16 +3,14 @@ import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-// import StudentDropdownMenu from '../Common/StudentDropdownMenu';
 import { useParams } from 'react-router-dom';
-// import { useRepositoryMembers } from '../../api/repo_members';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { useCommitDailyCounts } from '../../api/commit';
 import { DateTime } from 'luxon';
+import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 import MemberDropdown from '../CommitList/components/MemberDropdown';
 import { useDateFilterContext } from '../../contexts/DateFilterContext';
 import CalendarFilter from '../CalendarFilter';
-import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
