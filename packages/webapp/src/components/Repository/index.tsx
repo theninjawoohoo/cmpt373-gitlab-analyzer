@@ -1,13 +1,19 @@
 import { Operation } from '@ceres/types';
-import React, { useEffect } from 'react';
-import { useGetOperations, useSyncRepository } from '../../api/operation';
-import { useRepository, usePostRepository } from '../../api/repository';
+import React from 'react';
+import {
+  useFetchRepositories,
+  useGetOperations,
+  useSyncRepository,
+} from '../../api/operation';
+import { useRepository } from '../../api/repository';
 import { ProgressCircle } from '../Common/CircularProgress';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import RepositoryCard from './RepositoryCard';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
+import Box from '@material-ui/core/Box';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 function hasPendingSync(operations: Operation[], id: string) {
   return (
@@ -18,7 +24,6 @@ function hasPendingSync(operations: Operation[], id: string) {
 
 const Repository: React.FC = () => {
   const { data: repos } = useRepository();
-  const { mutate } = usePostRepository();
   const {
     data: operationsData,
     invalidate: invalidateOperations,
@@ -26,13 +31,19 @@ const Repository: React.FC = () => {
     status: [Operation.Status.PROCESSING, Operation.Status.PENDING],
     type: [Operation.Type.SYNC_REPOSITORY],
   });
+  const {
+    data: pendingFetches,
+    invalidate: invalidatePendingFetches,
+  } = useGetOperations({
+    status: [Operation.Status.PROCESSING, Operation.Status.PENDING],
+    type: [Operation.Type.FETCH_REPOSITORIES],
+  });
   const { sync } = useSyncRepository();
+  const { fetch } = useFetchRepositories();
   const openCircularProgress = false;
   const progress = 0;
+  const isFetchingRepositories = pendingFetches?.total > 0;
 
-  useEffect(() => {
-    mutate(null);
-  }, []);
   const syncRepository = (id: string) => {
     sync(id, {
       onSuccess: () => {
@@ -40,6 +51,14 @@ const Repository: React.FC = () => {
       },
     });
   };
+  const fetchRepositories = () => {
+    fetch({
+      onSuccess: () => {
+        void invalidatePendingFetches();
+      },
+    });
+  };
+
   const message =
     repos?.results.length == 0 ? (
       <h3>You have no repositories on your profile</h3>
@@ -52,9 +71,22 @@ const Repository: React.FC = () => {
           <DefaultPageTitleFormat>Projects</DefaultPageTitleFormat>
         </Grid>
         <Grid item>
-          <Button variant='contained' color='primary' size='large'>
-            Fetch
-          </Button>
+          <Box position='relative'>
+            <Button
+              variant='contained'
+              color='primary'
+              size='large'
+              onClick={fetchRepositories}
+              disabled={isFetchingRepositories}
+            >
+              Fetch
+            </Button>
+            {isFetchingRepositories && (
+              <Box position='absolute' top='.25rem' left='1.5rem'>
+                <CircularProgress color='secondary' />
+              </Box>
+            )}
+          </Box>
         </Grid>
       </Grid>
       {message}

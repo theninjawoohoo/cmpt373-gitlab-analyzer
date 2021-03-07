@@ -20,6 +20,16 @@ export function useSyncRepository() {
   };
 }
 
+export function useFetchRepositories() {
+  const mutation = useCreateOperation();
+  const fetch = (options?: MutateOptions<Operation, any, OperationInput>) =>
+    mutation.mutate({ type: Operation.Type.FETCH_REPOSITORIES }, options);
+  return {
+    ...mutation,
+    fetch,
+  };
+}
+
 interface QueryParams {
   subscribers?: string[];
   type?: Operation.Type[];
