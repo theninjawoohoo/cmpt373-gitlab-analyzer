@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { DateTime } from 'luxon';
 
 interface DateFilterContextState {
   startDate: string;
@@ -10,8 +11,8 @@ interface DateFilterContextState {
 }
 
 const DateFilterContextDefault: DateFilterContextState = {
-  startDate: '',
-  endDate: '',
+  startDate: DateTime.now().minus({ days: 7 }).toISO(),
+  endDate: DateTime.now().toISO(),
   elements: [],
   setStartDateContext: () => null,
   setEndDateContext: () => null,
@@ -27,8 +28,10 @@ export function useDateFilterContext() {
 }
 
 function useDateFilterState(): DateFilterContextState {
-  const [startDate, setStartDateContext] = useState<string>('');
-  const [endDate, setEndDateContext] = useState<string>('');
+  const [startDate, setStartDateContext] = useState<string>(
+    DateTime.now().minus({ days: 7 }).toISO(),
+  );
+  const [endDate, setEndDateContext] = useState<string>(DateTime.now().toISO());
   const [elements, setArrayContext] = useState<any>([]);
   return {
     startDate,
