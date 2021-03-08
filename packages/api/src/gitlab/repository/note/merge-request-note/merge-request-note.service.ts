@@ -28,11 +28,11 @@ export class MergeRequestNoteService {
       });
     }
 
-    // if (filters.author) {
-    //   query.andWhere("note.resource #>> '{author}' IN (:...author)", {
-    //     author: alwaysArray(filters.author),
-    //   });
-    // }
+    if (filters.author_email) {
+      query.andWhere("note.resource #>> '{author_email}' IN (:...author)", {
+        author_email: alwaysArray(filters.author_email),
+      });
+    }
 
     query.orderBy("note.resource #>> '{authored_date}'", 'DESC');
     paginate(query, filters);
@@ -52,7 +52,6 @@ export class MergeRequestNoteService {
   }
 
   async syncForMergeRequest(mergeRequest: MergeRequestEntity, token: string) {
-    console.log('syncForMergeRequest inside note service');
     const note = await this.fetchForMergeRequest(mergeRequest, token);
     return this.createOrUpdate(mergeRequest, note);
   }
@@ -79,14 +78,6 @@ export class MergeRequestNoteService {
       })
       .toPromise();
     return axiosResponse.data;
-  }
-
-  async findByGitlabId(repository: Repository, id: number) {
-    return this.noteRepository
-      .createQueryBuilder()
-      .where('repository_id = :repositoryId', { repositoryId: repository.id })
-      .andWhere('resource @> :resource', { resource: { id } })
-      .getOne();
   }
 
   private async fetchFromGitlab(

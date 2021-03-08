@@ -21,10 +21,3 @@ export interface Note {
     resolvable: boolean;
     confidential: boolean;
 }
-
-export namespace Note {
-    export enum Author {
-        author_name = 'author_name',
-        author_email = 'author_email',
-    }
-}
