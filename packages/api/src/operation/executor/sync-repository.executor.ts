@@ -16,6 +16,7 @@ enum Stage {
   syncCommits = 'syncCommits',
   syncMergeRequests = 'syncMergeRequests',
   linkCommitsAndMergeRequests = 'linkCommitsAndMergeRequests',
+  linkNotesAndMergeRequests = 'linkNotesAndMergeRequests',
   createDailyCommitCaches = 'createDailyCommitCaches',
   linkAuthors = 'linkAuthors',
 }
