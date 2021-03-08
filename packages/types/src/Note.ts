@@ -23,9 +23,8 @@ export interface Note {
 }
 
 export namespace Note {
-    export interface Author {
-        author_name: string;
-        author_email: string;
-        repository_member_id?: string;
+    export enum Author {
+        author_name = 'author_name',
+        author_email = 'author_email',
     }
 }
