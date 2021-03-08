@@ -1,4 +1,5 @@
 import React from 'react';
+//import 'date-fns';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import { useDateFilterContext } from '../../contexts/DateFilterContext';
 import Grid from '@material-ui/core/Grid';
@@ -25,9 +26,11 @@ const CalendarFilter: React.FC<DateProp> = (DateProp) => {
   const [startDate, setStartDate] = React.useState(
     DateTime.fromISO(DateProp.startDateIso),
   );
+  console.log(startDate.toString());
   const [endDate, setEndDate] = React.useState(
     DateTime.fromISO(DateProp.endDateIso),
   );
+  console.log(endDate.toString());
 
   const { data: commits } = useGetCommits(
     {
@@ -43,12 +46,14 @@ const CalendarFilter: React.FC<DateProp> = (DateProp) => {
     setStartDate(date.startOf('day'));
     setStartDateContext(date.toString());
     setArrayContext(commits?.results);
+    console.log(commits?.results);
   };
 
   const handleEndDateChange = (date) => {
     setEndDate(date.startOf('day'));
     setEndDateContext(date.toString());
     setArrayContext(commits?.results);
+    console.log(commits?.results);
   };
 
   return (
