@@ -4,9 +4,9 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import React, { useEffect, useState } from 'react';
-import { useRepositoryAuthors } from '../../../api/author';
-import { ApiResource } from '../../../api/base';
-import { useRepositoryMembers } from '../../../api/repo_members';
+import { useRepositoryAuthors } from '../../api/author';
+import { ApiResource } from '../../api/base';
+import { useRepositoryMembers } from '../../api/repo_members';
 
 function findEmailsForMember(
   memberId: string,
@@ -33,6 +33,8 @@ const MemberDropdown: React.FC<MemberDropdownProps> = ({
   useEffect(() => {
     if (value !== 'all') {
       const emails = findEmailsForMember(value, authors);
+      console.log(emails);
+
       onChange(emails.length > 0 ? emails : ['doesnotexist@email.com']);
     } else {
       onChange([]);

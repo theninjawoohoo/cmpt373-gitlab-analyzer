@@ -2,17 +2,15 @@ import { Commit, MergeRequest } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
+import alwaysArray from 'src/common/alwaysArray';
 import { Repository as TypeORMRepository } from 'typeorm';
 import { BaseSearch, paginate, withDefaults } from '../../common/query-dto';
 import { CommitService } from '../repository/commit/commit.service';
 import { DiffService } from '../repository/diff/diff.service';
 import { Repository } from '../repository/repository.entity';
 import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
+import { MergeRequestQueryDto } from './merge-request-query.dto';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
-
-interface MergeRequestSearch extends BaseSearch {
-  repository: string;
-}
 
 @Injectable()
 export class MergeRequestService {
@@ -25,13 +23,29 @@ export class MergeRequestService {
     private readonly participantService: MergeRequestParticipantService,
   ) {}
 
-  async search(filters: MergeRequestSearch) {
+  async search(filters: MergeRequestQueryDto) {
     filters = withDefaults(filters);
     const { repository } = filters;
     const query = this.repository
       .createQueryBuilder('merge_request')
       .where('merge_request.repository_id = :repository', { repository })
       .orderBy("merge_request.resource #>> '{merged_at}'", 'DESC');
+
+    if (filters.author_email) {
+      query.andWhere(
+        `
+          merge_request.id IN  (
+            SELECT "mrc"."mergeRequestId"
+            FROM merge_request_commits_commit mrc
+            INNER JOIN (
+              SELECT * FROM commit
+              WHERE commit.resource #>> '{author_email}' IN (:...authorEmail)
+            ) c ON c.id = "mrc"."commitId"
+          )
+        `,
+        { authorEmail: alwaysArray(filters.author_email) },
+      );
+    }
     paginate(query, filters);
     return query.getManyAndCount();
   }

@@ -11,14 +11,21 @@ import CommitList from './components/CommitList';
 import MergeRequestRenderer from './components/MergeRequestRenderer';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
+import MemberDropdown from '../../components/Common/MemberDropdown';
+import { useRepositoryContext } from '../../contexts/RepositoryContext';
 
 const ListMergeRequestPage = () => {
   const { id } = useParams<{ id: string }>();
+  const { repositoryId } = useRepositoryContext();
+  const [emails, setEmails] = useState<string[]>([]);
   const [activeMergeRequest, setActiveMergeRequest] = useState<
     ApiResource<MergeRequest>
   >();
   const [activeCommit, setActiveCommit] = useState<ApiResource<Commit>>();
-  const { data: mergeRequests } = useGetMergeRequests({ repository: id });
+  const { data: mergeRequests } = useGetMergeRequests({
+    repository: id,
+    author_email: emails,
+  });
   return (
     <>
       <DefaultPageLayout>
@@ -28,6 +35,14 @@ const ListMergeRequestPage = () => {
               <Box my={2}>
                 <Typography variant='h1'>Merge Requests</Typography>
               </Box>
+              <Grid item>
+                <MemberDropdown
+                  repositoryId={repositoryId}
+                  onChange={(newEmails) => {
+                    setEmails(newEmails);
+                  }}
+                />
+              </Grid>
               <Box pr={6} pl={2} py={1}>
                 <Grid container>
                   <Grid item xs={6}>
