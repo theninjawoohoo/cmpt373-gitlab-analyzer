@@ -206,10 +206,8 @@ export class CommitService {
     };
   }
 
-  async storeScore(commit: Commit){
+  async storeScore(commit: CommitEntity){
     var score = await this.diffService.calculateDiffScore({commit: commit.id});
-    // var commit = await this.commitRepository.createQueryBuilder('commit')
-    // .andWhere('id = :commit', { commit: filters.commit }).getOne();
     commit.score = score;
     this.commitRepository.save(commit);
   }
@@ -220,10 +218,8 @@ export class CommitService {
       repositoryId: repository.id,
     })
     .getMany();
-    // const entities = await Promise.all(
-    //   commits.map(async (commit) => {
-    //     await this.storeScore((commit));
-    //   }),
-    // );
+    commits.forEach(commit => {
+      this.storeScore(commit);
+    });
   }
 }

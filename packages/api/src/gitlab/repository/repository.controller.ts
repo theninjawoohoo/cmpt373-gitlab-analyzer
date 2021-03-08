@@ -34,7 +34,7 @@ export class RepositoryController {
 
   @Get(':id/participants')
   async findMergeRequestParticipants(@Param('id') id: string) {
-      const repository = await this.repositoryService.findOne(id);
+    const repository = await this.repositoryService.findOne(id);
     return await this.mergeRequestService.findAllParticipantsForRepository(
       repository,
     );

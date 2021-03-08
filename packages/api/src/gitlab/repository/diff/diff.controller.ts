@@ -21,6 +21,9 @@ export class DiffController {
   @Get('/score')
   score(@Query() query: DiffQueryDto) {
     const { merge_request, commit } = query;
+    if (!merge_request && !commit) {
+      throw new BadRequestException('repository or commit must be provided');
+    }
     return this.diffService.calculateDiffScore(query);
   }
 }

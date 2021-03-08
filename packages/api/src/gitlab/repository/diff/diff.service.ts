@@ -54,6 +54,9 @@ export class DiffService {
   }
 
   async calculateDiffScore(filters: DiffQueryDto){
+    var addScore = 1;
+    var deleteScore = 0.2;
+    var syntaxScore = 0.2;
     filters = withDefaults(filters);
     const query = this.diffRepository.createQueryBuilder('diff');
     var score = 0;
@@ -68,40 +71,11 @@ export class DiffService {
     paginate(query, filters);
     let diffs = query.getManyAndCount();
     await diffs.then(function(result) {
-      for (var index = 0; index < result[1]; index++){
-        var diff = result[0][index].resource.hunks[0].lines;
-        var commentFlag = false;
-        diff.forEach(line => {
-          // console.log(line)
-          if (line.match('^\\+\\/\\*')){
-            commentFlag = true;
-            return;
-          }
-          if (line.match('\\*\\/$')){
-            commentFlag = false;
-            return;
-          }
-          if (line.match('^\\+//')){
-            return;
-          }
-          if (line.match('^\\+.')){
-            if (line.match('[a-zA-Z1-9]') && commentFlag == false){
-              // console.log("add");
-              score+=1;
-            }
-            else if (commentFlag == false){
-              // console.log("syntax");
-              score+=0.2;
-            }
-          }
-          else if (line.match('^\\-.') && commentFlag == false){
-            // console.log("delete");
-            score+=0.2
-          }
-        });
-      }
+      result[0].forEach(diff => {
+        let summary = diff.resource.summary;
+        score+=summary.add*addScore+ summary.delete*deleteScore +summary.syntax*syntaxScore;
+      });
     });
-    // console.log(score);
     return score;
   }
 
