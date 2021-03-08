@@ -3,7 +3,7 @@ import { Commit } from '@ceres/types';
 
 interface DailyCommitSearchParams {
   repository: string;
-  author_email?: string;
+  author_email?: string[];
   start_date?: string;
   end_date?: string;
 }
