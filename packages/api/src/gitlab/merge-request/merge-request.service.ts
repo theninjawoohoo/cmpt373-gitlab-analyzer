@@ -11,6 +11,7 @@ import { Repository } from '../repository/repository.entity';
 import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
 import { MergeRequestQueryDto } from './merge-request-query.dto';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
+import { MergeRequestNoteService } from '../repository/note/merge-request-note/merge-request-note.service';
 
 @Injectable()
 export class MergeRequestService {
@@ -21,6 +22,7 @@ export class MergeRequestService {
     private readonly diffService: DiffService,
     private readonly commitService: CommitService,
     private readonly participantService: MergeRequestParticipantService,
+    private readonly noteService: MergeRequestNoteService,
   ) {}
 
   async search(filters: MergeRequestQueryDto) {
@@ -145,6 +147,11 @@ export class MergeRequestService {
         .map((mergeRequest) =>
           this.diffService.syncForMergeRequest(mergeRequest, token),
         ),
+    );
+    await Promise.all(
+      created.map((mergeRequest) =>
+        this.noteService.syncForMergeRequest(mergeRequest, token),
+      ),
     );
   }
 

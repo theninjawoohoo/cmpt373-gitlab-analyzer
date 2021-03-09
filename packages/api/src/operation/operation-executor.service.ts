@@ -8,9 +8,11 @@ import { CommitDailyCountService } from '../gitlab/repository/commit/daily-count
 import { RepositoryMemberService } from '../gitlab/repository/repository-member/repository-member.service';
 import { RepositoryService } from '../gitlab/repository/repository.service';
 import { GitlabTokenService } from '../gitlab/services/gitlab-token.service';
+import { FetchRepositoriesExecutor } from './executor/fetch-repositories.executor';
 import { SyncRepositoryExecutor } from './executor/sync-repository.executor';
 import { Operation as OperationEntity } from './operation.entity';
 import { Injectable } from '@nestjs/common';
+import { MergeRequestNoteService } from '../gitlab/repository/note/merge-request-note/merge-request-note.service';
 
 @Injectable()
 export class OperationExecutorService {
@@ -19,6 +21,7 @@ export class OperationExecutorService {
     private readonly operationRepository: Repository<OperationEntity>,
     private readonly tokenService: GitlabTokenService,
     private readonly commitService: CommitService,
+    private readonly noteService: MergeRequestNoteService,
     private readonly mergeRequestService: MergeRequestService,
     private readonly repositoryService: RepositoryService,
     private readonly commitDailyCountService: CommitDailyCountService,
@@ -33,6 +36,9 @@ export class OperationExecutorService {
     switch (operation.resource.type) {
       case Operation.Type.SYNC_REPOSITORY:
         await this.executeSyncRepositoryOperation(operation);
+        break;
+      case Operation.Type.FETCH_REPOSITORIES:
+        await this.executeFetchRepositoriesOperation(operation);
         break;
     }
     operation.resource = this.completeOperation(operation.resource);
@@ -51,7 +57,7 @@ export class OperationExecutorService {
     return operation;
   }
 
-  private async executeSyncRepositoryOperation(operation: OperationEntity) {
+  private executeSyncRepositoryOperation(operation: OperationEntity) {
     const executor = new SyncRepositoryExecutor(
       operation,
       this.operationRepository,
@@ -63,6 +69,16 @@ export class OperationExecutorService {
       this.commitAuthorService,
       this.repositoryMemberService,
     );
-    await executor.run();
+    return executor.run();
+  }
+
+  private executeFetchRepositoriesOperation(operation: OperationEntity) {
+    const executor = new FetchRepositoriesExecutor(
+      operation,
+      this.operationRepository,
+      this.tokenService,
+      this.repositoryService,
+    );
+    return executor.run();
   }
 }

@@ -45,6 +45,24 @@ export class CommitService {
       );
     }
 
+    if (filters.start_date) {
+      query.andWhere(
+        "DATE(commit.resource #>> '{authored_date}') >= DATE(:startDate)",
+        {
+          startDate: filters.start_date,
+        },
+      );
+    }
+
+    if (filters.end_date) {
+      query.andWhere(
+        "DATE(commit.resource #>> '{authored_date}') <= DATE(:endDate)",
+        {
+          endDate: filters.end_date,
+        },
+      );
+    }
+
     query.orderBy("commit.resource #>> '{authored_date}'", 'DESC');
     paginate(query, filters);
     return query.getManyAndCount();

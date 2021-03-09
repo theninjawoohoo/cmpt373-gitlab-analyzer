@@ -1,7 +1,6 @@
 import { Commit, RepositoryMember } from '@ceres/types';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
-import Typography from '@material-ui/core/Typography';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useRepositoryAuthors } from '../../api/author';
@@ -9,6 +8,7 @@ import { ApiResource } from '../../api/base';
 import { useRepositoryMembers } from '../../api/repo_members';
 import DefaultPageLayout from '../../components/DefaultPageLayout';
 import Author from './components/Author';
+import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 
 function findSelectedMember(
   author: ApiResource<Commit.Author>,
@@ -26,7 +26,7 @@ const Members: React.FC = () => {
   return (
     <DefaultPageLayout>
       <Container>
-        <Typography variant='h1'>Members</Typography>
+        <DefaultPageTitleFormat>Members</DefaultPageTitleFormat>
         <Box my={4}>
           {members &&
             authors?.map((author) => {

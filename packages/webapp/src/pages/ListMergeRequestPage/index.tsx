@@ -1,18 +1,21 @@
 import { Commit, MergeRequest } from '@ceres/types';
 import Typography from '@material-ui/core/Typography';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { useParams } from 'react-router-dom';
 import { ApiResource } from '../../api/base';
-import { useGetMergeRequests } from '../../api/mergeRequests';
+import { useInfiniteMergeRequest } from '../../api/mergeRequests';
 import DefaultPageLayout from '../../components/DefaultPageLayout';
 import Container from '@material-ui/core/Container';
+import LoadMore from '../../components/LoadMore';
 import CodeView from './components/CodeView';
 import CommitList from './components/CommitList';
 import MergeRequestRenderer from './components/MergeRequestRenderer';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import MemberDropdown from '../../components/Common/MemberDropdown';
+import MemberDropdown from '../../components/MemberDropdown';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
+import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 
 const ListMergeRequestPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,10 +25,27 @@ const ListMergeRequestPage = () => {
     ApiResource<MergeRequest>
   >();
   const [activeCommit, setActiveCommit] = useState<ApiResource<Commit>>();
-  const { data: mergeRequests } = useGetMergeRequests({
+  const { ref: loadMoreRef, inView: loadMoreInView } = useInView();
+  const {
+    data: mergeRequests,
+    fetchNextPage,
+    hasNextPage,
+  } = useInfiniteMergeRequest({
     repository: id,
     author_email: emails,
   });
+
+  useEffect(() => {
+    if (loadMoreInView) {
+      void fetchNextPage();
+    }
+  }, [loadMoreInView]);
+
+  const reducedMergeRequests =
+    mergeRequests?.pages?.reduce(
+      (accumulated, current) => [...accumulated, ...current.results],
+      [],
+    ) || [];
   return (
     <>
       <DefaultPageLayout>
@@ -43,6 +63,7 @@ const ListMergeRequestPage = () => {
                   }}
                 />
               </Grid>
+              <DefaultPageTitleFormat>Merge Requests</DefaultPageTitleFormat>
               <Box pr={6} pl={2} py={1}>
                 <Grid container>
                   <Grid item xs={6}>
@@ -56,7 +77,7 @@ const ListMergeRequestPage = () => {
                   </Grid>
                 </Grid>
               </Box>
-              {(mergeRequests?.results || []).map((mergeRequest) => {
+              {reducedMergeRequests.map((mergeRequest) => {
                 const active =
                   mergeRequest.meta.id === activeMergeRequest?.meta.id;
                 return (
@@ -81,6 +102,14 @@ const ListMergeRequestPage = () => {
                 );
               })}
             </Container>
+            {hasNextPage && (
+              <LoadMore
+                onClick={() => {
+                  void fetchNextPage();
+                }}
+                ref={loadMoreRef}
+              />
+            )}
           </Grid>
           {activeMergeRequest && (
             <Grid item xs={7}>

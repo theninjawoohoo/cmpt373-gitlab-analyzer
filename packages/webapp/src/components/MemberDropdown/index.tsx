@@ -43,7 +43,7 @@ const MemberDropdown: React.FC<MemberDropdownProps> = ({
 
   return (
     <FormControl variant='filled'>
-      <InputLabel>Member</InputLabel>
+      <InputLabel>Show results for:</InputLabel>
       <Select
         style={{ minWidth: '15rem' }}
         value={value || 'None'}
@@ -52,7 +52,7 @@ const MemberDropdown: React.FC<MemberDropdownProps> = ({
           setValue(e.target.value as string);
         }}
       >
-        <MenuItem value='all'>All</MenuItem>
+        <MenuItem value='all'>All students</MenuItem>
         {(members || [])?.map((m) => (
           <MenuItem key={m.meta.id} value={m.meta.id}>
             {m.name}
