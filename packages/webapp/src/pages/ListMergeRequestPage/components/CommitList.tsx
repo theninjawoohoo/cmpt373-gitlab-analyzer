@@ -12,18 +12,19 @@ interface CommitListProps {
   mergeRequest: ApiResource<MergeRequest>;
   activeCommit?: ApiResource<Commit>;
   setActiveCommit: (commit: ApiResource<Commit>) => void;
+  authorEmails: string[];
 }
 
-const Root = styled(Box)`
-  &:hover {
-    cursor: pointer;
-  }
+const Root = styled(Box)<{ disabled?: boolean }>`
+  cursor: ${(p) => (p.disabled ? 'pointer' : 'default')};
+  opacity: ${(o) => (o.disabled ? '100%' : '50%')};
 `;
 
 const CommitList: React.FC<CommitListProps> = ({
   mergeRequest,
   activeCommit,
   setActiveCommit,
+  authorEmails,
 }) => {
   const { data: commits } = useGetCommits({
     merge_request: mergeRequest.meta.id,
@@ -35,8 +36,15 @@ const CommitList: React.FC<CommitListProps> = ({
           key={commit.meta.id}
           pl={5}
           py={1}
-          onClick={() => setActiveCommit(commit)}
+          onClick={
+            authorEmails.indexOf(commit.author_email)
+              ? () => {
+                  console.log('Invalid selection');
+                }
+              : () => setActiveCommit(commit)
+          }
           bgcolor={activeCommit?.meta.id === commit.meta.id ? '#D3D3D3' : ''}
+          disabled={authorEmails.indexOf(commit.author_email) != -1}
         >
           <Grid container>
             <Grid item xs={8}>
