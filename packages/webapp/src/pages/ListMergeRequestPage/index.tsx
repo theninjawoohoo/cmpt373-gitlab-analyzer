@@ -40,7 +40,7 @@ const ListMergeRequestPage = () => {
     if (loadMoreInView) {
       void fetchNextPage();
     }
-  }, [loadMoreInView]);
+  }, [emails, loadMoreInView]);
 
   const reducedMergeRequests =
     mergeRequests?.pages?.reduce(
