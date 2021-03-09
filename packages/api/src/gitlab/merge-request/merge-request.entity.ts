@@ -1,5 +1,6 @@
 import { MergeRequest as MergeRequestResource } from '@ceres/types';
 import {
+  Column,
   Entity,
   JoinColumn,
   JoinTable,
@@ -36,7 +37,9 @@ export class MergeRequest extends BaseEntity<MergeRequestResource> {
   @OneToMany(() => MergeRequestNote, (note) => note.mergeRequest)
   notes: MergeRequestNote[];
   
+  @Column({name: 'diff_score', nullable: true, type: "float"})
   diffScore: number;
 
-  commitScore: number;
+  @Column({name: 'commit_score_sum', nullable: true, type: "float"})
+  commitScoreSum: number;
 }

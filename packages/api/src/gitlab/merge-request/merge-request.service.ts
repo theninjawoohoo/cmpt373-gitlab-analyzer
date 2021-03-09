@@ -234,4 +234,22 @@ export class MergeRequestService {
       })
       .toPromise();
   }
+
+  // async storeScore(mergeRequest: MergeRequestEntity){
+  //   var score = await this.diffService.calculateDiffScore({merge_request: mergeRequest.id});
+  //   mergeRequest.score = score;
+  //   this.commitRepository.save(commit);
+  // }
+
+  // async fetchAllScore(repository: Repository){
+  //   var commits = await this.commitRepository.createQueryBuilder('commit')
+  //   .andWhere('repository_id = :repositoryId', {
+  //     repositoryId: repository.id,
+  //   })
+  //   .getMany();
+  //   commits.forEach(commit => {
+  //     this.storeScore(commit);
+  //   });
+  // }
+
 }

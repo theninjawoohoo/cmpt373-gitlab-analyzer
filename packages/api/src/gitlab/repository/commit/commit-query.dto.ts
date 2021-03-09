@@ -1,4 +1,4 @@
-import { IsDateString, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsDateString, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 import { QueryDto } from '../../../common/query-dto';
 
 export class CommitQueryDto extends QueryDto {
@@ -21,7 +21,4 @@ export class CommitQueryDto extends QueryDto {
   @IsOptional()
   @IsDateString()
   end_date?: string;
-  
-  @IsString({ each: true })
-  score?: number;
 }
