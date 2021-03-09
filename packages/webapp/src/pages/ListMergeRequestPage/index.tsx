@@ -36,6 +36,7 @@ const ListMergeRequestPage = () => {
   });
 
   useEffect(() => {
+    console.log(emails);
     if (loadMoreInView) {
       void fetchNextPage();
     }
