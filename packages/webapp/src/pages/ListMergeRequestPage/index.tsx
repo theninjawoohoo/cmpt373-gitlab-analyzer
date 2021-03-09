@@ -74,6 +74,7 @@ const ListMergeRequestPage = () => {
                         mergeRequest={mergeRequest}
                         activeCommit={activeCommit}
                         setActiveCommit={setActiveCommit}
+                        authorEmails={emails}
                       />
                     )}
                   </MergeRequestRenderer>
