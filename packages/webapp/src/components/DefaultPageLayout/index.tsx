@@ -10,9 +10,9 @@ const useStyles = makeStyles(() => ({
   },
 
   gridDimensions: {
-    minHeight: '100vh',
+    minHeight: '0vh',
     display: 'grid',
-    gridTemplateColumns: 'auto 1fr',
+    // gridTemplateColumns: 'auto 1fr',
   },
 }));
 
@@ -20,16 +20,18 @@ const DefaultPageLayout: React.FC = ({ children }) => {
   const { user } = useAuthContext();
   const styles = useStyles();
   return (
-    <div className={styles.gridDimensions}>
-      {user?.sfuId ? (
-        <>
-          <NavBar username={user.sfuId} />
-        </>
-      ) : (
-        <NavBar username={'Guest'} />
-      )}
-      {children}
-    </div>
+    <>
+      <div className={styles.gridDimensions}>
+        {user?.sfuId ? (
+          <>
+            <NavBar username={user.sfuId} />
+          </>
+        ) : (
+          <NavBar username={'Guest'} />
+        )}
+      </div>
+      <div>{children}</div>
+    </>
   );
 };
 
