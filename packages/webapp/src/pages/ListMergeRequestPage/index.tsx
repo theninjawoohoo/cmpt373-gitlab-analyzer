@@ -53,7 +53,7 @@ const ListMergeRequestPage = () => {
           <Grid item xs={activeMergeRequest ? 5 : 12}>
             <Container>
               <Box my={2}>
-                <DefaultPageTitleFormat>Merge Requests</DefaultPageTitleFormat>
+                <Typography variant='h1'>Merge Requests</Typography>
               </Box>
               <Grid item>
                 <MemberDropdown
@@ -63,6 +63,7 @@ const ListMergeRequestPage = () => {
                   }}
                 />
               </Grid>
+              <DefaultPageTitleFormat>Merge Requests</DefaultPageTitleFormat>
               <Box pr={6} pl={2} py={1}>
                 <Grid container>
                   <Grid item xs={6}>
