@@ -1,7 +1,6 @@
 import React from 'react';
-import { useState } from 'react';
 import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
-import { ListItem, List } from '@material-ui/core';
+import { List } from '@material-ui/core';
 import ItemBox from './itemBox';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -17,13 +16,14 @@ const useStyles = makeStyles((theme) => ({
   root: {
     transition: theme.transitions.create('width'),
     overflow: 'hidden',
-    minHeight: '100vh',
+    minHeight: '120vh',
   },
 
   listCSS: {
-    width: '14rem',
+    width: '100rem',
     position: 'relative',
     height: '100%',
+    backgroundColor: '#1D3945',
   },
 }));
 
@@ -46,12 +46,13 @@ const Accordion = withStyles({
 
 const AccordionSummary = withStyles({
   root: {
-    backgroundColor: 'rgba(0, 0, 0, 0)',
+    backgroundColor: '#1D3945',
     borderBottom: '0px',
     marginBottom: -1,
-    minHeight: 56,
+    minHeight: '5em',
+    width: '6rem',
     '&$expanded': {
-      minHeight: 56,
+      minHeight: '5rem',
     },
   },
   content: {
@@ -64,30 +65,30 @@ const AccordionSummary = withStyles({
 
 const AccordionDetails = withStyles((theme) => ({
   root: {
+    width: '6rem',
+    backgroundColor: '#1D3945',
     padding: theme.spacing(0),
+    minHeight: '7rem',
   },
 }))(MuiAccordionDetails);
 
 const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
   const theme = useTheme();
   const styles = useStyles(theme);
-  const [open, setOpen] = useState(false);
   const { repositoryId } = useRepositoryContext();
   return (
     <>
-      <div
-        style={open ? { width: '14rem' } : { width: '4rem' }}
-        className={styles.root}
-      >
+      <div style={{ width: '6rem' }} className={styles.root}>
         <List className={styles.listCSS}>
-          <ListItem button onClick={() => setOpen(!open)}>
-            <ItemBox icon='collapse' primary={'Collapse'} url='nil' />
-          </ListItem>
           <ItemBox icon='user' primary={UserNameProps.username} url='/' />
           <ItemBox icon='repo' primary={'Repository'} url='/repository' />
           <Accordion>
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
+              expandIcon={
+                <ExpandMoreIcon
+                  style={{ color: 'white', backgroundColor: '#1D3945' }}
+                />
+              }
               aria-controls='panel1a-content'
               id='panel1a-header'
             >
