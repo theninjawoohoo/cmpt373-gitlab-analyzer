@@ -1,8 +1,13 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
+import {
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  SvgIcon,
+} from '@material-ui/core';
 import Icon from './iconHelper';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 
@@ -15,15 +20,39 @@ interface ListItemBoxProps {
 
 const useStyles = makeStyles(() => ({
   logoutButton: {
-    bottom: '1rem',
+    color: 'white',
+    bottom: '1.5rem',
     position: 'absolute',
+    display: 'flex',
+    width: '6rem',
+    alignItems: 'center',
+    flexDirection: 'column',
+  },
+  iconStyle: {
+    fontSize: '3.5vh',
+    color: 'white',
+  },
+  buttonStyle: {
+    color: 'white',
+    display: 'flex',
+    width: '6rem',
+    alignItems: 'center',
+    flexDirection: 'column',
+    height: '6rem',
+    textAlign: 'center',
   },
 }));
-
 const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
   const styles = useStyles();
   const { logout } = useAuthContext();
   const { repositoryId } = useRepositoryContext();
+  const activeRoute = (routeName: any) => {
+    const location = useLocation();
+    const parsed_location = location.pathname.split('?')[0];
+    const parsed_route = routeName.split('?')[0];
+    return parsed_location === parsed_route;
+  };
+
   if (ListItemBoxProps.primary == 'Logout') {
     return (
       <ListItem
@@ -32,27 +61,18 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
         to={ListItemBoxProps.url}
         className={styles.logoutButton}
       >
-        <ListItemIcon>
+        <SvgIcon className={styles.iconStyle}>
           <Icon icon={ListItemBoxProps.icon} />
-        </ListItemIcon>
+        </SvgIcon>
         <ListItemText primary={ListItemBoxProps.primary} />
       </ListItem>
     );
-  } else if (ListItemBoxProps.primary == 'Collapse') {
-    return (
-      <>
-        <ListItemIcon>
-          <Icon icon={ListItemBoxProps.icon} />
-        </ListItemIcon>
-        <ListItemText primary={ListItemBoxProps.primary} />
-      </>
-    );
   } else if (ListItemBoxProps.icon == 'user') {
     return (
-      <ListItem button>
-        <ListItemIcon>
+      <ListItem button className={styles.buttonStyle}>
+        <SvgIcon className={styles.iconStyle}>
           <Icon icon={ListItemBoxProps.icon} />
-        </ListItemIcon>
+        </SvgIcon>
         <ListItemText primary={ListItemBoxProps.primary} />
       </ListItem>
     );
@@ -64,7 +84,7 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
         to={ListItemBoxProps.url}
         onClick={logout}
       >
-        <ListItemIcon>
+        <ListItemIcon className={styles.iconStyle}>
           <Icon icon={ListItemBoxProps.icon} />
         </ListItemIcon>
         <ListItemText primary={ListItemBoxProps.primary} />
@@ -72,21 +92,33 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
     );
   } else if (ListItemBoxProps.repositoryDependent && repositoryId == '') {
     return (
-      <ListItem button disabled component={Link} to={ListItemBoxProps.url}>
-        <ListItemIcon>
+      <ListItem
+        button
+        disabled
+        component={NavLink}
+        to={ListItemBoxProps.url}
+        activeStyle={{ color: '#ffff00' }}
+        className={styles.buttonStyle}
+      >
+        <SvgIcon
+          className={styles.iconStyle}
+          style={{
+            color: activeRoute(ListItemBoxProps.url) ? '#ffff00' : 'white',
+          }}
+        >
           <Icon icon={ListItemBoxProps.icon} />
-        </ListItemIcon>
+        </SvgIcon>
         <ListItemText primary={ListItemBoxProps.primary} />
       </ListItem>
     );
   } else if (ListItemBoxProps.icon == 'list') {
     return (
-      <>
-        <ListItemIcon>
+      <ListItem button className={styles.buttonStyle}>
+        <SvgIcon className={styles.iconStyle}>
           <Icon icon={ListItemBoxProps.icon} />
-        </ListItemIcon>
+        </SvgIcon>
         <ListItemText primary={ListItemBoxProps.primary} />
-      </>
+      </ListItem>
     );
   }
   return (
@@ -95,11 +127,17 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
       component={NavLink}
       exact
       to={ListItemBoxProps.url}
-      activeStyle={{ color: 'red' }}
+      activeStyle={{ color: '#ffff00' }}
+      className={styles.buttonStyle}
     >
-      <ListItemIcon>
+      <SvgIcon
+        className={styles.iconStyle}
+        style={{
+          color: activeRoute(ListItemBoxProps.url) ? '#ffff00' : 'white',
+        }}
+      >
         <Icon icon={ListItemBoxProps.icon} />
-      </ListItemIcon>
+      </SvgIcon>
       <ListItemText primary={ListItemBoxProps.primary} />
     </ListItem>
   );
