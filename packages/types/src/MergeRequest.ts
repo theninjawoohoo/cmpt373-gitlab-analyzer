@@ -120,4 +120,6 @@ export interface MergeRequest {
     has_conflicts: boolean;
     blocking_discussions_resolved: boolean;
     approvals_before_merge?: any;
+    diffScore: number;
+    commitScoreSum: number;
 }

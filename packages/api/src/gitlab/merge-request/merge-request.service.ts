@@ -235,21 +235,40 @@ export class MergeRequestService {
       .toPromise();
   }
 
-  // async storeScore(mergeRequest: MergeRequestEntity){
-  //   var score = await this.diffService.calculateDiffScore({merge_request: mergeRequest.id});
-  //   mergeRequest.score = score;
-  //   this.commitRepository.save(commit);
-  // }
+  public async getSumScoreForMergeRequest(mergeRequest: MergeRequestEntity){
+    var score = 0;
+    const commits = await this.repository.createQueryBuilder('merge_request')
+    .addSelect('mrcc.commitId', 'commits_id')
+    .andWhere('merge_request.id = :mr_id', {mr_id : mergeRequest.id})
+    .innerJoin('merge_request_commits_commit', 'mrcc', 'merge_request.id = mrcc.mergeRequestId')
+    .getRawMany();
 
-  // async fetchAllScore(repository: Repository){
-  //   var commits = await this.commitRepository.createQueryBuilder('commit')
-  //   .andWhere('repository_id = :repositoryId', {
-  //     repositoryId: repository.id,
-  //   })
-  //   .getMany();
-  //   commits.forEach(commit => {
-  //     this.storeScore(commit);
-  //   });
-  // }
+    const entities = await Promise.all(
+      commits.map(async (commit) => {
+        var commitScore = this.diffService.calculateDiffScore({commit: commit.commits_id});
+        score += await commitScore;
+      }),
+    );
 
+    return score;
+  }
+
+  async storeScore(mergeRequest: MergeRequestEntity){
+    var score = await this.diffService.calculateDiffScore({merge_request: mergeRequest.id});
+    var sumScore = await this.getSumScoreForMergeRequest(mergeRequest);
+    mergeRequest.diffScore = score;
+    mergeRequest.commitScoreSum = sumScore;
+    this.repository.save(mergeRequest);
+  }
+
+  async fetchAllScore(repository: Repository){
+    var mergeRequests = await this.repository.createQueryBuilder('merge_request')
+    .andWhere('repository_id = :repositoryId', {
+      repositoryId: repository.id,
+    })
+    .getMany();
+    mergeRequests.forEach(mergeRequest => {
+      this.storeScore(mergeRequest);
+    });
+  }
 }

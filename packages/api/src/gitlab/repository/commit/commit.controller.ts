@@ -32,7 +32,7 @@ export class CommitController {
   }
 
   @Post('score/repository/:id')
-  async Score(@Param() { id }: IdParam) {
+  async syncCommitScoreByRepository(@Param() { id }: IdParam) {
     const repository = await this.repositoryService.findOne(id);
     return this.commitService.fetchAllScore(repository);
   }
