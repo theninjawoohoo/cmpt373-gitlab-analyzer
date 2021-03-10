@@ -1,4 +1,4 @@
-import { Commit, MergeRequest } from '@ceres/types';
+import { Commit } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
@@ -9,7 +9,6 @@ import { DiffService } from '../diff/diff.service';
 import { Repository } from '../repository.entity';
 import { CommitQueryDto } from './commit-query.dto';
 import { Commit as CommitEntity } from './commit.entity';
-import { MergeRequest as MergeRequestEntity } from '../../merge-request/merge-request.entity';
 
 @Injectable()
 export class CommitService {
