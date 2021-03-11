@@ -1,4 +1,4 @@
-import { Commit } from '@ceres/types';
+import { Commit, Extensions } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
@@ -66,6 +66,13 @@ export class CommitService {
     query.orderBy("commit.resource #>> '{authored_date}'", 'DESC');
     paginate(query, filters);
     return query.getManyAndCount();
+  }
+
+  async updateLastSync(commit: CommitEntity, timestamp = new Date()) {
+    commit.resource = Extensions.updateExtensions(commit.resource, {
+      lastSync: timestamp.toISOString(),
+    });
+    return this.commitRepository.save(commit);
   }
 
   async findAllForRepository(repository: Repository) {
@@ -207,19 +214,23 @@ export class CommitService {
   }
 
   async storeScore(commit: CommitEntity){
-    var score = await this.diffService.calculateDiffScore({commit: commit.id});
+    let score = await this.diffService.calculateDiffScore({commit: commit.id});
     commit.score = score;
-    this.commitRepository.save(commit);
+    await this.commitRepository.save(commit);
+    await this.updateLastSync(commit);
   }
 
-  async fetchAllScore(repository: Repository){
-    var commits = await this.commitRepository.createQueryBuilder('commit')
+  async updateCommitScoreByRepository(repositoryID: string){
+    let commits = await this.commitRepository.createQueryBuilder('commit')
     .andWhere('repository_id = :repositoryId', {
-      repositoryId: repository.id,
+      repositoryId: repositoryID,
     })
     .getMany();
-    commits.forEach(commit => {
-      this.storeScore(commit);
-    });
+
+    await Promise.all(
+      commits.map(async (commit) => {
+         await this.storeScore(commit);
+      })
+    );
   }
 }

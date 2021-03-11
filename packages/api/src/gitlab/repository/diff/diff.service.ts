@@ -54,12 +54,12 @@ export class DiffService {
   }
 
   async calculateDiffScore(filters: DiffQueryDto){
-    var addScore = 1;
-    var deleteScore = 0.2;
-    var syntaxScore = 0.2;
+    let addScore = 1;
+    let deleteScore = 0.2;
+    let syntaxScore = 0.2;
     filters = withDefaults(filters);
     const query = this.diffRepository.createQueryBuilder('diff');
-    var score = 0;
+    let score = 0;
     if(filters.commit){
       query.andWhere('diff.commit_id = :commit', { commit: filters.commit });
     }
@@ -68,14 +68,14 @@ export class DiffService {
         mergeRequest: filters.merge_request,
       });
     }
-    paginate(query, filters);
-    let diffs = query.getManyAndCount();
-    await diffs.then(function(result) {
-      result[0].forEach(diff => {
+
+    let diffs = await query.getMany();
+    await Promise.all(
+      diffs.map(async (diff) => {
         let summary = diff.resource.summary;
-        score+=summary.add*addScore+ summary.delete*deleteScore +summary.syntax*syntaxScore;
-      });
-    });
+        score += summary.add*addScore+ summary.delete*deleteScore +summary.syntax*syntaxScore;
+      })
+    );
     return score;
   }
 

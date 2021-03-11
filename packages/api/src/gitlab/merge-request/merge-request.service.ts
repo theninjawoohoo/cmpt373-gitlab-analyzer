@@ -1,4 +1,4 @@
-import { Commit, MergeRequest } from '@ceres/types';
+import { Commit, Extensions, MergeRequest } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
@@ -36,6 +36,13 @@ export class MergeRequestService {
       .orderBy("merge_request.resource #>> '{merged_at}'", 'DESC');
     paginate(query, filters);
     return query.getManyAndCount();
+  }
+
+  async updateLastSync(mergeRequest: MergeRequestEntity, timestamp = new Date()) {
+    mergeRequest.resource = Extensions.updateExtensions(mergeRequest.resource, {
+      lastSync: timestamp.toISOString(),
+    });
+    return this.repository.save(mergeRequest);
   }
 
   async fetchAllParticipantsForRepository(
@@ -236,16 +243,15 @@ export class MergeRequestService {
   }
 
   public async getSumScoreForMergeRequest(mergeRequest: MergeRequestEntity){
-    var score = 0;
+    let score = 0;
     const commits = await this.repository.createQueryBuilder('merge_request')
     .addSelect('mrcc.commitId', 'commits_id')
     .andWhere('merge_request.id = :mr_id', {mr_id : mergeRequest.id})
     .innerJoin('merge_request_commits_commit', 'mrcc', 'merge_request.id = mrcc.mergeRequestId')
     .getRawMany();
 
-    const entities = await Promise.all(
-      commits.map(async (commit) => {
-        var commitScore = this.diffService.calculateDiffScore({commit: commit.commits_id});
+    await Promise.all( commits.map(async (commit) => {
+        let commitScore = this.diffService.calculateDiffScore({commit: commit.commits_id});
         score += await commitScore;
       }),
     );
@@ -254,21 +260,25 @@ export class MergeRequestService {
   }
 
   async storeScore(mergeRequest: MergeRequestEntity){
-    var score = await this.diffService.calculateDiffScore({merge_request: mergeRequest.id});
-    var sumScore = await this.getSumScoreForMergeRequest(mergeRequest);
+    let score = await this.diffService.calculateDiffScore({merge_request: mergeRequest.id});
+    let sumScore = await this.getSumScoreForMergeRequest(mergeRequest);
     mergeRequest.diffScore = score;
     mergeRequest.commitScoreSum = sumScore;
-    this.repository.save(mergeRequest);
+    await this.repository.save(mergeRequest);
+    await this.updateLastSync(mergeRequest);
   }
 
-  async fetchAllScore(repository: Repository){
+  async updateMergeRequestScoreByRepository(repositoryId: string){
     var mergeRequests = await this.repository.createQueryBuilder('merge_request')
     .andWhere('repository_id = :repositoryId', {
-      repositoryId: repository.id,
+      repositoryId: repositoryId,
     })
     .getMany();
-    mergeRequests.forEach(mergeRequest => {
-      this.storeScore(mergeRequest);
-    });
+
+    await Promise.all(
+      mergeRequests.map(async (mergeRequest) => {
+        await this.storeScore(mergeRequest);
+      })
+    );
   }
 }
