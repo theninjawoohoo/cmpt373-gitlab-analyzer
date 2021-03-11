@@ -220,15 +220,11 @@ export class CommitService {
     await this.updateLastSync(commit);
   }
 
-  async updateCommitScoreByRepository(repositoryID: string){
-    let commits = await this.commitRepository.createQueryBuilder('commit')
-    .andWhere('repository_id = :repositoryId', {
-      repositoryId: repositoryID,
-    })
-    .getMany();
+  async updateCommitScoreByRepository(repositoryId: string){
+    var commits = await this.search({repository: repositoryId, pageSize: 500000});
 
     await Promise.all(
-      commits.map(async (commit) => {
+      commits[0].map(async (commit) => {
          await this.storeScore(commit);
       })
     );

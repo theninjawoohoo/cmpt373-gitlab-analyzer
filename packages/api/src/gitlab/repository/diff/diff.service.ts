@@ -57,21 +57,11 @@ export class DiffService {
     let addScore = 1;
     let deleteScore = 0.2;
     let syntaxScore = 0.2;
-    filters = withDefaults(filters);
-    const query = this.diffRepository.createQueryBuilder('diff');
     let score = 0;
-    if(filters.commit){
-      query.andWhere('diff.commit_id = :commit', { commit: filters.commit });
-    }
-    else if (filters.merge_request) {
-      query.andWhere('diff.merge_request_id = :mergeRequest', {
-        mergeRequest: filters.merge_request,
-      });
-    }
-
-    let diffs = await query.getMany();
+    filters.pageSize = 50000;
+    let diffs = await this.search(filters);
     await Promise.all(
-      diffs.map(async (diff) => {
+      diffs[0].map(async (diff) => {
         let summary = diff.resource.summary;
         score += summary.add*addScore+ summary.delete*deleteScore +summary.syntax*syntaxScore;
       })

@@ -269,14 +269,9 @@ export class MergeRequestService {
   }
 
   async updateMergeRequestScoreByRepository(repositoryId: string){
-    var mergeRequests = await this.repository.createQueryBuilder('merge_request')
-    .andWhere('repository_id = :repositoryId', {
-      repositoryId: repositoryId,
-    })
-    .getMany();
-
+    var mergeRequests = await this.search({repository: repositoryId, pageSize: 500000});
     await Promise.all(
-      mergeRequests.map(async (mergeRequest) => {
+      mergeRequests[0].map(async (mergeRequest) => {
         await this.storeScore(mergeRequest);
       })
     );
