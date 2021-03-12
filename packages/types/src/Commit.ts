@@ -1,4 +1,11 @@
-export interface Commit {
+import { WithExtensions } from "./WithExtensions";
+
+interface CommitExtensions {
+  lastSync?: string;
+  score?: number;
+}
+
+export interface Commit extends WithExtensions<CommitExtensions> {
   id: string;
   short_id: string;
   created_at: string;

@@ -52,6 +52,25 @@ export class DiffService {
     } while (diffs.length > 0);
   }
 
+  async calculateDiffScore(filters: DiffQueryDto) {
+    const addScore = 1;
+    const deleteScore = 0.2;
+    const syntaxScore = 0.2;
+    let score = 0;
+    filters.pageSize = 50000;
+    const [diffs] = await this.search(filters);
+    await Promise.all(
+      diffs.map(async (diff) => {
+        const summary = diff.resource.summary;
+        score +=
+          summary.add * addScore +
+          summary.delete * deleteScore +
+          summary.syntax * syntaxScore;
+      }),
+    );
+    return score;
+  }
+
   async syncForMergeRequest(mergeRequest: MergeRequest, token: string) {
     const diffs = await this.fetchForMergeRequest(mergeRequest, token);
     const parsedDiffs = await Promise.all(diffs.map(this.addParsedDefinitions));

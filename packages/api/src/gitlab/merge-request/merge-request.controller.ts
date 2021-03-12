@@ -100,4 +100,9 @@ export class MergeRequestController {
       );
     }
   }
+
+  @Post('/score/repository/:id')
+  async SyncMergeRequestScoreByRepository(@Param() { id }: IdParam) {
+    return this.mergeRequestService.updateMergeRequestScoreByRepository(id);
+  }
 }

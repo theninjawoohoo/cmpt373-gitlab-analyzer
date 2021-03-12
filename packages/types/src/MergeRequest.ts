@@ -1,3 +1,5 @@
+import { WithExtensions } from "./WithExtensions";
+
 interface MergedBy {
     id: number;
     name: string;
@@ -76,7 +78,13 @@ interface TaskCompletionStatus {
     completed_count: number;
 }
 
-export interface MergeRequest {
+interface MergeRequestExtensions {
+  lastSync?: string;
+  diffScore?: number;
+  commitScoreSum?: number;
+}
+
+export interface MergeRequest extends WithExtensions<MergeRequestExtensions>{
     id: number;
     iid: number;
     project_id: number;

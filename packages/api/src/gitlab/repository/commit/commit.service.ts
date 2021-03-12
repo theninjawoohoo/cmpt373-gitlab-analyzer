@@ -1,4 +1,4 @@
-import { Commit } from '@ceres/types';
+import { Commit, Extensions } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
@@ -66,6 +66,13 @@ export class CommitService {
     query.orderBy("commit.resource #>> '{authored_date}'", 'DESC');
     paginate(query, filters);
     return query.getManyAndCount();
+  }
+
+  async updateLastSync(commit: CommitEntity, timestamp = new Date()) {
+    commit.resource = Extensions.updateExtensions(commit.resource, {
+      lastSync: timestamp.toISOString(),
+    });
+    return this.commitRepository.save(commit);
   }
 
   async findAllForRepository(repository: Repository) {
@@ -204,5 +211,26 @@ export class CommitService {
         entities.filter(({ created }) => created).map(({ commit }) => commit),
       ),
     };
+  }
+
+  async storeScore(commit: CommitEntity) {
+    const score = await this.diffService.calculateDiffScore({
+      commit: commit.id,
+    });
+    commit.resource = Extensions.updateExtensions(commit.resource, { score });
+    await this.commitRepository.save(commit);
+  }
+
+  async updateCommitScoreByRepository(repositoryId: string) {
+    const [commits] = await this.search({
+      repository: repositoryId,
+      pageSize: 500000,
+    });
+
+    await Promise.all(
+      commits.map(async (commit) => {
+        await this.storeScore(commit);
+      }),
+    );
   }
 }

@@ -1,4 +1,4 @@
-import { Commit, MergeRequest } from '@ceres/types';
+import { Commit, Extensions, MergeRequest } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
@@ -36,6 +36,16 @@ export class MergeRequestService {
       .orderBy("merge_request.resource #>> '{merged_at}'", 'DESC');
     paginate(query, filters);
     return query.getManyAndCount();
+  }
+
+  async updateLastSync(
+    mergeRequest: MergeRequestEntity,
+    timestamp = new Date(),
+  ) {
+    mergeRequest.resource = Extensions.updateExtensions(mergeRequest.resource, {
+      lastSync: timestamp.toISOString(),
+    });
+    return this.repository.save(mergeRequest);
   }
 
   async fetchAllParticipantsForRepository(
@@ -233,5 +243,54 @@ export class MergeRequestService {
         },
       })
       .toPromise();
+  }
+
+  public async getSumScoreForMergeRequest(mergeRequest: MergeRequestEntity) {
+    let score = 0;
+    const commits = await this.repository
+      .createQueryBuilder('merge_request')
+      .addSelect('mrcc.commitId', 'commits_id')
+      .andWhere('merge_request.id = :mr_id', { mr_id: mergeRequest.id })
+      .innerJoin(
+        'merge_request_commits_commit',
+        'mrcc',
+        'merge_request.id = mrcc.mergeRequestId',
+      )
+      .getRawMany();
+
+    await Promise.all(
+      commits.map(async (commit) => {
+        const commitScore = this.diffService.calculateDiffScore({
+          commit: commit.commits_id,
+        });
+        score += await commitScore;
+      }),
+    );
+
+    return score;
+  }
+
+  async storeScore(mergeRequest: MergeRequestEntity) {
+    const score = await this.diffService.calculateDiffScore({
+      merge_request: mergeRequest.id,
+    });
+    const sumScore = await this.getSumScoreForMergeRequest(mergeRequest);
+    mergeRequest.resource = Extensions.updateExtensions(mergeRequest.resource, {
+      diffScore: score,
+      commitScoreSum: sumScore,
+    });
+    await this.repository.save(mergeRequest);
+  }
+
+  async updateMergeRequestScoreByRepository(repositoryId: string) {
+    const [mergeRequests] = await this.search({
+      repository: repositoryId,
+      pageSize: 500000,
+    });
+    await Promise.all(
+      mergeRequests.map(async (mergeRequest) => {
+        await this.storeScore(mergeRequest);
+      }),
+    );
   }
 }
