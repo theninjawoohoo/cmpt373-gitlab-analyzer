@@ -19,7 +19,7 @@ export class DiffService {
     private readonly httpService: HttpService,
     @InjectRepository(DiffEntity)
     private readonly diffRepository: TypeORMRepository<DiffEntity>,
-  ) {}
+  ) { }
 
   search(filters: DiffQueryDto) {
     filters = withDefaults(filters);
@@ -53,18 +53,21 @@ export class DiffService {
     } while (diffs.length > 0);
   }
 
-  async calculateDiffScore(filters: DiffQueryDto){
-    let addScore = 1;
-    let deleteScore = 0.2;
-    let syntaxScore = 0.2;
+  async calculateDiffScore(filters: DiffQueryDto) {
+    const addScore = 1;
+    const deleteScore = 0.2;
+    const syntaxScore = 0.2;
     let score = 0;
     filters.pageSize = 50000;
-    let diffs = await this.search(filters);
+    const [diffs] = await this.search(filters);
     await Promise.all(
-      diffs[0].map(async (diff) => {
-        let summary = diff.resource.summary;
-        score += summary.add*addScore+ summary.delete*deleteScore +summary.syntax*syntaxScore;
-      })
+      diffs.map(async (diff) => {
+        const summary = diff.resource.summary;
+        score +=
+          summary.add * addScore +
+          summary.delete * deleteScore +
+          summary.syntax * syntaxScore;
+      }),
     );
     return score;
   }

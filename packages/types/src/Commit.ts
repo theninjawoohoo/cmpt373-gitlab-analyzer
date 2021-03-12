@@ -2,6 +2,7 @@ import { WithExtensions } from "./WithExtensions";
 
 interface CommitExtensions {
   lastSync?: string;
+  score?: number;
 }
 
 export interface Commit extends WithExtensions<CommitExtensions> {
@@ -18,7 +19,6 @@ export interface Commit extends WithExtensions<CommitExtensions> {
   committer_email: string;
   committed_date: string;
   web_url: string;
-  score: number;
 }
 
 export namespace Commit {

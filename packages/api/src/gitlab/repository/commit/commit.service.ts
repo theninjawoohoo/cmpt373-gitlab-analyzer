@@ -213,20 +213,24 @@ export class CommitService {
     };
   }
 
-  async storeScore(commit: CommitEntity){
-    let score = await this.diffService.calculateDiffScore({commit: commit.id});
-    commit.score = score;
+  async storeScore(commit: CommitEntity) {
+    const score = await this.diffService.calculateDiffScore({
+      commit: commit.id,
+    });
+    commit.resource = Extensions.updateExtensions(commit.resource, { score });
     await this.commitRepository.save(commit);
-    await this.updateLastSync(commit);
   }
 
-  async updateCommitScoreByRepository(repositoryId: string){
-    var commits = await this.search({repository: repositoryId, pageSize: 500000});
+  async updateCommitScoreByRepository(repositoryId: string) {
+    const [commits] = await this.search({
+      repository: repositoryId,
+      pageSize: 500000,
+    });
 
     await Promise.all(
-      commits[0].map(async (commit) => {
-         await this.storeScore(commit);
-      })
+      commits.map(async (commit) => {
+        await this.storeScore(commit);
+      }),
     );
   }
 }

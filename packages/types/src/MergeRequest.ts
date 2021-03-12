@@ -79,8 +79,10 @@ interface TaskCompletionStatus {
 }
 
 interface MergeRequestExtensions {
-    lastSync?: string;
-  }
+  lastSync?: string;
+  diffScore?: number;
+  commitScoreSum?: number;
+}
 
 export interface MergeRequest extends WithExtensions<MergeRequestExtensions>{
     id: number;
@@ -126,6 +128,4 @@ export interface MergeRequest extends WithExtensions<MergeRequestExtensions>{
     has_conflicts: boolean;
     blocking_discussions_resolved: boolean;
     approvals_before_merge?: any;
-    diffScore: number;
-    commitScoreSum: number;
 }
