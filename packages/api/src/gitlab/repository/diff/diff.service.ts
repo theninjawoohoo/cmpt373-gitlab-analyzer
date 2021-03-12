@@ -4,7 +4,6 @@ import { paginate, withDefaults } from '../../../common/query-dto';
 import { MergeRequest } from '../../merge-request/merge-request.entity';
 import { Commit } from '../commit/commit.entity';
 import { DiffQueryDto } from './diff-query.dto';
-import { CommitQueryDto } from '../commit/commit-query.dto';
 import { Diff as DiffEntity } from './diff.entity';
 import { DeepPartial, Repository as TypeORMRepository } from 'typeorm';
 import { Diff, FileType, Line } from '@ceres/types';
@@ -19,7 +18,7 @@ export class DiffService {
     private readonly httpService: HttpService,
     @InjectRepository(DiffEntity)
     private readonly diffRepository: TypeORMRepository<DiffEntity>,
-  ) { }
+  ) {}
 
   search(filters: DiffQueryDto) {
     filters = withDefaults(filters);

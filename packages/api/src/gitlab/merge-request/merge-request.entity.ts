@@ -36,10 +36,10 @@ export class MergeRequest extends BaseEntity<MergeRequestResource> {
 
   @OneToMany(() => MergeRequestNote, (note) => note.mergeRequest)
   notes: MergeRequestNote[];
-  
-  @Column({name: 'diff_score', nullable: true, type: "float"})
+
+  @Column({ name: 'diff_score', nullable: true, type: 'float' })
   diffScore: number;
 
-  @Column({name: 'commit_score_sum', nullable: true, type: "float"})
+  @Column({ name: 'commit_score_sum', nullable: true, type: 'float' })
   commitScoreSum: number;
 }

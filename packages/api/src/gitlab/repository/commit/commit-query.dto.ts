@@ -1,4 +1,4 @@
-import { IsDateString, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsDateString, IsOptional, IsString, IsUUID } from 'class-validator';
 import { QueryDto } from '../../../common/query-dto';
 
 export class CommitQueryDto extends QueryDto {
