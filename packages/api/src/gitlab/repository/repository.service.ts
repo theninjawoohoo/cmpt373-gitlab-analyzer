@@ -54,7 +54,7 @@ export class RepositoryService extends BaseService<
           'NULLS LAST',
         );
       case 'project_created':
-        return query.orderBy("jrepository.resource #>> '{created_at}'", order);
+        return query.orderBy("repository.resource #>> '{created_at}'", order);
     }
     return query;
   }
