@@ -41,8 +41,8 @@ const Form: React.FC<FormProps> = ({ defaultValues, onSubmit }) => {
   console.log({ defaultValues });
   const { control, handleSubmit, register, errors } = useForm<ScoringConfig>({
     defaultValues: {
-      name: defaultValues.name,
-      weights: defaultValues.weights, // give one empty glob config to start
+      name: defaultValues?.name || '',
+      weights: defaultValues?.weights || [{}], // give one empty glob config to start
     },
     resolver: yupResolver(validationSchema),
   });
@@ -81,7 +81,7 @@ const Form: React.FC<FormProps> = ({ defaultValues, onSubmit }) => {
                   inputRef={register()}
                   error={!!errors?.weights?.[index]?.glob}
                   helperText={errors?.weights?.[index]?.glob?.message}
-                  defaultValue={field.glob}
+                  defaultValue={field?.glob}
                   fullWidth
                 />
               </Grid>
@@ -93,7 +93,7 @@ const Form: React.FC<FormProps> = ({ defaultValues, onSubmit }) => {
                   inputRef={register()}
                   error={!!errors?.weights?.[index]?.weight}
                   helperText={errors?.weights?.[index]?.weight?.message}
-                  defaultValue={field.weight}
+                  defaultValue={field?.weight}
                   fullWidth
                 />
               </Grid>

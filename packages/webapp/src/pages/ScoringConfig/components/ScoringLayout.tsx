@@ -22,7 +22,7 @@ const ScoringLayout: React.FC<ScoringLayoutProps> = ({
             <DefaultPageTitleFormat>Scoring Config</DefaultPageTitleFormat>
           </Grid>
           <Grid item>
-            {showCreateButton && (
+            {showCreateButton ? (
               <Button
                 variant='contained'
                 color='primary'
@@ -31,6 +31,15 @@ const ScoringLayout: React.FC<ScoringLayoutProps> = ({
                 to='/scoring/edit'
               >
                 Create
+              </Button>
+            ) : (
+              <Button
+                variant='contained'
+                color='secondary'
+                component={Link}
+                to='/scoring'
+              >
+                Cancel
               </Button>
             )}
           </Grid>

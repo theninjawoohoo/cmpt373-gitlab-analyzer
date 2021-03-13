@@ -1,8 +1,7 @@
 import React from 'react';
 import Form from './components/Form';
 import ScoringLayout from './components/ScoringLayout';
-import Button from '@material-ui/core/Button';
-import { Link, useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { parse } from 'querystring';
 import { ScoringConfig } from '@ceres/types';
 import {
@@ -50,14 +49,6 @@ const EditScoringConfigPage: React.FC = () => {
 
   return (
     <ScoringLayout>
-      <Button
-        variant='contained'
-        color='secondary'
-        component={Link}
-        to='/scoring'
-      >
-        Cancel
-      </Button>
       {query.id ? (
         <PreloadedForm id={query.id as string} />
       ) : (
