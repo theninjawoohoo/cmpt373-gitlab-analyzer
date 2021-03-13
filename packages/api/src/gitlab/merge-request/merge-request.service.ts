@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
 import alwaysArray from 'src/common/alwaysArray';
 import { Repository as TypeORMRepository } from 'typeorm';
-import { BaseSearch, paginate, withDefaults } from '../../common/query-dto';
+import { paginate, withDefaults } from '../../common/query-dto';
 import { CommitService } from '../repository/commit/commit.service';
 import { DiffService } from '../repository/diff/diff.service';
 import { Repository } from '../repository/repository.entity';
