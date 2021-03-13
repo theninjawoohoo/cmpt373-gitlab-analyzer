@@ -49,11 +49,12 @@ export class RepositoryService extends BaseService<
     switch (sortKey) {
       case 'project_synced':
         return query.orderBy(
-          "repository.resource #>> '{extensions,lastSync}'",
+          "(repository.resource #>> '{extensions,lastSync}')::timestamptz",
           order,
+          'NULLS LAST',
         );
       case 'project_created':
-        return query.orderBy("repository.resource #>> '{created_at}'", order);
+        return query.orderBy("jrepository.resource #>> '{created_at}'", order);
     }
     return query;
   }
