@@ -29,6 +29,16 @@ export class RepositoryService extends BaseService<
     filters: WithUser<RepositoryQueryDto>,
   ): SelectQueryBuilder<RepositoryEntity> {
     query.andWhere('repository.user_id = :userId', { userId: filters.user.id });
+
+    if (filters.name) {
+      query.andWhere(
+        "(repository.resource #>> '{name_with_namespace}') ~* ('.*' || :name || '.*')",
+        {
+          name: filters.name,
+        },
+      );
+    }
+
     return query;
   }
   buildSort(

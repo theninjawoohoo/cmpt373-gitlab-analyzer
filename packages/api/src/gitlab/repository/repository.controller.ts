@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { IdParam } from '../../common/id-param';
 import { paginatedToResponse } from '../../common/pagination';
-import { QueryDto } from '../../common/query-dto';
 import { CommitAuthorService } from './commit/author/commit-author.service';
 import { RepositoryMemberService } from './repository-member/repository-member.service';
 import { RepositoryService } from './repository.service';
@@ -20,12 +19,11 @@ import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { VerifiedUser } from '../../auth/types/VerifiedUser';
 import { MergeRequestService } from '../merge-request/merge-request.service';
-import { CommitService } from './commit/commit.service';
+import { RepositoryQueryDto } from './repository-query.dto';
 
 @Controller('repository')
 export class RepositoryController {
   constructor(
-    private readonly commitService: CommitService,
     private readonly repositoryService: RepositoryService,
     private readonly repositoryMemberService: RepositoryMemberService,
     private readonly mergeRequestService: MergeRequestService,
@@ -97,7 +95,7 @@ export class RepositoryController {
   }
 
   @Get()
-  search(@Auth() { user }: VerifiedUser, @Query() query: QueryDto) {
+  search(@Auth() { user }: VerifiedUser, @Query() query: RepositoryQueryDto) {
     return paginatedToResponse(
       this.repositoryService.search({ ...query, user }),
     );
