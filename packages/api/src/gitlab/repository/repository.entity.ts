@@ -6,6 +6,7 @@ import { MergeRequest } from '../merge-request/merge-request.entity';
 import { CommitAuthor } from './commit/author/commit-author.entity';
 import { RepositoryMember } from './repository-member/repository-member.entity';
 import { Commit } from './commit/commit.entity';
+import { Issue } from './issue/issue.entity';
 
 @Entity('repository')
 export class Repository extends BaseEntity<RepositoryResource> {
@@ -24,6 +25,9 @@ export class Repository extends BaseEntity<RepositoryResource> {
 
   @OneToMany(() => MergeRequest, (mergeRequest) => mergeRequest.repository)
   mergeRequests: MergeRequest[];
+
+  @OneToMany(() => Issue, (issue) => issue.repository)
+  issues: Issue[];
 
   @OneToMany(() => CommitAuthor, (commitAuthor) => commitAuthor.repository)
   commitAuthors: CommitAuthor[];

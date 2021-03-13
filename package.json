@@ -12,5 +12,8 @@
   "devDependencies": {
     "lerna": "^3.22.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@date-io/luxon": "^2.10.8",
+    "chokidar": "^3.5.1"
+  }
 }
