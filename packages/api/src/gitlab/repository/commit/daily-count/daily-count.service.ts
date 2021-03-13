@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import alwaysArray from '../../../../common/alwaysArray';
 import { paginate, withDefaults } from '../../../../common/query-dto';
-import { CommitDailyCounQueryDto } from './daily-count-query.dto';
+import { CommitDailyCountQueryDto } from './daily-count-query.dto';
 import { CommitDailyCount } from './daily-count.entity';
 
 @Injectable()
@@ -14,9 +14,13 @@ export class CommitDailyCountService {
     private readonly repository: Repository<CommitDailyCount>,
   ) {}
 
-  search(filters: CommitDailyCounQueryDto) {
+  search(filters: CommitDailyCountQueryDto) {
     filters = withDefaults(filters);
     const query = this.repository.createQueryBuilder('daily_count');
+
+    query.andWhere('repository_id = :repositoryId', {
+      repositoryId: filters.repository,
+    });
 
     if (filters.author_email) {
       query.andWhere(
