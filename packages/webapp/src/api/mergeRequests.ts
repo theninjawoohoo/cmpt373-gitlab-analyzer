@@ -14,6 +14,7 @@ export function useMergeRequest(id: string) {
 
 interface MergeRequestSearchParams {
   repository: string;
+  author_email?: string[];
 }
 
 export function useGetMergeRequests(

@@ -96,7 +96,7 @@ const DiffView: React.FC<DiffViewProps> = ({
       </AccordionSummary>
       <AccordionDetails>
         <Root>
-          {lines.map((line) => {
+          {lines?.map((line) => {
             return renderLine(line);
           })}
         </Root>

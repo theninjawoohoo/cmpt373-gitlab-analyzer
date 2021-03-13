@@ -13,10 +13,14 @@ import CommitList from './components/CommitList';
 import MergeRequestRenderer from './components/MergeRequestRenderer';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
+import MemberDropdown from '../../components/MemberDropdown';
+import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 
 const ListMergeRequestPage = () => {
   const { id } = useParams<{ id: string }>();
+  const { repositoryId } = useRepositoryContext();
+  const [emails, setEmails] = useState<string[]>([]);
   const [activeMergeRequest, setActiveMergeRequest] = useState<
     ApiResource<MergeRequest>
   >();
@@ -28,13 +32,15 @@ const ListMergeRequestPage = () => {
     hasNextPage,
   } = useInfiniteMergeRequest({
     repository: id,
+    author_email: emails,
   });
 
   useEffect(() => {
+    console.log(emails);
     if (loadMoreInView) {
       void fetchNextPage();
     }
-  }, [loadMoreInView]);
+  }, [emails, loadMoreInView]);
 
   const reducedMergeRequests =
     mergeRequests?.pages?.reduce(
@@ -47,7 +53,17 @@ const ListMergeRequestPage = () => {
         <Grid container>
           <Grid item xs={activeMergeRequest ? 5 : 12}>
             <Container>
-              <DefaultPageTitleFormat>Merge Requests</DefaultPageTitleFormat>
+              <Box my={2}>
+                <DefaultPageTitleFormat>Merge Requests</DefaultPageTitleFormat>
+              </Box>
+              <Grid item>
+                <MemberDropdown
+                  repositoryId={repositoryId}
+                  onChange={(newEmails) => {
+                    setEmails(newEmails);
+                  }}
+                />
+              </Grid>
               <Box pr={6} pl={2} py={1}>
                 <Grid container>
                   <Grid item xs={6}>
@@ -79,6 +95,7 @@ const ListMergeRequestPage = () => {
                         mergeRequest={mergeRequest}
                         activeCommit={activeCommit}
                         setActiveCommit={setActiveCommit}
+                        authorEmails={emails}
                       />
                     )}
                   </MergeRequestRenderer>

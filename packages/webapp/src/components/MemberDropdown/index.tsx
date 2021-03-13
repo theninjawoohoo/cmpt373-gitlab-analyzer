@@ -33,7 +33,8 @@ const MemberDropdown: React.FC<MemberDropdownProps> = ({
   useEffect(() => {
     if (value !== 'all') {
       const emails = findEmailsForMember(value, authors);
-      onChange(emails.length > 0 ? emails : ['doesnotexist@email.com']);
+
+      onChange(emails.length > 0 ? emails : ['']);
     } else {
       onChange([]);
     }
