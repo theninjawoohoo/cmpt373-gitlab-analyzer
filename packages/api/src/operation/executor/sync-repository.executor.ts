@@ -11,10 +11,12 @@ import { RepositoryService } from '../../gitlab/repository/repository.service';
 import { GitlabTokenService } from '../../gitlab/services/gitlab-token.service';
 import { Operation as OperationEntity } from '../operation.entity';
 import { BaseExecutor } from './base.executor';
+import { IssueService } from '../../gitlab/repository/issue/issue.service';
 
 enum Stage {
   syncCommits = 'syncCommits',
   syncMergeRequests = 'syncMergeRequests',
+  syncIssues = 'syncIssues',
   linkCommitsAndMergeRequests = 'linkCommitsAndMergeRequests',
   linkNotesAndMergeRequests = 'linkNotesAndMergeRequests',
   createDailyCommitCaches = 'createDailyCommitCaches',
@@ -28,6 +30,7 @@ export class SyncRepositoryExecutor extends BaseExecutor<Stage> {
     private readonly tokenService: GitlabTokenService,
     private readonly commitService: CommitService,
     private readonly mergeRequestService: MergeRequestService,
+    private readonly issueService: IssueService,
     private readonly repositoryService: RepositoryService,
     private readonly commitDailyCountService: CommitDailyCountService,
     private readonly commitAuthorService: CommitAuthorService,
@@ -36,6 +39,7 @@ export class SyncRepositoryExecutor extends BaseExecutor<Stage> {
     super(operation, operationRepository);
     this.addStage(Stage.syncCommits, 'Sync Commits');
     this.addStage(Stage.syncMergeRequests, 'Sync Merge Requests');
+    this.addStage(Stage.syncIssues, 'Sync Issues');
     this.addStage(
       Stage.linkCommitsAndMergeRequests,
       'Link Commits and Merge Requests',
@@ -53,6 +57,7 @@ export class SyncRepositoryExecutor extends BaseExecutor<Stage> {
     await Promise.all([
       this.syncResource(Stage.syncCommits, this.commitService),
       this.syncResource(Stage.syncMergeRequests, this.mergeRequestService),
+      this.syncResource(Stage.syncIssues, this.issueService),
     ]);
     await Promise.all([
       this.linkCommitsAndMergeRequests(),
@@ -86,7 +91,7 @@ export class SyncRepositoryExecutor extends BaseExecutor<Stage> {
 
   private async syncResource(
     name: Stage,
-    service: CommitService | MergeRequestService,
+    service: CommitService | MergeRequestService | IssueService,
   ): Promise<void> {
     await this.startStage(name);
     let resources = [];
