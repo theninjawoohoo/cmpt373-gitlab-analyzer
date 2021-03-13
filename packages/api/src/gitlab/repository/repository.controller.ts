@@ -96,25 +96,11 @@ export class RepositoryController {
     return this.repositoryMemberService.findAllForRepository(repository);
   }
 
-  @Post(':id/commits/sync')
-  async syncProjectCommits(
-    @Param() { id }: IdParam,
-    @GitlabToken() token: string,
-  ) {
-    const repository = await this.repositoryService.findOne(id);
-    await this.commitService.fetchForRepository(repository, token);
-  }
-
-  @Get('/:id/commits')
-  async fetchCommits(@Param() { id }: IdParam) {
-    const repository = await this.repositoryService.findOne(id);
-    return this.commitService.findAllForRepository(repository);
-  }
-
   @Get()
-  search(@Auth() user: VerifiedUser, @Query() query: QueryDto) {
-    const filters = { ...query, userId: user.sub };
-    return paginatedToResponse(this.repositoryService.search(filters));
+  search(@Auth() { user }: VerifiedUser, @Query() query: QueryDto) {
+    return paginatedToResponse(
+      this.repositoryService.search({ ...query, user }),
+    );
   }
 
   @Get(':id')
@@ -124,14 +110,5 @@ export class RepositoryController {
       return repo;
     }
     throw new NotFoundException(`Could not find a repository with id: ${id}`);
-  }
-
-  @Post()
-  @HttpCode(204)
-  async fetchRepositories(
-    @Auth() user: VerifiedUser,
-    @GitlabToken() token: string,
-  ) {
-    await this.repositoryService.fetchForUser(user.user, token);
   }
 }
