@@ -1,0 +1,59 @@
+import React from 'react';
+import Form from './components/Form';
+import ScoringLayout from './components/ScoringLayout';
+import Button from '@material-ui/core/Button';
+import { Link, useHistory, useLocation } from 'react-router-dom';
+import { parse } from 'querystring';
+import { ScoringConfig } from '@ceres/types';
+import {
+  useCreateScoringConfig,
+  useGetScoringConfig,
+} from '../../api/scoringConfig';
+
+interface PreloadedFormProps {
+  id: string;
+  onSubmit: (values: ScoringConfig) => void;
+}
+
+const PreloadedForm: React.FC<PreloadedFormProps> = ({ id, onSubmit }) => {
+  const { data } = useGetScoringConfig(id);
+  if (data) {
+    return <Form onSubmit={onSubmit} />;
+  }
+  return <div>Loading...</div>;
+};
+
+const EditScoringConfigPage: React.FC = () => {
+  const { mutate: createScoringConfig } = useCreateScoringConfig();
+  const { push } = useHistory();
+  const location = useLocation();
+  const query = parse(location.search.replace(/^\?/, ''));
+
+  const onSubmit = (values: ScoringConfig) => {
+    createScoringConfig(values, {
+      onSuccess: () => {
+        push('/scoring');
+      },
+    });
+  };
+
+  return (
+    <ScoringLayout>
+      <Button
+        variant='contained'
+        color='secondary'
+        component={Link}
+        to='/scoring'
+      >
+        Cancel
+      </Button>
+      {query.id ? (
+        <PreloadedForm id={query.id as string} onSubmit={onSubmit} />
+      ) : (
+        <Form onSubmit={onSubmit} />
+      )}
+    </ScoringLayout>
+  );
+};
+
+export default EditScoringConfigPage;

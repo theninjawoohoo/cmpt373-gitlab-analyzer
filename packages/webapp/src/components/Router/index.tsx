@@ -4,7 +4,8 @@ import Diff from '../../pages/Diff';
 import RepositoryPage from '../../pages/Repository';
 import Login from '../../pages/Login';
 import OperationsPage from '../../pages/Operations';
-import ScoringConfigPage from '../../pages/ScoringConfig';
+import BrowseScoringConfigsPage from '../../pages/ScoringConfig/Browse';
+import EditScoringConfigPage from '../../pages/ScoringConfig/Edit';
 import SfuVerify from '../../pages/SfuVerify';
 import Graph from '../../pages/Graph';
 import ListMergeRequestPage from '../../pages/ListMergeRequestPage';
@@ -49,7 +50,10 @@ export function Router() {
           <Diff />
         </Route>
         <Route path='/scoring' exact>
-          <ScoringConfigPage />
+          <BrowseScoringConfigsPage />
+        </Route>
+        <Route path='/scoring/edit' exact>
+          <EditScoringConfigPage />
         </Route>
         <Route path='/logout' exact>
           <Login />

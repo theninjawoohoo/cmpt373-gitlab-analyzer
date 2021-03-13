@@ -7,6 +7,7 @@ import { IdParam } from '../common/id-param';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { VerifiedUser } from '../auth/types/VerifiedUser';
 import { ScoringConfigService } from './scoring-config.service';
+import { paginatedToResponse } from '../common/pagination';
 
 @Controller('scoring_config')
 export class ScoringConfigController {
@@ -14,7 +15,12 @@ export class ScoringConfigController {
 
   @Get()
   search(@Auth() { user }: VerifiedUser) {
-    return this.scoringConfigService.search({ user });
+    return paginatedToResponse(this.scoringConfigService.search({ user }));
+  }
+
+  @Get(':id')
+  findOne(@Param() { id }: IdParam) {
+    return this.scoringConfigService.findOne(id);
   }
 
   @Post()

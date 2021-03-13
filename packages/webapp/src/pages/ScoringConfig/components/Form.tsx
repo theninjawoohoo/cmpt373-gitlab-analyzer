@@ -13,20 +13,11 @@ import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-
-interface GlobScale {
-  glob: string;
-  weight: number;
-}
-
-interface Config {
-  name: string;
-  config: GlobScale[];
-}
+import { GlobWeight, ScoringConfig } from '@ceres/types';
 
 const validationSchema = yup.object().shape({
   name: yup.string().required('A scoring config requires a name'),
-  config: yup
+  weights: yup
     .array()
     .required()
     .of(
@@ -34,29 +25,28 @@ const validationSchema = yup.object().shape({
         glob: yup.string().required('Glob is required'),
         weight: yup
           .number()
+          .typeError('Weight must be a number')
           .required('Weight is required')
           .min(0, 'Weight cannot be below 0'),
       }),
     ),
 });
 
-const Form: React.FC = () => {
-  const { control, handleSubmit, register, errors } = useForm<Config>({
+interface FormProps {
+  onSubmit: (values: ScoringConfig) => void;
+}
+
+const Form: React.FC<FormProps> = ({ onSubmit }) => {
+  const { control, handleSubmit, register, errors } = useForm<ScoringConfig>({
     defaultValues: {
-      config: [{}], // give one empty glob config to start
+      weights: [{}], // give one empty glob config to start
     },
     resolver: yupResolver(validationSchema),
   });
-  const { fields, append, remove, swap, insert } = useFieldArray<GlobScale>({
+  const { fields, append, remove, swap, insert } = useFieldArray<GlobWeight>({
     control,
-    name: 'config',
+    name: 'weights',
   });
-
-  console.log({ errors });
-
-  const onSubmit = (values: Config) => {
-    console.log({ values });
-  };
 
   return (
     <form
@@ -83,22 +73,22 @@ const Form: React.FC = () => {
               <Grid item xs={7}>
                 <TextField
                   label='Glob'
-                  name={`config[${index}].glob`}
+                  name={`weights[${index}].glob`}
                   variant='outlined'
                   inputRef={register()}
-                  error={!!errors?.config?.[index]?.glob}
-                  helperText={errors?.config?.[index]?.glob?.message}
+                  error={!!errors?.weights?.[index]?.glob}
+                  helperText={errors?.weights?.[index]?.glob?.message}
                   fullWidth
                 />
               </Grid>
               <Grid item xs={2}>
                 <TextField
                   label='Weight'
-                  name={`config[${index}].weight`}
+                  name={`weights[${index}].weight`}
                   variant='outlined'
                   inputRef={register()}
-                  error={!!errors?.config?.[index]?.weight}
-                  helperText={errors?.config?.[index]?.weight?.message}
+                  error={!!errors?.weights?.[index]?.weight}
+                  helperText={errors?.weights?.[index]?.weight?.message}
                   fullWidth
                 />
               </Grid>
