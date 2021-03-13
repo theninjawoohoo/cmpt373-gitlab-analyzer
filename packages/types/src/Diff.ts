@@ -1,6 +1,7 @@
 // Generated from http://json2ts.com/
 // Hunk is not from Gitlab, it's the output of parsePatch from the diff package
 import { Line } from './Line';
+import { WithExtensions } from './WithExtensions';
 
 export interface Hunk {
   oldStart: number;
@@ -11,7 +12,13 @@ export interface Hunk {
   linedelimiters: string[];
 }
 
-export interface Diff {
+interface DiffExtensions {
+  weight?: number;
+  glob?: string;
+  score?: number;
+}
+
+export interface Diff extends WithExtensions<DiffExtensions> {
   old_path: string;
   new_path: string;
   a_mode: string;

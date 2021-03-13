@@ -6,7 +6,7 @@ import { Commit } from '../commit/commit.entity';
 import { DiffQueryDto } from './diff-query.dto';
 import { Diff as DiffEntity } from './diff.entity';
 import { DeepPartial, Repository as TypeORMRepository } from 'typeorm';
-import { Diff, FileType, Line } from '@ceres/types';
+import { Diff, Extensions, FileType, Line, LINE_SCORING } from '@ceres/types';
 import { parsePatch } from 'diff';
 import DiffInterpreter from './helpers/DiffInterpreter';
 
@@ -18,7 +18,7 @@ export class DiffService {
     private readonly httpService: HttpService,
     @InjectRepository(DiffEntity)
     private readonly diffRepository: TypeORMRepository<DiffEntity>,
-  ) {}
+  ) { }
 
   search(filters: DiffQueryDto) {
     filters = withDefaults(filters);
@@ -53,22 +53,27 @@ export class DiffService {
   }
 
   async calculateDiffScore(filters: DiffQueryDto) {
-    const addScore = 1;
-    const deleteScore = 0.2;
-    const syntaxScore = 0.2;
-    let score = 0;
     filters.pageSize = 50000;
     const [diffs] = await this.search(filters);
-    await Promise.all(
-      diffs.map(async (diff) => {
-        const summary = diff.resource.summary;
-        score +=
-          summary.add * addScore +
-          summary.delete * deleteScore +
-          summary.syntax * syntaxScore;
-      }),
-    );
-    return score;
+    const updatedDiffs = diffs.map((diff) => {
+      const summary = diff.resource?.summary;
+      let score = 0;
+      if (summary) {
+        score = Object.keys(summary)
+          .map((lineType) => LINE_SCORING[lineType] * (summary[lineType] || 0))
+          .reduce((a, b) => a + b, 0);
+      }
+      diff.resource = Extensions.updateExtensions(diff.resource, {
+        score,
+        glob: '*',
+        weight: 1,
+      });
+      return diff;
+    });
+    await this.diffRepository.save(updatedDiffs);
+    return updatedDiffs
+      .map((diff) => diff.resource?.extensions?.score || 0)
+      .reduce((a, b) => a + b, 0);
   }
 
   async syncForMergeRequest(mergeRequest: MergeRequest, token: string) {
