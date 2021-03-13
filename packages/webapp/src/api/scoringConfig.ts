@@ -25,3 +25,10 @@ export function useCreateScoringConfig() {
     'POST',
   );
 }
+
+export function useUpdateScoringConfig(id: string) {
+  return useApiMutation<ApiResource<ScoringConfig>, ScoringConfig>(
+    `/scoring_config/${id}`,
+    'PUT',
+  );
+}

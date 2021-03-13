@@ -8,17 +8,28 @@ import { ScoringConfig } from '@ceres/types';
 import {
   useCreateScoringConfig,
   useGetScoringConfig,
+  useUpdateScoringConfig,
 } from '../../api/scoringConfig';
 
 interface PreloadedFormProps {
   id: string;
-  onSubmit: (values: ScoringConfig) => void;
 }
 
-const PreloadedForm: React.FC<PreloadedFormProps> = ({ id, onSubmit }) => {
-  const { data } = useGetScoringConfig(id);
+const PreloadedForm: React.FC<PreloadedFormProps> = ({ id }) => {
+  const { data, invalidate } = useGetScoringConfig(id);
+  const { mutate: updateScoringConfig } = useUpdateScoringConfig(id);
+  const { push } = useHistory();
+
+  const onSubmit = (values: ScoringConfig) => {
+    updateScoringConfig(values, {
+      onSuccess: () => {
+        void invalidate();
+        push('/scoring');
+      },
+    });
+  };
   if (data) {
-    return <Form onSubmit={onSubmit} />;
+    return <Form onSubmit={onSubmit} defaultValues={data} />;
   }
   return <div>Loading...</div>;
 };
@@ -48,7 +59,7 @@ const EditScoringConfigPage: React.FC = () => {
         Cancel
       </Button>
       {query.id ? (
-        <PreloadedForm id={query.id as string} onSubmit={onSubmit} />
+        <PreloadedForm id={query.id as string} />
       ) : (
         <Form onSubmit={onSubmit} />
       )}
