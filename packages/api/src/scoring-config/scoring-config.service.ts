@@ -32,8 +32,6 @@ export class ScoringConfigService extends BaseService<
 
   buildSort(
     query: SelectQueryBuilder<ScoringConfigEntity>,
-    sortKey?: string,
-    order?: 'asc' | 'desc',
   ): SelectQueryBuilder<ScoringConfigEntity> {
     query = query.orderBy(`${this.tableName}.updated_at`, 'DESC');
     return query;
