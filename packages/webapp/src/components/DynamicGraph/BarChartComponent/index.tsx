@@ -29,7 +29,7 @@ const DynamicBarChart: React.FC<BarChartProps> = (BarChartProps) => {
         <XAxis dataKey='date' />
         <YAxis />
         <Tooltip />
-        <Bar dataKey='score' name='Score' fill='#0A4D63' />
+        <Bar dataKey='score' name='Score' fill='#FFAA00' />
       </BarChart>
     );
   } else {

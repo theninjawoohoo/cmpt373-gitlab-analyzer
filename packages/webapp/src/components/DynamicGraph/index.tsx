@@ -56,7 +56,7 @@ const getScoreData = (date: DateTime, scores: any[]) => {
   let score = 0;
   for (const result of scores) {
     if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
-      score += result.count;
+      score += result.total_score;
     }
   }
   return {
@@ -112,7 +112,7 @@ const DynamicGraph: React.FC = () => {
         } while (date <= DateTime.fromISO(endDate));
       } else if (graphType == 1) {
         do {
-          countsByDay.push(getScoreData(date, []));
+          countsByDay.push(getScoreData(date, commits?.results || []));
           date = date.plus({ days: 1 });
         } while (date <= DateTime.fromISO(endDate));
       } else {
