@@ -6,8 +6,14 @@ import {
 } from './base';
 import { Repository } from '@ceres/types';
 
-export function useRepository() {
-  return useApiQuery<SearchResults<Repository>>('/repository');
+interface QueryParams {
+  name?: string;
+  sortKey?: string;
+  order?: string;
+}
+
+export function useRepository(params: QueryParams) {
+  return useApiQuery<SearchResults<Repository>>('/repository', params);
 }
 
 export function useGetRepository(id: string) {

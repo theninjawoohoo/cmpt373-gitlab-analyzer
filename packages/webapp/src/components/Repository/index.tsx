@@ -1,6 +1,6 @@
 import { Operation } from '@ceres/types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   useFetchRepositories,
   useGetOperations,
@@ -10,14 +10,16 @@ import { useRepository } from '../../api/repository';
 import { ProgressCircle } from '../Common/CircularProgress';
 import RepositoryCard from './RepositoryCard';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
-import { CircularProgress, Select, InputLabel } from '@material-ui/core';
 import {
-  FormControl,
-  MenuItem,
-  Button,
-  Container,
   Box,
+  Button,
+  CircularProgress,
+  Container,
+  FormControl,
   Grid,
+  InputLabel,
+  MenuItem,
+  Select,
 } from '@material-ui/core';
 
 function hasPendingSync(operations: Operation[], id: string) {
@@ -28,7 +30,9 @@ function hasPendingSync(operations: Operation[], id: string) {
 }
 
 const Repository: React.FC = () => {
-  const { data: repos } = useRepository();
+  const { data: asc_repos } = useRepository({ order: 'ASC' });
+  const { data: desc_repos } = useRepository({ order: 'DESC' });
+  let repos = desc_repos;
   const {
     data: operationsData,
     invalidate: invalidateOperations,
@@ -48,7 +52,6 @@ const Repository: React.FC = () => {
   const openCircularProgress = false;
   const progress = 0;
   const isFetchingRepositories = pendingFetches?.total > 0;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [descending, setDesc] = useState('ASC');
 
   const syncRepository = (id: string) => {
@@ -71,13 +74,17 @@ const Repository: React.FC = () => {
       <h3>You have no repositories on your profile</h3>
     ) : null;
 
-  // useEffect(()=>{
-  //   if (descending === 'DESC'){
-  //
-  //   } else {
-  //
-  //   }
-  // }
+  useEffect(() => {
+    if (descending === 'DESC') {
+      repos = desc_repos;
+    } else {
+      repos = asc_repos;
+    }
+  }, [repos, descending]);
+
+  const handleChange = (e) => {
+    setDesc(e.target.value as string);
+  };
 
   return (
     <Container>
@@ -90,7 +97,7 @@ const Repository: React.FC = () => {
             style={{ minWidth: '15rem', minHeight: '3rem', fontSize: '20px' }}
             key='random1'
             // value={keyword}
-            placeholder={'search repository name'}
+            placeholder={'not implemented yet search'}
             // onChange={(e) => setKeyword(e.target.value)}
           />
         </Grid>
@@ -103,14 +110,11 @@ const Repository: React.FC = () => {
               labelId='sort-order-label'
               id='sort-order-label-options'
               value={descending}
-              onChange={(e) => {
-                e.preventDefault();
-                setDesc(e.target.value as string);
-              }}
+              onChange={handleChange}
               style={{ minWidth: '15rem' }}
             >
-              <MenuItem value='ASC'>ascending</MenuItem>
-              <MenuItem value='DESC'>descending</MenuItem>
+              <MenuItem value='ASC'>A to Z</MenuItem>
+              <MenuItem value='DESC'>Z to A</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -133,7 +137,6 @@ const Repository: React.FC = () => {
           </Box>
         </Grid>
       </Grid>
-
       {message}
       {openCircularProgress && <ProgressCircle progress={progress} />}
       {repos?.results.map((repo) => {

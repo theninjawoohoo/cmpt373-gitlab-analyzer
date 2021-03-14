@@ -38,13 +38,12 @@ export class RepositoryService extends BaseService<
         },
       );
     }
-
     return query;
   }
   buildSort(
     query: SelectQueryBuilder<RepositoryEntity>,
-    sortKey = 'project_created',
-    order: 'ASC' | 'DESC' = 'DESC',
+    sortKey = 'project_name',
+    order: 'ASC' | 'DESC' = 'ASC',
   ): SelectQueryBuilder<RepositoryEntity> {
     switch (sortKey) {
       case 'project_synced':
@@ -55,6 +54,8 @@ export class RepositoryService extends BaseService<
         );
       case 'project_created':
         return query.orderBy("repository.resource #>> '{created_at}'", order);
+      case 'project_name':
+        return query.orderBy("repository.resource #> '{name}'", order);
     }
     return query;
   }
