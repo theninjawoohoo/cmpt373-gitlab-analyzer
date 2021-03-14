@@ -235,7 +235,6 @@ export class CommitService {
     const score = await this.diffService.calculateDiffScore({
       commit: commit.id,
     });
-    console.log(score);
     commit.resource = Extensions.updateExtensions(commit.resource, { score });
     commit.score = score;
     await this.commitRepository.save(commit);
