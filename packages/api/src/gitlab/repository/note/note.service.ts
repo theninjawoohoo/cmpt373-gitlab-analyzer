@@ -184,4 +184,11 @@ export class NoteService {
       resource: note,
     });
   }
+
+  private countWords(note: NoteEntity) {
+    const sentences = note.resource.body;
+    const content = sentences.replace(/\*([^*]+)\*$/g, '');
+    const noWhiteSpace = content.trim().split(/\s+/);
+    return noWhiteSpace.length;
+  }
 }
