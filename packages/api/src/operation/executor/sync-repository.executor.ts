@@ -121,6 +121,10 @@ export class SyncRepositoryExecutor extends BaseExecutor<Stage> {
         this.token,
         this.repository,
       );
+
+      await this.commitService.updateCommitScoreByRepository(this.repository.id);
+      await this.mergeRequestService.updateMergeRequestScoreByRepository(this.repository.id);  
+  
     } catch {}
 
     await this.completeStage(Stage.linkCommitsAndMergeRequests);
