@@ -91,6 +91,7 @@ export class CommitService {
       .addSelect("DATE(commit.resource #>>'{created_at}')", 'date')
       .addSelect("commit.resource #>>'{author_name}'", 'author_name')
       .addSelect('count(*)', 'count')
+      .addSelect("sum((commit.resource #>> '{extensions,score}')::float)", 'total_score')
       .where('commit.repository_id = :repositoryId', {
         repositoryId: repository.id,
       })
@@ -235,6 +236,7 @@ export class CommitService {
       commit: commit.id,
     });
     commit.resource = Extensions.updateExtensions(commit.resource, { score });
+    commit.score = score;
     await this.commitRepository.save(commit);
   }
 
