@@ -112,7 +112,7 @@ export default class DiffInterpreter {
   ) {
     const deletedLines: LineContent[] = [];
     let line = lines[currentLine];
-    while (this.determineLineType(line) === Line.Type.delete) {
+    while (line && this.determineLineType(line) === Line.Type.delete) {
       deletedLines.push({
         number: leftLineNumber,
         content: line,
@@ -131,7 +131,7 @@ export default class DiffInterpreter {
   ) {
     const addedLines: LineContent[] = [];
     let line = lines[currentLine];
-    while (this.determineLineType(line) === Line.Type.add) {
+    while (line && this.determineLineType(line) === Line.Type.add) {
       addedLines.push({
         number: rightLineNumber,
         content: line,
