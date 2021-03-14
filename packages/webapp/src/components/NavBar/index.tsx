@@ -81,7 +81,11 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
       <div style={{ width: '6rem' }} className={styles.root}>
         <List className={styles.listCSS}>
           <ItemBox icon='user' primary={UserNameProps.username} url='/' />
-          <ItemBox icon='repo' primary={'Repository'} url='/repository' />
+          <ItemBox
+            icon='repo'
+            primary={'Repository'}
+            url={repositoryId ? `/repository/${repositoryId}` : '/repository'}
+          />
           <Accordion>
             <AccordionSummary
               expandIcon={

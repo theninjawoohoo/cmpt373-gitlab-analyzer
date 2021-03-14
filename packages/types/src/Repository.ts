@@ -39,7 +39,7 @@ interface ContainerExpirationPolicy {
   older_than: string;
   name_regex: string;
   name_regex_keep?: any;
-  next_run_at: Date;
+  next_run_at: string;
 }
 
 interface ProjectAccess {
@@ -73,7 +73,7 @@ export interface Repository extends WithExtensions<RepositoryExtensions> {
   name_with_namespace: string;
   path: string;
   path_with_namespace: string;
-  created_at: Date;
+  created_at: string;
   default_branch: string;
   tag_list: any[];
   ssh_url_to_repo: string;
@@ -83,7 +83,7 @@ export interface Repository extends WithExtensions<RepositoryExtensions> {
   avatar_url: string;
   forks_count: number;
   star_count: number;
-  last_activity_at: Date;
+  last_activity_at: string;
   namespace: Namespace;
   _links: Links;
   packages_enabled?: boolean;
