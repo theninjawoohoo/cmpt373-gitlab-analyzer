@@ -31,6 +31,9 @@ export default class DiffInterpreter {
       const line = hunk.lines[currentLine];
       const lineType = this.determineLineType(line);
       if (lineType === Line.Type.add) {
+        if (line.substring(0,1) === "//"){
+          hunkLines.push(this.createComment(line, rightLineNumber));
+        }
         hunkLines.push(this.createAdd(line, rightLineNumber));
         rightLineNumber++;
         currentLine++;
@@ -143,6 +146,30 @@ export default class DiffInterpreter {
   }
 
   private createAdd(
+    line: string,
+    lineNumber: number,
+    deletedLine?: string,
+    deletedLineNumber?: number,
+  ): Line {
+    const definition: Line = {
+      type: Line.Type.add,
+      right: {
+        lineNumber,
+        lineContent: line,
+      },
+    };
+    // If this line was added at the same time as a line was deleted, store
+    // the deleted line as the left side.
+    if (deletedLine && deletedLineNumber) {
+      definition.left = {
+        lineContent: deletedLine,
+        lineNumber: deletedLineNumber,
+      };
+    }
+    return definition;
+  }
+
+  private createComment(
     line: string,
     lineNumber: number,
     deletedLine?: string,
