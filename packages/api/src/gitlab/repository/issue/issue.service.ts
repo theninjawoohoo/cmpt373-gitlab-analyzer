@@ -50,7 +50,7 @@ export class IssueService {
     repository: Repository,
     issues: Issue[],
   ): Promise<void> {
-    const { created } = await this.createIfNotExists(repository, issues);
+    const { created } = await this.createAndSaveIssues(repository, issues);
     await Promise.all(created.map((issue) => ({ ...issue, repository })));
     await Promise.all(
       created.map((issue) => this.noteService.syncForIssue(issue, token)),
@@ -76,30 +76,10 @@ export class IssueService {
       .toPromise();
   }
 
-  private async createIfNotExists(repository: Repository, issues: Issue[]) {
+  private async createAndSaveIssues(repository: Repository, issues: Issue[]) {
     const entities = await Promise.all(
       issues.map(async (issue) => {
-        const found = await this.repository
-          .createQueryBuilder()
-          .where('resource @> :resource', {
-            resource: {
-              id: issue.id,
-            },
-          })
-          .andWhere('repository_id = :repositoryId', {
-            repositoryId: repository.id,
-          })
-          .getOne();
-        if (found) {
-          return { issue: found, created: false };
-        }
-        return {
-          issue: this.repository.create({
-            repository: repository,
-            resource: issue,
-          }),
-          created: true,
-        };
+        return this.createIssueIfNotExists(repository, issue);
       }),
     );
     return {
@@ -110,5 +90,37 @@ export class IssueService {
         entities.filter(({ created }) => created).map(({ issue }) => issue),
       ),
     };
+  }
+
+  private async createIssueIfNotExists(repository: Repository, issue: Issue) {
+    const found = await this.queryIssueFromRepository(repository, issue);
+    if (found) {
+      return { issue: found, created: false };
+    }
+    return {
+      issue: this.createNewIssue(repository, issue),
+      created: true,
+    };
+  }
+
+  private queryIssueFromRepository(repository: Repository, issue: Issue) {
+    return this.repository
+      .createQueryBuilder()
+      .where('resource @> :resource', {
+        resource: {
+          id: issue.id,
+        },
+      })
+      .andWhere('repository_id = :repositoryId', {
+        repositoryId: repository.id,
+      })
+      .getOne();
+  }
+
+  private createNewIssue(repository: Repository, issue: Issue) {
+    return this.repository.create({
+      repository: repository,
+      resource: issue,
+    });
   }
 }

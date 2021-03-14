@@ -58,12 +58,12 @@ export class NoteService {
 
   async syncForMergeRequest(mergeRequest: MergeRequestEntity, token: string) {
     const note = await this.fetchForMergeRequest(mergeRequest, token);
-    return this.createOrUpdateMergeRequest(mergeRequest, note);
+    return this.saveMergeRequestNote(mergeRequest, note);
   }
 
   async syncForIssue(issue: IssueEntity, token: string) {
     const note = await this.fetchForIssue(issue, token);
-    return this.createOrUpdateIssue(issue, note);
+    return this.saveIssueNote(issue, note);
   }
 
   async fetchForMergeRequest(mergeRequest: MergeRequestEntity, token: string) {
@@ -96,62 +96,92 @@ export class NoteService {
     return axiosResponse.data;
   }
 
-  async createOrUpdateMergeRequest(
-    mergeRequest: MergeRequestEntity,
-    notes: Note[],
-  ) {
+  async saveMergeRequestNote(mergeRequest: MergeRequestEntity, notes: Note[]) {
     const entities = await Promise.all(
       notes.map(async (note) => {
-        let entity = await this.noteRepository
-          .createQueryBuilder()
-          .where('resource @> :resource', {
-            resource: {
-              id: note.id,
-            },
-          })
-          .andWhere('merge_request_id = :mr_Id', {
-            mr_Id: mergeRequest.id,
-          })
-          .getOne();
-        if (!entity) {
-          entity = this.noteRepository.create({
-            mergeRequest: mergeRequest,
-            resource: note,
-          });
-        } else {
-          entity.resource = note;
-        }
-        return entity;
+        return this.createOrUpdateMergeRequestNote(mergeRequest, note);
       }),
     );
     return this.noteRepository.save(entities);
   }
 
-  async createOrUpdateIssue(issue: IssueEntity, notes: Note[]) {
+  async saveIssueNote(issue: IssueEntity, notes: Note[]) {
     const entities = await Promise.all(
       notes.map(async (note) => {
-        let entity = await this.noteRepository
-          .createQueryBuilder()
-          .where('resource @> :resource', {
-            resource: {
-              id: note.id,
-            },
-          })
-          .andWhere('issue_id = :is_Id', {
-            is_Id: issue.id,
-          })
-          .getOne();
-        if (!entity) {
-          entity = this.noteRepository.create({
-            issue: issue,
-            resource: note,
-          });
-        } else {
-          entity.resource = note;
-        }
-        return entity;
+        return this.createOrUpdateIssueNote(issue, note);
       }),
     );
     return this.noteRepository.save(entities);
+  }
+
+  private async createOrUpdateMergeRequestNote(
+    mergeRequest: MergeRequestEntity,
+    note: Note,
+  ) {
+    let entity = await this.queryNoteForMergeRequest(mergeRequest, note);
+    if (!entity) {
+      entity = this.createNoteForMergeRequest(mergeRequest, note);
+    } else {
+      entity.resource = note;
+    }
+    return entity;
+  }
+
+  private async createOrUpdateIssueNote(issue: IssueEntity, note: Note) {
+    let entity = await this.queryNoteForIssue(issue, note);
+    if (!entity) {
+      entity = this.createNoteForIssue(issue, note);
+    } else {
+      entity.resource = note;
+    }
+    return entity;
+  }
+
+  private queryNoteForMergeRequest(
+    mergeRequest: MergeRequestEntity,
+    note: Note,
+  ) {
+    return this.noteRepository
+      .createQueryBuilder()
+      .where('resource @> :resource', {
+        resource: {
+          id: note.id,
+        },
+      })
+      .andWhere('merge_request_id = :mr_Id', {
+        mr_Id: mergeRequest.id,
+      })
+      .getOne();
+  }
+
+  private queryNoteForIssue(issue: IssueEntity, note: Note) {
+    return this.noteRepository
+      .createQueryBuilder()
+      .where('resource @> :resource', {
+        resource: {
+          id: note.id,
+        },
+      })
+      .andWhere('issue_id = :is_Id', {
+        is_Id: issue.id,
+      })
+      .getOne();
+  }
+
+  private createNoteForMergeRequest(
+    mergeRequest: MergeRequestEntity,
+    note: Note,
+  ) {
+    return this.noteRepository.create({
+      mergeRequest: mergeRequest,
+      resource: note,
+    });
+  }
+
+  private createNoteForIssue(issue: IssueEntity, note: Note) {
+    return this.noteRepository.create({
+      issue: issue,
+      resource: note,
+    });
   }
 }
