@@ -91,6 +91,7 @@ export class CommitService {
       .addSelect("DATE(commit.resource #>>'{created_at}')", 'date')
       .addSelect("commit.resource #>>'{author_name}'", 'author_name')
       .addSelect('count(*)', 'count')
+      .addSelect('sum(score)', 'totalScore')
       .where('commit.repository_id = :repositoryId', {
         repositoryId: repository.id,
       })
@@ -234,7 +235,9 @@ export class CommitService {
     const score = await this.diffService.calculateDiffScore({
       commit: commit.id,
     });
+    console.log(score);
     commit.resource = Extensions.updateExtensions(commit.resource, { score });
+    commit.score = score;
     await this.commitRepository.save(commit);
   }
 

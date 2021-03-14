@@ -76,6 +76,9 @@ export class SyncRepositoryExecutor extends BaseExecutor<Stage> {
       repository,
     );
     await this.updateLastSync();
+    await this.commitService.updateCommitScoreByRepository(payload.repository_id);
+    await this.mergeRequestService.updateMergeRequestScoreByRepository(payload.repository_id);
+
   }
 
   private async updateLastSync() {
