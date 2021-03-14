@@ -10,6 +10,7 @@ import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PeopleIcon from '@material-ui/icons/People';
 import ListIcon from '@material-ui/icons/List';
+import ScoreIcon from '@material-ui/icons/Score';
 
 export default function Icon(props: any) {
   switch (props.icon) {
@@ -35,6 +36,8 @@ export default function Icon(props: any) {
       return <PeopleIcon />;
     case 'list':
       return <ListIcon />;
+    case 'scoring':
+      return <ScoreIcon />;
   }
   return <ErrorIcon />;
 }
