@@ -48,6 +48,25 @@ export class MergeRequestService {
         { authorEmail: alwaysArray(filters.author_email) },
       );
     }
+
+    if (filters.merged_start_date) {
+      query.andWhere(
+        "DATE(merge_request.resource #>> '{merged_at}') >= DATE(:startDate)",
+        {
+          startDate: filters.merged_start_date,
+        },
+      );
+    }
+
+    if (filters.merged_end_date) {
+      query.andWhere(
+        "DATE(merge_request.resource #>> '{merged_at}') <= DATE(:endDate)",
+        {
+          endDate: filters.merged_end_date,
+        },
+      );
+    }
+
     paginate(query, filters);
     return query.getManyAndCount();
   }

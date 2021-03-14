@@ -17,9 +17,11 @@ import MemberDropdown from '../../components/MemberDropdown';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 import CalendarFilter from '../../components/CalendarFilter';
+import { useFilterContext } from '../../contexts/FilterContext';
 
 const ListMergeRequestPage = () => {
   const { id } = useParams<{ id: string }>();
+  const { startDate, endDate } = useFilterContext();
   const { repositoryId } = useRepositoryContext();
   const [emails, setEmails] = useState<string[]>([]);
   const [activeMergeRequest, setActiveMergeRequest] = useState<
@@ -34,6 +36,8 @@ const ListMergeRequestPage = () => {
   } = useInfiniteMergeRequest({
     repository: id,
     author_email: emails,
+    merged_start_date: startDate.toString(),
+    merged_end_date: endDate.toString(),
   });
 
   useEffect(() => {
