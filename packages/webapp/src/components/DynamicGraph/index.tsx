@@ -9,7 +9,7 @@ import { useCommitDailyCounts } from '../../api/commit';
 import { DateTime } from 'luxon';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 import MemberDropdown from '../MemberDropdown';
-import { useDateFilterContext } from '../../contexts/DateFilterContext';
+import { useFilterContext } from '../../contexts/FilterContext';
 import CalendarFilter from '../CalendarFilter';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -54,7 +54,7 @@ const createGraphData = (date: DateTime, commits: any[], merges: any[]) => {
 
 const DynamicGraph: React.FC = () => {
   const classes = useStyles();
-  const { startDate, endDate } = useDateFilterContext();
+  const { startDate, endDate } = useFilterContext();
   const [value, setValue] = React.useState(0);
   const { id } = useParams<{ id: string }>();
   const [emails, setEmails] = useState<string[]>([]);
@@ -97,7 +97,7 @@ const DynamicGraph: React.FC = () => {
           <DefaultPageTitleFormat>Contribution Graph</DefaultPageTitleFormat>
         </Grid>
         <Grid item>
-          <CalendarFilter startDateIso={startDate} endDateIso={endDate} />
+          <CalendarFilter />
         </Grid>
         <Grid
           item

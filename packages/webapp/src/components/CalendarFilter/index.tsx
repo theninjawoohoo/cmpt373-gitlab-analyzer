@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
-import { useDateFilterContext } from '../../contexts/DateFilterContext';
+import { useFilterContext } from '../../contexts/FilterContext';
 import Grid from '@material-ui/core/Grid';
 import LuxonUtils from '@date-io/luxon';
 import {
@@ -8,26 +8,19 @@ import {
   KeyboardDatePicker,
 } from '@material-ui/pickers';
 import { useGetCommits } from '../../api/commit';
-import { DateTime } from 'luxon';
 
-interface DateProp {
-  startDateIso?: string;
-  endDateIso?: string;
-}
-
-const CalendarFilter: React.FC<DateProp> = (DateProp) => {
+const CalendarFilter: React.FC = () => {
   const { repositoryId } = useRepositoryContext();
   const {
+    startDate,
+    endDate,
     setStartDateContext,
     setEndDateContext,
     setArrayContext,
-  } = useDateFilterContext();
-  const [startDate, setStartDate] = React.useState(
-    DateTime.fromISO(DateProp.startDateIso),
-  );
-  const [endDate, setEndDate] = React.useState(
-    DateTime.fromISO(DateProp.endDateIso),
-  );
+  } = useFilterContext();
+
+  const [componentStartDate, setStartDate] = React.useState(startDate);
+  const [componentEndDate, setEndDate] = React.useState(endDate);
 
   const { data: commits } = useGetCommits(
     {
@@ -61,7 +54,7 @@ const CalendarFilter: React.FC<DateProp> = (DateProp) => {
           margin='normal'
           id='date-picker-inline'
           label='Start Date'
-          value={startDate.toString()}
+          value={componentStartDate.toString()}
           onChange={handleStartDateChange}
           KeyboardButtonProps={{
             'aria-label': 'change date',
@@ -74,7 +67,7 @@ const CalendarFilter: React.FC<DateProp> = (DateProp) => {
           margin='normal'
           id='date-picker-inline'
           label='End Date'
-          value={endDate.toString()}
+          value={componentEndDate.toString()}
           onChange={handleEndDateChange}
           KeyboardButtonProps={{
             'aria-label': 'change date',

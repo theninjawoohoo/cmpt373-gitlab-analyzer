@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { useRepositoryAuthors } from '../../api/author';
 import { ApiResource } from '../../api/base';
 import { useRepositoryMembers } from '../../api/repo_members';
+import { useFilterContext } from '../../contexts/FilterContext';
 
 function findEmailsForMember(
   memberId: string,
@@ -27,15 +28,24 @@ const MemberDropdown: React.FC<MemberDropdownProps> = ({
   repositoryId,
   onChange,
 }) => {
-  const [value, setValue] = useState('all');
+  const { author, setAuthorContext } = useFilterContext();
+  const [value, setValue] = useState(author);
+
   const { data: members } = useRepositoryMembers(repositoryId);
   const { data: authors } = useRepositoryAuthors(repositoryId);
+
+  const handleChangeAuthor = (author) => {
+    setAuthorContext(author);
+  };
+
   useEffect(() => {
+    console.log(value);
     if (value !== 'all') {
       const emails = findEmailsForMember(value, authors);
-
+      handleChangeAuthor(value);
       onChange(emails.length > 0 ? emails : ['']);
     } else {
+      handleChangeAuthor(value);
       onChange([]);
     }
   }, [value]);

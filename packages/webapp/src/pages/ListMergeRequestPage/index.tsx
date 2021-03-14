@@ -16,6 +16,7 @@ import Box from '@material-ui/core/Box';
 import MemberDropdown from '../../components/MemberDropdown';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
+import CalendarFilter from '../../components/CalendarFilter';
 
 const ListMergeRequestPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -63,6 +64,7 @@ const ListMergeRequestPage = () => {
                     setEmails(newEmails);
                   }}
                 />
+                <CalendarFilter />
               </Grid>
               <Box pr={6} pl={2} py={1}>
                 <Grid container>
