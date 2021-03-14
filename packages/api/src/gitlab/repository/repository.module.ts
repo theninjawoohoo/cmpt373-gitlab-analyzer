@@ -20,10 +20,12 @@ import { Commit } from './commit/commit.entity';
 import { DiffService } from './diff/diff.service';
 import { CommitController } from './commit/commit.controller';
 import { DiffController } from './diff/diff.controller';
-import { MergeRequestNoteService } from './note/merge-request-note/merge-request-note.service';
-import { MergeRequestNoteController } from './note/merge-request-note/merge-request-note.controller';
-import { MergeRequestNote } from './note/merge-request-note/merge-request-note.entity';
-// import { Issue } from './issues/issues.entity';
+import { NoteService } from './note/note.service';
+import { NoteController } from './note/note.controller';
+import { Note } from './note/note.entity';
+import { Issue } from './issue/issue.entity';
+import { IssueService } from './issue/issue.service';
+import { IssueController } from './issue/issue.controller';
 
 @Module({
   imports: [
@@ -36,10 +38,10 @@ import { MergeRequestNote } from './note/merge-request-note/merge-request-note.e
       MergeRequestParticipant,
       CommitDailyCount,
       CommitAuthor,
-      MergeRequestNote,
+      Note,
+      Issue,
     ]),
     ApiModule,
-    // Issue,
   ],
   providers: [
     RepositoryService,
@@ -50,13 +52,15 @@ import { MergeRequestNote } from './note/merge-request-note/merge-request-note.e
     DiffService,
     CommitDailyCountService,
     CommitAuthorService,
-    MergeRequestNoteService,
+    NoteService,
+    IssueService,
   ],
   controllers: [
     RepositoryController,
     CommitController,
     DiffController,
-    MergeRequestNoteController,
+    NoteController,
+    IssueController,
   ],
   exports: [
     RepositoryService,
@@ -65,7 +69,8 @@ import { MergeRequestNote } from './note/merge-request-note/merge-request-note.e
     CommitService,
     CommitDailyCountService,
     CommitAuthorService,
-    MergeRequestNoteService,
+    NoteService,
+    IssueService,
   ],
 })
 export class RepositoryModule {}

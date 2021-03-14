@@ -11,7 +11,7 @@ import { Repository } from '../repository/repository.entity';
 import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
 import { MergeRequestQueryDto } from './merge-request-query.dto';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
-import { MergeRequestNoteService } from '../repository/note/merge-request-note/merge-request-note.service';
+import { NoteService } from '../repository/note/note.service';
 
 @Injectable()
 export class MergeRequestService {
@@ -22,7 +22,7 @@ export class MergeRequestService {
     private readonly diffService: DiffService,
     private readonly commitService: CommitService,
     private readonly participantService: MergeRequestParticipantService,
-    private readonly noteService: MergeRequestNoteService,
+    private readonly noteService: NoteService,
   ) {}
 
   async search(filters: MergeRequestQueryDto) {
