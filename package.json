@@ -13,8 +13,6 @@
     "lerna": "^3.22.1"
   },
   "dependencies": {
-    "@date-io/luxon": "^2.10.8",
-    "chokidar": "^3.5.1",
-    "luxon": "^1.26.0"
+    "@date-io/luxon": "^2.10.8"
   }
 }
