@@ -76,9 +76,6 @@ export class SyncRepositoryExecutor extends BaseExecutor<Stage> {
       repository,
     );
     await this.updateLastSync();
-    await this.commitService.updateCommitScoreByRepository(payload.repository_id);
-    await this.mergeRequestService.updateMergeRequestScoreByRepository(payload.repository_id);
-
   }
 
   private async updateLastSync() {
@@ -119,6 +116,10 @@ export class SyncRepositoryExecutor extends BaseExecutor<Stage> {
         this.token,
         this.repository,
       );
+
+      await this.commitService.updateCommitScoreByRepository(this.repository.id);
+      await this.mergeRequestService.updateMergeRequestScoreByRepository(this.repository.id);  
+  
     } catch {}
 
     await this.completeStage(Stage.linkCommitsAndMergeRequests);

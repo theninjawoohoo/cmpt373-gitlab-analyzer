@@ -91,7 +91,7 @@ export class CommitService {
       .addSelect("DATE(commit.resource #>>'{created_at}')", 'date')
       .addSelect("commit.resource #>>'{author_name}'", 'author_name')
       .addSelect('count(*)', 'count')
-      .addSelect('sum(score)', 'totalScore')
+      .addSelect('sum(score)', 'total_score')
       .where('commit.repository_id = :repositoryId', {
         repositoryId: repository.id,
       })
