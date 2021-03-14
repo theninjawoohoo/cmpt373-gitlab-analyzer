@@ -27,10 +27,12 @@ export namespace Commit {
     author_email: string;
     repository_member_id?: string;
   }
+  
   export interface DailyCount {
     author_email: string;
     author_name: string;
     date: string;
     count: number;
+    total_score: number; 
   }
 }
