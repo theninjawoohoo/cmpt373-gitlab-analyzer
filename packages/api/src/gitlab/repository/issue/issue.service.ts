@@ -5,6 +5,7 @@ import { Repository as TypeORMRepository } from 'typeorm/repository/Repository';
 import { Repository } from '../repository.entity';
 import { Issue } from '@ceres/types';
 import { AxiosResponse } from 'axios';
+import { NoteService } from '../note/note.service';
 
 @Injectable()
 export class IssueService {
@@ -12,6 +13,7 @@ export class IssueService {
     private readonly httpService: HttpService,
     @InjectRepository(IssueEntity)
     private readonly repository: TypeORMRepository<IssueEntity>,
+    private readonly noteService: NoteService,
   ) {}
 
   async findAllForRepository(repository: Repository) {
@@ -50,6 +52,9 @@ export class IssueService {
   ): Promise<void> {
     const { created } = await this.createIfNotExists(repository, issues);
     await Promise.all(created.map((issue) => ({ ...issue, repository })));
+    await Promise.all(
+      created.map((issue) => this.noteService.syncForIssue(issue, token)),
+    );
   }
 
   private async fetchFromGitlab(
