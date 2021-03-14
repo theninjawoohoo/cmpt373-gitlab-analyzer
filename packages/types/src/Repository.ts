@@ -1,4 +1,5 @@
 // Generated using: http://json2ts.com/
+import { ScoringConfig } from './ScoringConfig';
 import { WithExtensions } from './WithExtensions';
 
 interface Namespace {
@@ -58,6 +59,11 @@ interface Permissions {
 
 interface RepositoryExtensions {
   lastSync?: string;
+  scoringConfig?: {
+    config?: ScoringConfig;
+    id?: string;
+    lastRan?: string;
+  };
 }
 
 export interface Repository extends WithExtensions<RepositoryExtensions> {

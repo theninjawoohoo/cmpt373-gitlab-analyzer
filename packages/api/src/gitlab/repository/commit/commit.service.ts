@@ -23,6 +23,9 @@ export class CommitService {
     const query = this.commitRepository.createQueryBuilder('commit');
     filters = withDefaults(filters);
 
+    // Only merge commits have more than one parent
+    query.andWhere("jsonb_array_length(commit.resource #> '{parent_ids}') < 2");
+
     if (filters.repository) {
       query.andWhere('commit.repository_id = :repository', {
         repository: filters.repository,

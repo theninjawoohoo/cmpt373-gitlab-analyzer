@@ -52,7 +52,7 @@ export abstract class BaseService<
   abstract buildSort(
     query: SelectQueryBuilder<TEntity>,
     sortKey?: string,
-    order?: 'asc' | 'desc',
+    order?: 'ASC' | 'DESC',
   ): SelectQueryBuilder<TEntity>;
 
   private determineSort(sort: string) {
@@ -60,7 +60,7 @@ export abstract class BaseService<
     const sortKey = sort.substr(1);
     return {
       sortKey,
-      order: firstChar === '+' ? 'asc' : 'desc',
+      order: firstChar === '+' ? 'ASC' : 'DESC',
     };
   }
 }

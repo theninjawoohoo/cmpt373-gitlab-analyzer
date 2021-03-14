@@ -24,7 +24,10 @@ export class FetchRepositoriesExecutor extends BaseExecutor<Stage> {
   async run() {
     await this.init();
     await this.startStage(Stage.fetch);
-    await this.repositoryService.fetchForUser(this.operation.user, this.token);
+    await this.repositoryService.fetchFromGitlabForUser(
+      this.operation.user,
+      this.token,
+    );
     await this.completeStage(Stage.fetch);
   }
 
