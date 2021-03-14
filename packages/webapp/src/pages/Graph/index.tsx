@@ -5,7 +5,7 @@ import DefaultPageLayout from '../../components/DefaultPageLayout';
 
 const useStyles = makeStyles(() => ({
   root: {
-    height: '100vh',
+    height: '120vh',
     width: '100vw',
     overflow: 'hidden',
   },
