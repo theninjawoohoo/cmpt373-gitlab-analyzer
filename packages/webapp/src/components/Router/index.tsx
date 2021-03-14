@@ -13,6 +13,7 @@ import SettingsPage from '../../pages/Settings';
 import { useAuthContext } from '../../contexts/AuthContext';
 import CommitsPage from '../../pages/Commits';
 import Members from '../../pages/Members';
+import RepositoryHomePage from '../../pages/RepositoryHomePage';
 
 export function Router() {
   const { user } = useAuthContext();
@@ -30,6 +31,9 @@ export function Router() {
         </Route>
         <Route path='/repository' exact>
           <RepositoryPage />
+        </Route>
+        <Route path='/repository/:id' exact>
+          <RepositoryHomePage />
         </Route>
         <Route path='/graph/:id' exact>
           <Graph />

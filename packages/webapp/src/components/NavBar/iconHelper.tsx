@@ -25,15 +25,15 @@ export default function Icon(props: any) {
     case 'collapse':
       return <ExitToAppIcon />;
     case 'graph':
-      return <InsertChart />;
+      return <InsertChart fontSize={props.size} />;
     case 'merge':
-      return <MergeType />;
+      return <MergeType fontSize={props.size} />;
     case 'commit':
-      return <ArrowUpwardIcon />;
+      return <ArrowUpwardIcon fontSize={props.size} />;
     case 'operation':
       return <PlayArrowIcon />;
     case 'members':
-      return <PeopleIcon />;
+      return <PeopleIcon fontSize={props.size} />;
     case 'list':
       return <ListIcon />;
     case 'scoring':
