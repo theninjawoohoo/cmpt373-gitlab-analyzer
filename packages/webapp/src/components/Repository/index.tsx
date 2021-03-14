@@ -1,5 +1,6 @@
 import { Operation } from '@ceres/types';
-import React from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import React, { useState, useEffect } from 'react';
 import {
   useFetchRepositories,
   useGetOperations,
@@ -7,13 +8,17 @@ import {
 } from '../../api/operation';
 import { useRepository } from '../../api/repository';
 import { ProgressCircle } from '../Common/CircularProgress';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import RepositoryCard from './RepositoryCard';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
-import Box from '@material-ui/core/Box';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import { CircularProgress, Select, InputLabel } from '@material-ui/core';
+import {
+  FormControl,
+  MenuItem,
+  Button,
+  Container,
+  Box,
+  Grid,
+} from '@material-ui/core';
 
 function hasPendingSync(operations: Operation[], id: string) {
   return (
@@ -43,6 +48,8 @@ const Repository: React.FC = () => {
   const openCircularProgress = false;
   const progress = 0;
   const isFetchingRepositories = pendingFetches?.total > 0;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [descending, setDesc] = useState('ASC');
 
   const syncRepository = (id: string) => {
     sync(id, {
@@ -63,6 +70,14 @@ const Repository: React.FC = () => {
     repos?.results.length == 0 ? (
       <h3>You have no repositories on your profile</h3>
     ) : null;
+
+  // useEffect(()=>{
+  //   if (descending === 'DESC'){
+  //
+  //   } else {
+  //
+  //   }
+  // }
 
   return (
     <Container>
@@ -89,6 +104,26 @@ const Repository: React.FC = () => {
           </Box>
         </Grid>
       </Grid>
+      <div>
+        <FormControl variant='filled'>
+          <InputLabel shrink id='sort-order-label'>
+            Select sort order:
+          </InputLabel>
+          <Select
+            labelId='sort-order-label'
+            id='sort-order-label-options'
+            value={descending}
+            onChange={(e) => {
+              e.preventDefault();
+              setDesc(e.target.value as string);
+            }}
+            style={{ minWidth: '15rem' }}
+          >
+            <MenuItem value='ASC'>ascending</MenuItem>
+            <MenuItem value='DESC'>descending</MenuItem>
+          </Select>
+        </FormControl>
+      </div>
       {message}
       {openCircularProgress && <ProgressCircle progress={progress} />}
       {repos?.results.map((repo) => {
