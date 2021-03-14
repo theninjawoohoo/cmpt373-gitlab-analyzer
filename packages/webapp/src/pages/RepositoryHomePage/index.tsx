@@ -13,6 +13,7 @@ import LinkGrid from './components/LinkGrid';
 import MembersWarning from './components/MembersWarning';
 import Box from '@material-ui/core/Box';
 import ScoringConfigWarning from './components/ScoringConfigWarning';
+import ScoringConfigSelector from './components/ScoringConfigSelector';
 
 const RepositoryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -52,6 +53,9 @@ const RepositoryPage: React.FC = () => {
         </Box>
         <Box my={3}>
           <ScoringConfigWarning repository={data} />
+        </Box>
+        <Box my={3}>
+          <ScoringConfigSelector />
         </Box>
         <LinkGrid repositoryId={id} />
       </Container>
