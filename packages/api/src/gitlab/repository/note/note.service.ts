@@ -1,9 +1,7 @@
 import { Note } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AxiosResponse } from 'axios';
 import { Repository as TypeORMNote } from 'typeorm';
-import { Repository } from '../repository.entity';
 import { Note as NoteEntity } from './note.entity';
 import { MergeRequest as MergeRequestEntity } from '../../merge-request/merge-request.entity';
 import { Issue as IssueEntity } from '../issue/issue.entity';
@@ -155,34 +153,5 @@ export class NoteService {
       }),
     );
     return this.noteRepository.save(entities);
-  }
-
-  async fetchByPage(
-    token: string,
-    repo: Repository,
-    page: number,
-  ): Promise<Note[]> {
-    const axiosResponse = await this.fetchFromGitlab(token, repo, page);
-    return axiosResponse.data;
-  }
-
-  private async fetchFromGitlab(
-    token: string,
-    repo: Repository,
-    page: number,
-    pageSize = 10,
-  ): Promise<AxiosResponse<Note[]>> {
-    return await this.httpService
-      .get<Note[]>(`projects/${repo.resource.id}/repository/notes`, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: pageSize,
-          page,
-          ref_name: 'master',
-        },
-      })
-      .toPromise();
   }
 }

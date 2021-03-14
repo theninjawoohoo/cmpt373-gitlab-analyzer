@@ -18,7 +18,7 @@ export class DiffService {
     private readonly httpService: HttpService,
     @InjectRepository(DiffEntity)
     private readonly diffRepository: TypeORMRepository<DiffEntity>,
-  ) { }
+  ) {}
 
   search(filters: DiffQueryDto) {
     filters = withDefaults(filters);
