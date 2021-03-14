@@ -1,4 +1,4 @@
-import { Line } from '@ceres/types';
+import { Diff, Line } from '@ceres/types';
 import {
   Accordion,
   AccordionSummary,
@@ -14,6 +14,7 @@ interface DiffViewProps {
   fileName: string;
   lines: Line[];
   expanded?: boolean;
+  extensions?: Diff['extensions'];
   onSummaryClick?: () => void;
 }
 
