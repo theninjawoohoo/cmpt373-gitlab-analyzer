@@ -1,13 +1,13 @@
 import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
-import { MergeRequestNoteService } from './merge-request-note.service';
-import { IdParam } from '../../../../common/id-param';
-import { RepositoryService } from '../../repository.service';
-import { MergeRequestService } from '../../../merge-request/merge-request.service';
+import { NoteService } from './note.service';
+import { IdParam } from '../../../common/id-param';
+import { RepositoryService } from '../repository.service';
+import { MergeRequestService } from '../../merge-request/merge-request.service';
 
 @Controller('notes')
-export class MergeRequestNoteController {
+export class NoteController {
   constructor(
-    private readonly noteService: MergeRequestNoteService,
+    private readonly noteService: NoteService,
     private readonly repositoryService: RepositoryService,
     private readonly mergeRequestService: MergeRequestService,
   ) {}
