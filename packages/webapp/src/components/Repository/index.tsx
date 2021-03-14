@@ -86,6 +86,35 @@ const Repository: React.FC = () => {
           <DefaultPageTitleFormat>Projects</DefaultPageTitleFormat>
         </Grid>
         <Grid item>
+          <input
+            style={{ minWidth: '15rem', minHeight: '3rem', fontSize: '20px' }}
+            key='random1'
+            // value={keyword}
+            placeholder={'search repository name'}
+            // onChange={(e) => setKeyword(e.target.value)}
+          />
+        </Grid>
+        <Grid item>
+          <FormControl variant='filled'>
+            <InputLabel shrink id='sort-order-label'>
+              Select sort order:
+            </InputLabel>
+            <Select
+              labelId='sort-order-label'
+              id='sort-order-label-options'
+              value={descending}
+              onChange={(e) => {
+                e.preventDefault();
+                setDesc(e.target.value as string);
+              }}
+              style={{ minWidth: '15rem' }}
+            >
+              <MenuItem value='ASC'>ascending</MenuItem>
+              <MenuItem value='DESC'>descending</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item>
           <Box position='relative'>
             <Button
               variant='contained'
@@ -104,26 +133,7 @@ const Repository: React.FC = () => {
           </Box>
         </Grid>
       </Grid>
-      <div>
-        <FormControl variant='filled'>
-          <InputLabel shrink id='sort-order-label'>
-            Select sort order:
-          </InputLabel>
-          <Select
-            labelId='sort-order-label'
-            id='sort-order-label-options'
-            value={descending}
-            onChange={(e) => {
-              e.preventDefault();
-              setDesc(e.target.value as string);
-            }}
-            style={{ minWidth: '15rem' }}
-          >
-            <MenuItem value='ASC'>ascending</MenuItem>
-            <MenuItem value='DESC'>descending</MenuItem>
-          </Select>
-        </FormControl>
-      </div>
+
       {message}
       {openCircularProgress && <ProgressCircle progress={progress} />}
       {repos?.results.map((repo) => {
