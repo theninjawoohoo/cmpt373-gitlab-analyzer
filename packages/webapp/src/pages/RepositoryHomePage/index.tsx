@@ -76,13 +76,15 @@ const RepositoryPage: React.FC = () => {
         <Box my={3}>
           <ScoringConfigWarning repository={data} />
         </Box>
-        <Box my={3}>
-          <ScoringConfigSelector
-            isLoading={updateScoreLoading}
-            onSubmit={handleUpdateScore}
-            repository={data}
-          />
-        </Box>
+        {data && (
+          <Box my={3}>
+            <ScoringConfigSelector
+              isLoading={updateScoreLoading}
+              onSubmit={handleUpdateScore}
+              repository={data}
+            />
+          </Box>
+        )}
         <LinkGrid repositoryId={id} />
       </Container>
     </DefaultPageLayout>

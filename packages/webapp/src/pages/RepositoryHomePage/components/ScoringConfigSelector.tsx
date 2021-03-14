@@ -31,7 +31,9 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
   repository,
 }) => {
   const { data } = useSearchScoringConfigs(0, 1000);
-  const [selectedScoringConfig, setSelectedScoringConfig] = useState('None');
+  const [selectedScoringConfig, setSelectedScoringConfig] = useState(
+    repository?.extensions?.scoringConfig?.id || 'None',
+  );
 
   const handleSubmit = () => {
     onSubmit(findConfigById(selectedScoringConfig, data));
