@@ -4,13 +4,13 @@ import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { useParams } from 'react-router-dom';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { useCommitDailyCounts } from '../../api/commit';
 import { DateTime } from 'luxon';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 import MemberDropdown from '../MemberDropdown';
 import { useFilterContext } from '../../contexts/FilterContext';
 import CalendarFilter from '../CalendarFilter';
+import DynamicBarChart from './BarChartComponent';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const createGraphData = (date: DateTime, commits: any[], merges: any[]) => {
+const getCodeData = (date: DateTime, commits: any[], merges: any[]) => {
   let commitCount = 0;
   let mergeCount = 0;
   for (const result of commits) {
@@ -52,10 +52,35 @@ const createGraphData = (date: DateTime, commits: any[], merges: any[]) => {
   };
 };
 
+const getScoreData = (date: DateTime, scores: any[]) => {
+  let score = 0;
+  for (const result of scores) {
+    if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
+      score += result.total_score;
+    }
+  }
+  return {
+    date: date.toLocaleString(DateTime.DATE_SHORT),
+    score,
+  };
+};
+
+const getCommentData = (date: DateTime, wordCounts: any[]) => {
+  let wordCount = 0;
+  for (const result of wordCounts) {
+    if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
+      wordCount += result.count;
+    }
+  }
+  return {
+    date: date.toLocaleString(DateTime.DATE_SHORT),
+    wordCount,
+  };
+};
+
 const DynamicGraph: React.FC = () => {
   const classes = useStyles();
   const { startDate, endDate } = useFilterContext();
-  const [value, setValue] = React.useState(0);
   const { id } = useParams<{ id: string }>();
   const [emails, setEmails] = useState<string[]>([]);
   const { data: commits } = useCommitDailyCounts(
@@ -66,28 +91,42 @@ const DynamicGraph: React.FC = () => {
     0,
     9000,
   );
-  const [mergeResults] = useState([]); // Empty until backend implements call
+  // const { data: merges } = useMergeDailyCounts(
+  //   {
+  //     repository: id,
+  //   },
+  //   0,
+  //   9000,
+  // );
+  const [graphType, setGraphType] = useState(0);
   const [graphData, setGraphData] = useState([]);
 
   useEffect(() => {
-    if (mergeResults && startDate && endDate) {
+    if (startDate && endDate) {
       let date = DateTime.fromISO(startDate);
       const countsByDay = [];
-      do {
-        countsByDay.push(
-          createGraphData(date, commits?.results || [], mergeResults),
-        );
-        date = date.plus({ days: 1 });
-      } while (date <= DateTime.fromISO(endDate));
+      if (graphType == 0) {
+        do {
+          countsByDay.push(getCodeData(date, commits?.results || [], []));
+          date = date.plus({ days: 1 });
+        } while (date <= DateTime.fromISO(endDate));
+      } else if (graphType == 1) {
+        do {
+          countsByDay.push(getScoreData(date, commits?.results || []));
+          date = date.plus({ days: 1 });
+        } while (date <= DateTime.fromISO(endDate));
+      } else {
+        do {
+          countsByDay.push(getCommentData(date, []));
+          date = date.plus({ days: 1 });
+        } while (date <= DateTime.fromISO(endDate));
+      }
       setGraphData(countsByDay);
     }
-  }, [commits?.results, startDate, endDate]);
+  }, [graphType, commits?.results, /* merges?.results, */ startDate, endDate]);
 
-  const handleChange = (
-    event: React.ChangeEvent<unknown>,
-    newValue: number,
-  ) => {
-    setValue(newValue);
+  const handleTabs = (event: React.ChangeEvent<unknown>, newType: number) => {
+    setGraphType(newType);
   };
 
   return (
@@ -108,8 +147,8 @@ const DynamicGraph: React.FC = () => {
         >
           <Grid item>
             <Tabs
-              value={value}
-              onChange={handleChange}
+              value={graphType}
+              onChange={handleTabs}
               variant='fullWidth'
               indicatorColor='primary'
               textColor='primary'
@@ -129,24 +168,7 @@ const DynamicGraph: React.FC = () => {
           </Grid>
         </Grid>
         <Grid item>
-          <BarChart width={1000} height={500} data={graphData}>
-            <XAxis dataKey='date' />
-            <YAxis />
-            <Tooltip />
-            <Legend layout='vertical' align='right' verticalAlign='top' />
-            <Bar
-              dataKey='commitCount'
-              name='Commits'
-              stackId='a'
-              fill='#0A4D63'
-            />
-            <Bar
-              dataKey='mergeCount'
-              name='Merge Requests'
-              stackId='a'
-              fill='#e37500'
-            />
-          </BarChart>
+          <DynamicBarChart graphData={graphData} graphType={graphType} />
         </Grid>
       </Grid>
     </>

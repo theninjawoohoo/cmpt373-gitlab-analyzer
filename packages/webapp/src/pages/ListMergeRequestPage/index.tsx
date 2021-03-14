@@ -16,8 +16,29 @@ import Box from '@material-ui/core/Box';
 import MemberDropdown from '../../components/MemberDropdown';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
-import CalendarFilter from '../../components/CalendarFilter';
+import styled from 'styled-components';
 import { useFilterContext } from '../../contexts/FilterContext';
+import CalendarFilter from '../../components/CalendarFilter';
+
+const IndependentScrollGrid = styled(Grid)`
+  height: 100vh;
+  position: fixed;
+  margin-left: 5rem;
+  padding-right: 6rem;
+  & > * {
+    height: 100vh;
+    overflow: hidden;
+
+    & > * {
+      // hack to hide scrollbar: https://stackoverflow.com/questions/16670931/hide-scroll-bar-but-while-still-being-able-to-scroll
+      padding-right: 30px;
+      height: 100vh;
+      width: 100%;
+      overflow-y: scroll;
+      box-sizing: content-box;
+    }
+  }
+`;
 
 const ListMergeRequestPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -52,10 +73,11 @@ const ListMergeRequestPage = () => {
       (accumulated, current) => [...accumulated, ...current.results],
       [],
     ) || [];
+  const GridComponent = activeMergeRequest ? IndependentScrollGrid : Grid;
   return (
     <>
       <DefaultPageLayout>
-        <Grid container>
+        <GridComponent container spacing={activeMergeRequest ? 3 : 0}>
           <Grid item xs={activeMergeRequest ? 5 : 12}>
             <Container>
               <Box my={2}>
@@ -107,15 +129,15 @@ const ListMergeRequestPage = () => {
                   </MergeRequestRenderer>
                 );
               })}
+              {hasNextPage && (
+                <LoadMore
+                  onClick={() => {
+                    void fetchNextPage();
+                  }}
+                  ref={loadMoreRef}
+                />
+              )}
             </Container>
-            {hasNextPage && (
-              <LoadMore
-                onClick={() => {
-                  void fetchNextPage();
-                }}
-                ref={loadMoreRef}
-              />
-            )}
           </Grid>
           {activeMergeRequest && (
             <Grid item xs={7}>
@@ -125,7 +147,7 @@ const ListMergeRequestPage = () => {
               />
             </Grid>
           )}
-        </Grid>
+        </GridComponent>
       </DefaultPageLayout>
     </>
   );
