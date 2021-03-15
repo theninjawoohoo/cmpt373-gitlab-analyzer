@@ -1,5 +1,4 @@
 import { Operation } from '@ceres/types';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useEffect, useState } from 'react';
 import {
   useFetchRepositories,
@@ -30,8 +29,8 @@ function hasPendingSync(operations: Operation[], id: string) {
 }
 
 const Repository: React.FC = () => {
-  const { data: asc_repos } = useRepository({ order: 'ASC' });
-  const { data: desc_repos } = useRepository({ order: 'DESC' });
+  const { data: asc_repos } = useRepository({ sort: '+project_synced' });
+  const { data: desc_repos } = useRepository({ sort: '-project_synced' });
   let repos = desc_repos;
   const {
     data: operationsData,
@@ -52,7 +51,7 @@ const Repository: React.FC = () => {
   const openCircularProgress = false;
   const progress = 0;
   const isFetchingRepositories = pendingFetches?.total > 0;
-  const [descending, setDesc] = useState('ASC');
+  const [orderState, setOrder] = useState('DESC');
 
   const syncRepository = (id: string) => {
     sync(id, {
@@ -75,15 +74,21 @@ const Repository: React.FC = () => {
     ) : null;
 
   useEffect(() => {
-    if (descending === 'DESC') {
+    if (orderState === 'DESC') {
+      console.log('in!');
       repos = desc_repos;
     } else {
+      console.log('out');
       repos = asc_repos;
     }
-  }, [repos, descending]);
+    console.log(repos);
+  }, [repos, orderState]);
 
   const handleChange = (e) => {
-    setDesc(e.target.value as string);
+    console.log('now', orderState);
+    console.log('target', e.target.value);
+    setOrder(e.target.value as string);
+    console.log('this', repos);
   };
 
   return (
@@ -109,12 +114,12 @@ const Repository: React.FC = () => {
             <Select
               labelId='sort-order-label'
               id='sort-order-label-options'
-              value={descending}
+              value={orderState}
               onChange={handleChange}
               style={{ minWidth: '15rem' }}
             >
-              <MenuItem value='ASC'>A to Z</MenuItem>
-              <MenuItem value='DESC'>Z to A</MenuItem>
+              <MenuItem value='DESC'>Recently Synced</MenuItem>
+              <MenuItem value='ASC'>Oldest Synced</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -139,20 +144,22 @@ const Repository: React.FC = () => {
       </Grid>
       {message}
       {openCircularProgress && <ProgressCircle progress={progress} />}
-      {repos?.results.map((repo) => {
-        const isSyncing = hasPendingSync(
-          operationsData?.results || [],
-          repo.meta.id,
-        );
-        return (
-          <RepositoryCard
-            repository={repo}
-            isSyncing={isSyncing}
-            syncRepository={syncRepository}
-            key={repo.meta.id}
-          />
-        );
-      })}
+      <React.Fragment>
+        {repos?.results.map((repo) => {
+          const isSyncing = hasPendingSync(
+            operationsData?.results || [],
+            repo.meta.id,
+          );
+          return (
+            <RepositoryCard
+              repository={repo}
+              isSyncing={isSyncing}
+              syncRepository={syncRepository}
+              key={repo.meta.id}
+            />
+          );
+        })}
+      </React.Fragment>
     </Container>
   );
 };
