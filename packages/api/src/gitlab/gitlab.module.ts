@@ -6,7 +6,6 @@ import { GitlabToken } from './entities/gitlab-token.entity';
 import { GitlabTokenController } from './token/gitlab-token.controller';
 import { RepositoryModule } from './repository/repository.module';
 import { MergeRequestModule } from './merge-request/merge-request.module';
-import { ScoringConfigModule } from '../scoring-config/scoring-config.module';
 
 @Module({
   imports: [
@@ -14,10 +13,9 @@ import { ScoringConfigModule } from '../scoring-config/scoring-config.module';
     ApiModule,
     RepositoryModule,
     MergeRequestModule,
-    ScoringConfigModule,
   ],
   controllers: [GitlabTokenController],
   providers: [GitlabTokenService],
-  exports: [GitlabTokenService],
+  exports: [GitlabTokenService, RepositoryModule, MergeRequestModule],
 })
 export class GitlabModule {}

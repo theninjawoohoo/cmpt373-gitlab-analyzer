@@ -14,11 +14,33 @@ import MembersWarning from './components/MembersWarning';
 import Box from '@material-ui/core/Box';
 import ScoringConfigWarning from './components/ScoringConfigWarning';
 import ScoringConfigSelector from './components/ScoringConfigSelector';
+import { useUpdateScoring } from '../../api/scoring';
+import { ApiResource } from '../../api/base';
+import { ScoringConfig } from '@ceres/types';
 
 const RepositoryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { push } = useHistory();
-  const { data } = useGetRepository(id);
+  const {
+    mutate: updateScoring,
+    isLoading: updateScoreLoading,
+  } = useUpdateScoring();
+  const { data, invalidate } = useGetRepository(id);
+
+  const handleUpdateScore = (scoringConfig: ApiResource<ScoringConfig>) => {
+    updateScoring(
+      {
+        repositoryId: id,
+        scoringConfigId: scoringConfig?.meta?.id,
+      },
+      {
+        onSuccess: () => {
+          void invalidate();
+        },
+      },
+    );
+  };
+
   return (
     <DefaultPageLayout>
       <Container>
@@ -54,9 +76,15 @@ const RepositoryPage: React.FC = () => {
         <Box my={3}>
           <ScoringConfigWarning repository={data} />
         </Box>
-        <Box my={3}>
-          <ScoringConfigSelector />
-        </Box>
+        {data && (
+          <Box my={3}>
+            <ScoringConfigSelector
+              isLoading={updateScoreLoading}
+              onSubmit={handleUpdateScore}
+              repository={data}
+            />
+          </Box>
+        )}
         <LinkGrid repositoryId={id} />
       </Container>
     </DefaultPageLayout>

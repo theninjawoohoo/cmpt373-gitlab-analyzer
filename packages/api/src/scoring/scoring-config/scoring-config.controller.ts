@@ -3,11 +3,11 @@ import { Body } from '@nestjs/common';
 import { Put } from '@nestjs/common';
 import { Param } from '@nestjs/common';
 import { Controller, Get, Post } from '@nestjs/common';
-import { IdParam } from '../common/id-param';
-import { Auth } from '../auth/decorators/auth.decorator';
-import { VerifiedUser } from '../auth/types/VerifiedUser';
+import { IdParam } from '../../common/id-param';
+import { Auth } from '../../auth/decorators/auth.decorator';
+import { VerifiedUser } from '../../auth/types/VerifiedUser';
 import { ScoringConfigService } from './scoring-config.service';
-import { paginatedToResponse } from '../common/pagination';
+import { paginatedToResponse } from '../../common/pagination';
 
 @Controller('scoring_config')
 export class ScoringConfigController {

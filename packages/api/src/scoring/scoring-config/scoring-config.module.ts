@@ -8,5 +8,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [TypeOrmModule.forFeature([ScoringConfig])],
   providers: [ScoringConfigService],
   controllers: [ScoringConfigController],
+  exports: [ScoringConfigService],
 })
 export class ScoringConfigModule {}

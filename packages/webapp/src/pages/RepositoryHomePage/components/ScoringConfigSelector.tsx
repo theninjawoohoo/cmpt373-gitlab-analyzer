@@ -1,4 +1,4 @@
-import { ScoringConfig } from '@ceres/types';
+import { Repository, ScoringConfig } from '@ceres/types';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
@@ -10,20 +10,60 @@ import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ApiResource, SearchResults } from '../../../api/base';
 import { useSearchScoringConfigs } from '../../../api/scoringConfig';
+import SmartDate from '../../../components/SmartDate';
 
 interface ScoringConfigSelectorProps {
-  onChange?: (config: ScoringConfig) => void;
+  isLoading?: boolean;
+  onChange?: (config?: ApiResource<ScoringConfig>) => void;
+  onSubmit?: (config?: ApiResource<ScoringConfig>) => void;
+  repository?: Repository;
 }
 
-const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = () => {
+function findConfigById(id: string, configs: SearchResults<ScoringConfig>) {
+  return configs?.results?.find((config) => config.meta.id === id);
+}
+
+const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
+  isLoading,
+  onSubmit,
+  repository,
+}) => {
   const { data } = useSearchScoringConfigs(0, 1000);
-  const [selectedScoringConfig, setSelectedScoringConfig] = useState('None');
+  const [selectedScoringConfig, setSelectedScoringConfig] = useState(
+    repository?.extensions?.scoringConfig?.id || 'None',
+  );
+
+  const handleSubmit = () => {
+    onSubmit(findConfigById(selectedScoringConfig, data));
+  };
+
   return (
     <Paper>
       <Box p={2}>
         <Typography variant='h2'>Scoring Config</Typography>
         <Grid container spacing={3} alignItems='center' direction='column'>
+          {repository?.extensions?.scoringConfig?.lastRan ? (
+            <Grid item>
+              <Typography>
+                Last evaluated at{' '}
+                <strong>
+                  <SmartDate>
+                    {repository.extensions.scoringConfig.lastRan}
+                  </SmartDate>
+                </strong>{' '}
+                with config:{' '}
+                <strong>
+                  {repository.extensions.scoringConfig?.config?.name || 'None'}
+                </strong>
+              </Typography>
+            </Grid>
+          ) : (
+            <Grid item>
+              <Typography>This repository has never been evaluated.</Typography>
+            </Grid>
+          )}
           <Grid item>
             <FormControl variant='filled'>
               <InputLabel id='selected-scoring-config'>
@@ -50,7 +90,12 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = () => {
             </FormControl>
           </Grid>
           <Grid item>
-            <Button color='primary' variant='contained'>
+            <Button
+              color='primary'
+              variant='contained'
+              onClick={handleSubmit}
+              disabled={isLoading}
+            >
               Evaluate
             </Button>
           </Grid>

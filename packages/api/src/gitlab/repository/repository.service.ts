@@ -66,6 +66,16 @@ export class RepositoryService extends BaseService<
     return this.update(repository);
   }
 
+  updateScoringConfig(
+    repository: RepositoryEntity,
+    scoringConfig: Repository['extensions']['scoringConfig'],
+  ) {
+    repository.resource = Extensions.updateExtensions(repository.resource, {
+      scoringConfig,
+    });
+    return this.update(repository);
+  }
+
   async fetchFromGitlabForUser(user: User, token: string) {
     let repositories: Repository[] = [];
     let page = 1;

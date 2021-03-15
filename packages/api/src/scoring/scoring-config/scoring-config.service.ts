@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ScoringConfig as ScoringConfigEntity } from './scoring-config.entity';
 import { ScoringConfig } from '@ceres/types';
-import { BaseService } from '../common/base.service';
+import { BaseService } from '../../common/base.service';
 import { ScoringConfigDto } from './scoring-config.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
