@@ -279,28 +279,19 @@ export class MergeRequestService {
   }
 
   public async getSumScoreForMergeRequest(mergeRequest: MergeRequestEntity) {
-    let score = 0;
-    const commits = await this.repository
-      .createQueryBuilder('merge_request')
-      .addSelect('mrcc.commitId', 'commits_id')
-      .andWhere('merge_request.id = :mr_id', { mr_id: mergeRequest.id })
-      .innerJoin(
-        'merge_request_commits_commit',
-        'mrcc',
-        'merge_request.id = mrcc.mergeRequestId',
-      )
-      .getRawMany();
-
-    await Promise.all(
+    const [commits] = await this.commitService.search({
+      merge_request: mergeRequest.id,
+      pageSize: 50000,
+    });
+    const scores = await Promise.all(
       commits.map(async (commit) => {
-        const commitScore = this.diffService.calculateDiffScore({
-          commit: commit.commits_id,
+        return this.diffService.calculateDiffScore({
+          commit: commit.id,
         });
-        score += await commitScore;
       }),
     );
 
-    return score;
+    return scores.reduce((a, b) => a + b, 0);
   }
 
   async storeScore(mergeRequest: MergeRequestEntity) {
