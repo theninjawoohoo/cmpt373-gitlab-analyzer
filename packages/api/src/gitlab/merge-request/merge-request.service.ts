@@ -1,4 +1,4 @@
-import { Commit, Extensions, MergeRequest } from '@ceres/types';
+import { Commit, Extensions, GlobWeight, MergeRequest } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
@@ -278,27 +278,39 @@ export class MergeRequestService {
       .toPromise();
   }
 
-  public async getSumScoreForMergeRequest(mergeRequest: MergeRequestEntity) {
+  public async getSumScoreForMergeRequest(
+    mergeRequest: MergeRequestEntity,
+    weights?: GlobWeight[],
+  ) {
     const [commits] = await this.commitService.search({
       merge_request: mergeRequest.id,
       pageSize: 50000,
     });
     const scores = await Promise.all(
       commits.map(async (commit) => {
-        return this.diffService.calculateDiffScore({
-          commit: commit.id,
-        });
+        return this.diffService.calculateDiffScore(
+          {
+            commit: commit.id,
+          },
+          weights,
+        );
       }),
     );
 
     return scores.reduce((a, b) => a + b, 0);
   }
 
-  async storeScore(mergeRequest: MergeRequestEntity) {
-    const score = await this.diffService.calculateDiffScore({
-      merge_request: mergeRequest.id,
-    });
-    const sumScore = await this.getSumScoreForMergeRequest(mergeRequest);
+  async storeScore(mergeRequest: MergeRequestEntity, weights?: GlobWeight[]) {
+    const score = await this.diffService.calculateDiffScore(
+      {
+        merge_request: mergeRequest.id,
+      },
+      weights,
+    );
+    const sumScore = await this.getSumScoreForMergeRequest(
+      mergeRequest,
+      weights,
+    );
     mergeRequest.resource = Extensions.updateExtensions(mergeRequest.resource, {
       diffScore: score,
       commitScoreSum: sumScore,
@@ -308,14 +320,17 @@ export class MergeRequestService {
     await this.repository.save(mergeRequest);
   }
 
-  async updateMergeRequestScoreByRepository(repositoryId: string) {
+  async updateMergeRequestScoreByRepository(
+    repositoryId: string,
+    weights?: GlobWeight[],
+  ) {
     const [mergeRequests] = await this.search({
       repository: repositoryId,
       pageSize: 500000,
     });
     await Promise.all(
       mergeRequests.map(async (mergeRequest) => {
-        await this.storeScore(mergeRequest);
+        await this.storeScore(mergeRequest, weights);
       }),
     );
   }

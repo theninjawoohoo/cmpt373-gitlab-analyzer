@@ -1,4 +1,4 @@
-import { Commit, Extensions } from '@ceres/types';
+import { Commit, Extensions, GlobWeight } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
@@ -234,16 +234,22 @@ export class CommitService {
     };
   }
 
-  async storeScore(commit: CommitEntity) {
-    const score = await this.diffService.calculateDiffScore({
-      commit: commit.id,
-    });
+  async storeScore(commit: CommitEntity, weights?: GlobWeight[]) {
+    const score = await this.diffService.calculateDiffScore(
+      {
+        commit: commit.id,
+      },
+      weights,
+    );
     commit.resource = Extensions.updateExtensions(commit.resource, { score });
     commit.score = score;
     await this.commitRepository.save(commit);
   }
 
-  async updateCommitScoreByRepository(repositoryId: string) {
+  async updateCommitScoreByRepository(
+    repositoryId: string,
+    weights?: GlobWeight[],
+  ) {
     const [commits] = await this.search({
       repository: repositoryId,
       pageSize: 500000,
@@ -251,7 +257,7 @@ export class CommitService {
 
     await Promise.all(
       commits.map(async (commit) => {
-        await this.storeScore(commit);
+        await this.storeScore(commit, weights);
       }),
     );
   }
