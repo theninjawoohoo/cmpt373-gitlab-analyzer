@@ -4,6 +4,8 @@ import Diff from '../../pages/Diff';
 import RepositoryPage from '../../pages/Repository';
 import Login from '../../pages/Login';
 import OperationsPage from '../../pages/Operations';
+import BrowseScoringConfigsPage from '../../pages/ScoringConfig/Browse';
+import EditScoringConfigPage from '../../pages/ScoringConfig/Edit';
 import SfuVerify from '../../pages/SfuVerify';
 import Graph from '../../pages/Graph';
 import ListMergeRequestPage from '../../pages/ListMergeRequestPage';
@@ -11,6 +13,7 @@ import SettingsPage from '../../pages/Settings';
 import { useAuthContext } from '../../contexts/AuthContext';
 import CommitsPage from '../../pages/Commits';
 import Members from '../../pages/Members';
+import RepositoryHomePage from '../../pages/RepositoryHomePage';
 
 export function Router() {
   const { user } = useAuthContext();
@@ -29,6 +32,9 @@ export function Router() {
         <Route path='/repository' exact>
           <RepositoryPage />
         </Route>
+        <Route path='/repository/:id' exact>
+          <RepositoryHomePage />
+        </Route>
         <Route path='/graph/:id' exact>
           <Graph />
         </Route>
@@ -46,6 +52,12 @@ export function Router() {
         </Route>
         <Route path='/diff' exact>
           <Diff />
+        </Route>
+        <Route path='/scoring' exact>
+          <BrowseScoringConfigsPage />
+        </Route>
+        <Route path='/scoring/edit' exact>
+          <EditScoringConfigPage />
         </Route>
         <Route path='/logout' exact>
           <Login />

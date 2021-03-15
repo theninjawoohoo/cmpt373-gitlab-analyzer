@@ -1,4 +1,5 @@
 import { Profile } from '@ceres/types';
+import { ScoringConfig } from '../../scoring/scoring-config/scoring-config.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Repository } from '../../gitlab/repository/repository.entity';
 import { Operation } from '../../operation/operation.entity';
@@ -27,4 +28,7 @@ export class User {
 
   @OneToMany(() => Operation, (operation) => operation.user)
   operations: Operation[];
+
+  @OneToMany(() => ScoringConfig, (scoringConfig) => scoringConfig.user)
+  scoringConfigs: ScoringConfig[];
 }

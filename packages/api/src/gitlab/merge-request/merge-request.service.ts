@@ -1,18 +1,17 @@
-import { Commit, MergeRequest } from '@ceres/types';
+import { Commit, Extensions, GlobWeight, MergeRequest } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
+import alwaysArray from 'src/common/alwaysArray';
 import { Repository as TypeORMRepository } from 'typeorm';
-import { BaseSearch, paginate, withDefaults } from '../../common/query-dto';
+import { paginate, withDefaults } from '../../common/query-dto';
 import { CommitService } from '../repository/commit/commit.service';
 import { DiffService } from '../repository/diff/diff.service';
 import { Repository } from '../repository/repository.entity';
 import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
+import { MergeRequestQueryDto } from './merge-request-query.dto';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
-
-interface MergeRequestSearch extends BaseSearch {
-  repository: string;
-}
+import { NoteService } from '../repository/note/note.service';
 
 @Injectable()
 export class MergeRequestService {
@@ -23,17 +22,63 @@ export class MergeRequestService {
     private readonly diffService: DiffService,
     private readonly commitService: CommitService,
     private readonly participantService: MergeRequestParticipantService,
+    private readonly noteService: NoteService,
   ) {}
 
-  async search(filters: MergeRequestSearch) {
+  async search(filters: MergeRequestQueryDto) {
     filters = withDefaults(filters);
     const { repository } = filters;
     const query = this.repository
       .createQueryBuilder('merge_request')
       .where('merge_request.repository_id = :repository', { repository })
       .orderBy("merge_request.resource #>> '{merged_at}'", 'DESC');
+
+    if (filters.author_email) {
+      query.andWhere(
+        `
+          merge_request.id IN  (
+            SELECT "mrc"."mergeRequestId"
+            FROM merge_request_commits_commit mrc
+            INNER JOIN (
+              SELECT * FROM commit
+              WHERE commit.resource #>> '{author_email}' IN (:...authorEmail)
+            ) c ON c.id = "mrc"."commitId"
+          )
+        `,
+        { authorEmail: alwaysArray(filters.author_email) },
+      );
+    }
+
+    if (filters.merged_start_date) {
+      query.andWhere(
+        "DATE(merge_request.resource #>> '{merged_at}') >= DATE(:startDate)",
+        {
+          startDate: filters.merged_start_date,
+        },
+      );
+    }
+
+    if (filters.merged_end_date) {
+      query.andWhere(
+        "DATE(merge_request.resource #>> '{merged_at}') <= DATE(:endDate)",
+        {
+          endDate: filters.merged_end_date,
+        },
+      );
+    }
+
     paginate(query, filters);
     return query.getManyAndCount();
+  }
+
+  async updateLastSync(
+    mergeRequest: MergeRequestEntity,
+    timestamp = new Date(),
+  ) {
+    mergeRequest.resource = Extensions.updateExtensions(mergeRequest.resource, {
+      lastSync: timestamp.toISOString(),
+    });
+    return this.repository.save(mergeRequest);
   }
 
   async fetchAllParticipantsForRepository(
@@ -132,6 +177,11 @@ export class MergeRequestService {
           this.diffService.syncForMergeRequest(mergeRequest, token),
         ),
     );
+    await Promise.all(
+      created.map((mergeRequest) =>
+        this.noteService.syncForMergeRequest(mergeRequest, token),
+      ),
+    );
   }
 
   private async createIfNotExists(
@@ -226,5 +276,62 @@ export class MergeRequestService {
         },
       })
       .toPromise();
+  }
+
+  public async getSumScoreForMergeRequest(
+    mergeRequest: MergeRequestEntity,
+    weights?: GlobWeight[],
+  ) {
+    const [commits] = await this.commitService.search({
+      merge_request: mergeRequest.id,
+      pageSize: 50000,
+    });
+    const scores = await Promise.all(
+      commits.map(async (commit) => {
+        return this.diffService.calculateDiffScore(
+          {
+            commit: commit.id,
+          },
+          weights,
+        );
+      }),
+    );
+
+    return scores.reduce((a, b) => a + b, 0);
+  }
+
+  async storeScore(mergeRequest: MergeRequestEntity, weights?: GlobWeight[]) {
+    const score = await this.diffService.calculateDiffScore(
+      {
+        merge_request: mergeRequest.id,
+      },
+      weights,
+    );
+    const sumScore = await this.getSumScoreForMergeRequest(
+      mergeRequest,
+      weights,
+    );
+    mergeRequest.resource = Extensions.updateExtensions(mergeRequest.resource, {
+      diffScore: score,
+      commitScoreSum: sumScore,
+    });
+    mergeRequest.diffScore = score;
+    mergeRequest.commitScoreSum = sumScore;
+    await this.repository.save(mergeRequest);
+  }
+
+  async updateMergeRequestScoreByRepository(
+    repositoryId: string,
+    weights?: GlobWeight[],
+  ) {
+    const [mergeRequests] = await this.search({
+      repository: repositoryId,
+      pageSize: 500000,
+    });
+    await Promise.all(
+      mergeRequests.map(async (mergeRequest) => {
+        await this.storeScore(mergeRequest, weights);
+      }),
+    );
   }
 }

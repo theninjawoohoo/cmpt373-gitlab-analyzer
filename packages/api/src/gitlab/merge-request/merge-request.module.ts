@@ -7,15 +7,18 @@ import { MergeRequestController } from './merge-request.controller';
 import { RepositoryModule } from '../repository/repository.module';
 import { MergeRequestParticipant } from './merge-request-participant/merge-request-participant.entity';
 import { MergeRequestParticipantService } from './merge-request-participant/merge-request-participant.service';
+import { Note } from '../repository/note/note.entity';
+import { NoteService } from '../repository/note/note.service';
+import { NoteController } from '../repository/note/note.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([MergeRequest, MergeRequestParticipant]),
+    TypeOrmModule.forFeature([MergeRequest, MergeRequestParticipant, Note]),
     ApiModule,
     RepositoryModule,
   ],
-  providers: [MergeRequestService, MergeRequestParticipantService],
-  controllers: [MergeRequestController],
-  exports: [MergeRequestService],
+  providers: [MergeRequestService, MergeRequestParticipantService, NoteService],
+  controllers: [MergeRequestController, NoteController],
+  exports: [MergeRequestService, NoteService],
 })
 export class MergeRequestModule {}

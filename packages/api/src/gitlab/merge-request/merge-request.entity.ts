@@ -1,5 +1,6 @@
 import { MergeRequest as MergeRequestResource } from '@ceres/types';
 import {
+  Column,
   Entity,
   JoinColumn,
   JoinTable,
@@ -12,6 +13,7 @@ import { Commit } from '../repository/commit/commit.entity';
 import { Diff } from '../repository/diff/diff.entity';
 import { Repository } from '../repository/repository.entity';
 import { MergeRequestParticipant } from './merge-request-participant/merge-request-participant.entity';
+import { Note } from '../repository/note/note.entity';
 
 @Entity('merge_request')
 export class MergeRequest extends BaseEntity<MergeRequestResource> {
@@ -31,4 +33,13 @@ export class MergeRequest extends BaseEntity<MergeRequestResource> {
     (mergeRequestParticipant) => mergeRequestParticipant.mergeRequest,
   )
   participants: MergeRequestParticipant[];
+
+  @OneToMany(() => Note, (note) => note.mergeRequest)
+  notes: Note[];
+
+  @Column({ name: 'diff_score', nullable: true, type: 'float' })
+  diffScore: number;
+
+  @Column({ name: 'commit_score_sum', nullable: true, type: 'float' })
+  commitScoreSum: number;
 }

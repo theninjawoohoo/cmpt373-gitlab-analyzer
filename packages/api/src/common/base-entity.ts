@@ -12,9 +12,9 @@ export class BaseEntity<T> {
   @Column('jsonb')
   resource: T;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
+  @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
   createdAt: string;
 
-  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
+  @UpdateDateColumn({ type: 'timestamp with time zone', name: 'updated_at' })
   updatedAt: string;
 }

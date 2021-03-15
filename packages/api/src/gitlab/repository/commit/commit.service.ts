@@ -1,4 +1,4 @@
-import { Commit } from '@ceres/types';
+import { Commit, Extensions, GlobWeight } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
@@ -22,6 +22,9 @@ export class CommitService {
   async search(filters: CommitQueryDto) {
     const query = this.commitRepository.createQueryBuilder('commit');
     filters = withDefaults(filters);
+
+    // Only merge commits have more than one parent
+    query.andWhere("jsonb_array_length(commit.resource #> '{parent_ids}') < 2");
 
     if (filters.repository) {
       query.andWhere('commit.repository_id = :repository', {
@@ -68,6 +71,13 @@ export class CommitService {
     return query.getManyAndCount();
   }
 
+  async updateLastSync(commit: CommitEntity, timestamp = new Date()) {
+    commit.resource = Extensions.updateExtensions(commit.resource, {
+      lastSync: timestamp.toISOString(),
+    });
+    return this.commitRepository.save(commit);
+  }
+
   async findAllForRepository(repository: Repository) {
     return this.commitRepository.find({
       where: { repository: repository },
@@ -81,6 +91,10 @@ export class CommitService {
       .addSelect("DATE(commit.resource #>>'{created_at}')", 'date')
       .addSelect("commit.resource #>>'{author_name}'", 'author_name')
       .addSelect('count(*)', 'count')
+      .addSelect(
+        "sum((commit.resource #>> '{extensions,score}')::float)",
+        'total_score',
+      )
       .where('commit.repository_id = :repositoryId', {
         repositoryId: repository.id,
       })
@@ -102,6 +116,20 @@ export class CommitService {
       })
       .getRawMany();
     return rows as Commit.Author[];
+  }
+
+  async getByAuthors(repository: Repository, author: [string]) {
+    const rows = await this.commitRepository
+      .createQueryBuilder('commit')
+      .select('commit.id', 'commit_id')
+      .where('commit.repository_id = :repositoryId', {
+        repositoryId: repository.id,
+      })
+      .andWhere('commit.resource.author_email = :author_email', {
+        author_email: author,
+      })
+      .getRawMany();
+    return rows as Commit[];
   }
 
   async fetchForRepository(repository: Repository, token: string) {
@@ -204,5 +232,33 @@ export class CommitService {
         entities.filter(({ created }) => created).map(({ commit }) => commit),
       ),
     };
+  }
+
+  async storeScore(commit: CommitEntity, weights?: GlobWeight[]) {
+    const score = await this.diffService.calculateDiffScore(
+      {
+        commit: commit.id,
+      },
+      weights,
+    );
+    commit.resource = Extensions.updateExtensions(commit.resource, { score });
+    commit.score = score;
+    await this.commitRepository.save(commit);
+  }
+
+  async updateCommitScoreByRepository(
+    repositoryId: string,
+    weights?: GlobWeight[],
+  ) {
+    const [commits] = await this.search({
+      repository: repositoryId,
+      pageSize: 500000,
+    });
+
+    await Promise.all(
+      commits.map(async (commit) => {
+        await this.storeScore(commit, weights);
+      }),
+    );
   }
 }

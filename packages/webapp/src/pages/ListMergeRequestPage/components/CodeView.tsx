@@ -1,9 +1,9 @@
 import { Commit, Diff, MergeRequest } from '@ceres/types';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button/Button';
+import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { ApiResource } from '../../../api/base';
 import { useGetDiffs } from '../../../api/diff';
 import DiffView from '../../../components/DiffView';
@@ -13,13 +13,6 @@ interface CodeViewProps {
   commit?: ApiResource<Commit>;
 }
 
-const Root = styled.div`
-  position: relative;
-  min-height: 99vh;
-  max-height: 99vh;
-  overflow: scroll;
-`;
-
 const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
   const { data: diffs } = useGetDiffs(
     commit
@@ -28,7 +21,7 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
   );
   const [expandedDiffs, setExpandedDiffs] = useState<ApiResource<Diff>[]>([]);
   return (
-    <Root>
+    <Container>
       <Box my={2}>
         <Typography variant='h2'>
           {commit?.title || mergeRequest?.title}
@@ -40,15 +33,16 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
         </Button>
         <Button onClick={() => setExpandedDiffs([])}>Collapse All</Button>
       </Box>
-      <Box overflow='scroll'>
+      <Box>
         {diffs?.results.map((diff) => {
           const expanded = expandedDiffs.includes(diff);
           return (
             <DiffView
               key={diff.meta.id}
               fileName={diff.new_path}
-              hunks={diff.hunks}
+              lines={diff.lines}
               expanded={expanded}
+              extensions={diff.extensions}
               onSummaryClick={() => {
                 if (expanded) {
                   setExpandedDiffs(
@@ -62,7 +56,7 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
           );
         })}
       </Box>
-    </Root>
+    </Container>
   );
 };
 

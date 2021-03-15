@@ -4,9 +4,10 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import React, { useEffect, useState } from 'react';
-import { useRepositoryAuthors } from '../../../api/author';
-import { ApiResource } from '../../../api/base';
-import { useRepositoryMembers } from '../../../api/repo_members';
+import { useRepositoryAuthors } from '../../api/author';
+import { ApiResource } from '../../api/base';
+import { useRepositoryMembers } from '../../api/repo_members';
+import { useFilterContext } from '../../contexts/FilterContext';
 
 function findEmailsForMember(
   memberId: string,
@@ -27,21 +28,31 @@ const MemberDropdown: React.FC<MemberDropdownProps> = ({
   repositoryId,
   onChange,
 }) => {
-  const [value, setValue] = useState('all');
+  const { author, setAuthorContext } = useFilterContext();
+  const [value, setValue] = useState(author);
+
   const { data: members } = useRepositoryMembers(repositoryId);
   const { data: authors } = useRepositoryAuthors(repositoryId);
+
+  const handleChangeAuthor = (author) => {
+    setAuthorContext(author);
+  };
+
   useEffect(() => {
+    console.log(value);
     if (value !== 'all') {
       const emails = findEmailsForMember(value, authors);
-      onChange(emails.length > 0 ? emails : ['doesnotexist@email.com']);
+      handleChangeAuthor(value);
+      onChange(emails.length > 0 ? emails : ['']);
     } else {
+      handleChangeAuthor(value);
       onChange([]);
     }
   }, [value]);
 
   return (
     <FormControl variant='filled'>
-      <InputLabel>Member</InputLabel>
+      <InputLabel>Show results for:</InputLabel>
       <Select
         style={{ minWidth: '15rem' }}
         value={value || 'None'}
@@ -50,7 +61,7 @@ const MemberDropdown: React.FC<MemberDropdownProps> = ({
           setValue(e.target.value as string);
         }}
       >
-        <MenuItem value='all'>All</MenuItem>
+        <MenuItem value='all'>All students</MenuItem>
         {(members || [])?.map((m) => (
           <MenuItem key={m.meta.id} value={m.meta.id}>
             {m.name}

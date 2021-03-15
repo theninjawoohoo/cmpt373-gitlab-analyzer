@@ -12,6 +12,9 @@ export class QueryDto implements BaseSearch {
   @IsNumber()
   @Min(0)
   page?: number;
+
+  @IsOptional()
+  sort?: string;
 }
 
 export interface BaseSearch {

@@ -29,7 +29,7 @@ const Diff: React.FC = () => {
           <DiffView
             key={diff.meta.id}
             fileName={diff.new_path}
-            hunks={diff.hunks}
+            lines={diff.lines}
           />
         ))}
       </Container>

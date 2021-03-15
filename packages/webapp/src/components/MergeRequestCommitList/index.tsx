@@ -20,10 +20,10 @@ import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
-import StudentDropdownMenu from '../Common/StudentDropdownMenu';
+import MemberDropdown from '../MemberDropdown';
+import CalendarFilter from '../CalendarFilter';
 import { useParams } from 'react-router-dom';
 import { useCommitsForMergeRequest } from '../../api/commit';
-import { useRepositoryMembers } from '../../api/repo_members';
 
 const useBigTableStyles = makeStyles({
   table: {
@@ -141,22 +141,15 @@ const MergeRequestCommitList: React.FC = () => {
   const classes = useBigTableStyles();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [studentName, setStudentName] = React.useState('All students');
-
+  const [emails, setEmails] = React.useState<string[]>([]);
   const { id } = useParams<{ id: string }>();
   const { data: searchInterface } = useCommitsForMergeRequest(id);
   const rows = searchInterface?.results || [];
-  const { data: repoMembers } = useRepositoryMembers(id);
-
   const [results, setResults] = React.useState(rows);
 
   useEffect(() => {
-    if (studentName != 'All students') {
-      setResults(rows.filter((row) => row.author_name == studentName));
-    } else {
-      setResults(rows);
-    }
-  }, [repoMembers, studentName, rows]);
+    setResults(rows.filter((row) => emails.includes(row.author_email)));
+  }, [emails]);
 
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, results?.length - page * rowsPerPage);
@@ -181,11 +174,15 @@ const MergeRequestCommitList: React.FC = () => {
 
   return (
     <>
+      <div style={{ float: 'left' }}>
+        <CalendarFilter />
+      </div>
       <div style={{ float: 'right' }}>
-        <StudentDropdownMenu
-          repoMembers={repoMembers}
-          studentName={studentName}
-          setStudentName={setStudentName}
+        <MemberDropdown
+          repositoryId={id}
+          onChange={(newEmails) => {
+            setEmails(newEmails);
+          }}
         />
       </div>
       <TableContainer component={Paper}>

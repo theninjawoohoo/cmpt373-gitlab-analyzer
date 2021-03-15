@@ -1,47 +1,86 @@
-import { Repository } from '@ceres/types';
-import { BaseSearch, paginate, withDefaults } from '../../common/query-dto';
+import { Extensions, Repository } from '@ceres/types';
+import { WithUser } from '../../common/query-dto';
 import { RepositoryMemberService } from './repository-member/repository-member.service';
 import { Repository as RepositoryEntity } from './repository.entity';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository as TypeORMRepository } from 'typeorm';
+import { Repository as TypeORMRepository, SelectQueryBuilder } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
-
-interface RepositorySearch extends BaseSearch {
-  userId: string;
-}
+import { RepositoryQueryDto } from './repository-query.dto';
+import { BaseService } from 'src/common/base.service';
 
 @Injectable()
-export class RepositoryService {
+export class RepositoryService extends BaseService<
+  Repository,
+  RepositoryEntity,
+  WithUser<RepositoryQueryDto>
+> {
   constructor(
     private readonly httpService: HttpService,
-    @InjectRepository(RepositoryEntity)
-    private readonly repository: TypeORMRepository<RepositoryEntity>,
     private readonly repositoryMemberService: RepositoryMemberService,
-  ) {}
-
-  async search(filters: RepositorySearch) {
-    filters = withDefaults(filters);
-    const { userId } = filters;
-    const query = this.repository
-      .createQueryBuilder('repository')
-      .where('repository.user_id = :userId', { userId })
-      .orderBy("repository.resource #>> '{created_at}'", 'DESC');
-    paginate(query, filters);
-    return query.getManyAndCount();
+    @InjectRepository(RepositoryEntity)
+    repository: TypeORMRepository<RepositoryEntity>,
+  ) {
+    super(repository, 'repository');
   }
 
-  async findOne(id: string) {
-    return this.repository.findOne({
-      where: { id },
+  buildFilters(
+    query: SelectQueryBuilder<RepositoryEntity>,
+    filters: WithUser<RepositoryQueryDto>,
+  ): SelectQueryBuilder<RepositoryEntity> {
+    query.andWhere('repository.user_id = :userId', { userId: filters.user.id });
+
+    if (filters.name) {
+      query.andWhere(
+        "(repository.resource #>> '{name_with_namespace}') ~* ('.*' || :name || '.*')",
+        {
+          name: filters.name,
+        },
+      );
+    }
+
+    return query;
+  }
+  buildSort(
+    query: SelectQueryBuilder<RepositoryEntity>,
+    sortKey = 'project_created',
+    order: 'ASC' | 'DESC' = 'DESC',
+  ): SelectQueryBuilder<RepositoryEntity> {
+    switch (sortKey) {
+      case 'project_synced':
+        return query.orderBy(
+          "(repository.resource #>> '{extensions,lastSync}')::timestamptz",
+          order,
+          'NULLS LAST',
+        );
+      case 'project_created':
+        return query.orderBy("repository.resource #>> '{created_at}'", order);
+    }
+    return query;
+  }
+
+  async updateLastSync(repository: RepositoryEntity, timestamp = new Date()) {
+    repository.resource = Extensions.updateExtensions(repository.resource, {
+      lastSync: timestamp.toISOString(),
     });
+    return this.update(repository);
   }
 
-  async fetchForUser(user: User, token: string) {
+  updateScoringConfig(
+    repository: RepositoryEntity,
+    scoringConfig: Repository['extensions']['scoringConfig'],
+  ) {
+    repository.resource = Extensions.updateExtensions(repository.resource, {
+      scoringConfig,
+    });
+    return this.update(repository);
+  }
+
+  async fetchFromGitlabForUser(user: User, token: string) {
     let repositories: Repository[] = [];
     let page = 1;
     do {
-      repositories = await this.fetchByPage(token, page);
+      repositories = await this.fetchFromGitlabByPage(token, page);
       const entities = await this.createOrUpdate(user, repositories);
       await Promise.all(
         entities.map((entity) =>
@@ -55,7 +94,7 @@ export class RepositoryService {
   private async createOrUpdate(user: User, repositories: Repository[]) {
     const entities = await Promise.all(
       repositories.map(async (repo) => {
-        let found = await this.repository
+        let found = await this.serviceRepository
           .createQueryBuilder()
           .where('resource @> :resource', {
             resource: {
@@ -65,20 +104,20 @@ export class RepositoryService {
           .andWhere('user_id = :userId', { userId: user.id })
           .getOne();
         if (!found) {
-          found = await this.repository.create({
+          found = this.serviceRepository.create({
             user,
             resource: repo,
           });
         } else {
-          found.resource = repo;
+          found.resource = Extensions.updateResource(found.resource, repo);
         }
         return found;
       }),
     );
-    return this.repository.save(entities);
+    return this.serviceRepository.save(entities);
   }
 
-  private async fetchByPage(
+  private async fetchFromGitlabByPage(
     token: string,
     page: number,
   ): Promise<Repository[]> {

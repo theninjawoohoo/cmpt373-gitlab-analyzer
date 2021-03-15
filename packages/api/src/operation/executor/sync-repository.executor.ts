@@ -10,39 +10,44 @@ import { Repository } from '../../gitlab/repository/repository.entity';
 import { RepositoryService } from '../../gitlab/repository/repository.service';
 import { GitlabTokenService } from '../../gitlab/services/gitlab-token.service';
 import { Operation as OperationEntity } from '../operation.entity';
+import { BaseExecutor } from './base.executor';
+import { IssueService } from '../../gitlab/repository/issue/issue.service';
 
 enum Stage {
   syncCommits = 'syncCommits',
   syncMergeRequests = 'syncMergeRequests',
+  syncIssues = 'syncIssues',
   linkCommitsAndMergeRequests = 'linkCommitsAndMergeRequests',
+  linkNotesAndMergeRequests = 'linkNotesAndMergeRequests',
   createDailyCommitCaches = 'createDailyCommitCaches',
   linkAuthors = 'linkAuthors',
 }
 
-export class SyncRepositoryExecutor {
+export class SyncRepositoryExecutor extends BaseExecutor<Stage> {
   constructor(
-    private operation: OperationEntity,
-    private readonly operationRepository: TypeORMRepository<OperationEntity>,
+    operation: OperationEntity,
+    operationRepository: TypeORMRepository<OperationEntity>,
     private readonly tokenService: GitlabTokenService,
     private readonly commitService: CommitService,
     private readonly mergeRequestService: MergeRequestService,
+    private readonly issueService: IssueService,
     private readonly repositoryService: RepositoryService,
     private readonly commitDailyCountService: CommitDailyCountService,
     private readonly commitAuthorService: CommitAuthorService,
     private readonly repositoryMemberService: RepositoryMemberService,
-  ) {}
-
-  private stages = {
-    [Stage.syncCommits]: this.createStage('Sync Commits'),
-    [Stage.syncMergeRequests]: this.createStage('Sync Merge Requests'),
-    [Stage.linkCommitsAndMergeRequests]: this.createStage(
+  ) {
+    super(operation, operationRepository);
+    this.addStage(Stage.syncCommits, 'Sync Commits');
+    this.addStage(Stage.syncMergeRequests, 'Sync Merge Requests');
+    this.addStage(Stage.syncIssues, 'Sync Issues');
+    this.addStage(
+      Stage.linkCommitsAndMergeRequests,
       'Link Commits and Merge Requests',
-    ),
-    [Stage.createDailyCommitCaches]: this.createStage(
-      'Create Daily Commit Caches',
-    ),
-    [Stage.linkAuthors]: this.createStage('Link Authors'),
-  };
+    );
+    this.addStage(Stage.createDailyCommitCaches, 'Create Daily Commit Caches');
+    this.addStage(Stage.linkAuthors, 'Link Authors');
+  }
+
   private repository: Repository;
   private token: string;
   private members: RepositoryMember[] = [];
@@ -52,6 +57,7 @@ export class SyncRepositoryExecutor {
     await Promise.all([
       this.syncResource(Stage.syncCommits, this.commitService),
       this.syncResource(Stage.syncMergeRequests, this.mergeRequestService),
+      this.syncResource(Stage.syncIssues, this.issueService),
     ]);
     await Promise.all([
       this.linkCommitsAndMergeRequests(),
@@ -74,26 +80,35 @@ export class SyncRepositoryExecutor {
     this.members = await this.repositoryMemberService.findAllForRepository(
       repository,
     );
+    await this.updateLastSync();
+  }
+
+  private async updateLastSync() {
+    this.repository = await this.repositoryService.updateLastSync(
+      this.repository,
+    );
   }
 
   private async syncResource(
     name: Stage,
-    service: CommitService | MergeRequestService,
+    service: CommitService | MergeRequestService | IssueService,
   ): Promise<void> {
     await this.startStage(name);
     let resources = [];
     let page = 1;
     do {
       try {
-              resources = await service.fetchByPage(this.token, this.repository, page);
-      await service.syncForRepositoryPage(
-        this.token,
-        this.repository,
-        resources,
-      );
-      } catch {
-
-      }
+        resources = await service.fetchByPage(
+          this.token,
+          this.repository,
+          page,
+        );
+        await service.syncForRepositoryPage(
+          this.token,
+          this.repository,
+          resources,
+        );
+      } catch {}
       page++;
     } while (resources.length > 0);
     await this.completeStage(name);
@@ -102,13 +117,18 @@ export class SyncRepositoryExecutor {
   private async linkCommitsAndMergeRequests() {
     await this.startStage(Stage.linkCommitsAndMergeRequests);
     try {
-          await this.mergeRequestService.linkCommitsForRepository(
-      this.token,
-      this.repository,
-    );
-    } catch {
-      
-    }
+      await this.mergeRequestService.linkCommitsForRepository(
+        this.token,
+        this.repository,
+      );
+
+      await this.commitService.updateCommitScoreByRepository(
+        this.repository.id,
+      );
+      await this.mergeRequestService.updateMergeRequestScoreByRepository(
+        this.repository.id,
+      );
+    } catch {}
 
     await this.completeStage(Stage.linkCommitsAndMergeRequests);
   }
@@ -157,34 +177,5 @@ export class SyncRepositoryExecutor {
       }),
     );
     await this.completeStage(Stage.linkAuthors);
-  }
-
-  private createStage(name: string) {
-    return {
-      name,
-      status: Operation.Status.PENDING,
-      percentage: 0,
-    } as Operation.Stage;
-  }
-
-  private async startStage(name: Stage) {
-    await this.updateStage(name, {
-      status: Operation.Status.PROCESSING,
-      start_time: new Date().toISOString(),
-    });
-  }
-
-  private async completeStage(name: Stage) {
-    await this.updateStage(name, {
-      status: Operation.Status.COMPLETED,
-      end_time: new Date().toISOString(),
-      percentage: 100,
-    });
-  }
-
-  private async updateStage(name: Stage, properties: Partial<Operation.Stage>) {
-    this.stages[name] = { ...this.stages[name], ...properties };
-    this.operation.resource.stages = Object.values(this.stages);
-    this.operation = await this.operationRepository.save(this.operation);
   }
 }

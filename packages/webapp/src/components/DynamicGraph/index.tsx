@@ -1,169 +1,152 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import StudentDropdownMenu from '../Common/StudentDropdownMenu';
 import { useParams } from 'react-router-dom';
-import { useRepositoryMembers } from '../../api/repo_members';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { useCommitDailyCounts } from '../../api/commit';
 import { DateTime } from 'luxon';
-// import { SearchResults } from '../../api/base';
-// import { Commit } from '@ceres/types';
+import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
+import MemberDropdown from '../MemberDropdown';
+import { useFilterContext } from '../../contexts/FilterContext';
+import CalendarFilter from '../CalendarFilter';
+import DynamicBarChart from './BarChartComponent';
+import Container from '@material-ui/core/Container';
+import Box from '@material-ui/core/Box';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      padding: '2rem',
-      display: 'flex',
-      height: '100vh',
-      width: '100vw',
-      alignContent: 'flex-start',
-    },
-    title: {
-      fontSize: '2rem',
-      fontWeight: 'bold',
-      color: theme.palette.primary.main,
-    },
-    tabs: {
-      padding: '2rem',
-      width: '65vw', //TODO: fix tab bar layout
-    },
-  }),
-);
+const getCodeData = (date: DateTime, commits: any[], merges: any[]) => {
+  let commitCount = 0;
+  let mergeCount = 0;
+  for (const result of commits) {
+    if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
+      commitCount += result.count;
+    }
+  }
+  for (const result of merges) {
+    if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
+      mergeCount += result.count;
+    }
+  }
+  return {
+    date: date.toLocaleString(DateTime.DATE_SHORT),
+    commitCount,
+    mergeCount,
+  };
+};
+
+const getScoreData = (date: DateTime, scores: any[]) => {
+  let score = 0;
+  for (const result of scores) {
+    if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
+      score += result.total_score;
+    }
+  }
+  return {
+    date: date.toLocaleString(DateTime.DATE_SHORT),
+    score,
+  };
+};
+
+const getCommentData = (date: DateTime, wordCounts: any[]) => {
+  let wordCount = 0;
+  for (const result of wordCounts) {
+    if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
+      wordCount += result.count;
+    }
+  }
+  return {
+    date: date.toLocaleString(DateTime.DATE_SHORT),
+    wordCount,
+  };
+};
 
 const DynamicGraph: React.FC = () => {
-  const classes = useStyles();
-  const [studentName, setStudentName] = useState('All students');
-  const [startDate, setStartDate] = useState(DateTime.now());
-  const [endDate, setEndDate] = useState(DateTime.now().plus({ days: 7 }));
-  const [value, setValue] = React.useState(0);
+  const { startDate, endDate } = useFilterContext();
   const { id } = useParams<{ id: string }>();
-  const { data: repoMembers } = useRepositoryMembers(id);
+  const [emails, setEmails] = useState<string[]>([]);
   const { data: commits } = useCommitDailyCounts(
     {
       repository: id,
+      author_email: emails,
     },
     0,
     9000,
   );
-  const [commitResults, setCommitResults] = useState(commits?.results);
-  const [mergeResults, setMergeResults] = useState([]); // Empty until backend implements call
+  // const { data: merges } = useMergeDailyCounts(
+  //   {
+  //     repository: id,
+  //   },
+  //   0,
+  //   9000,
+  // );
+  const [graphType, setGraphType] = useState(0);
   const [graphData, setGraphData] = useState([]);
 
   useEffect(() => {
-    setStartDate(DateTime.fromISO('2020-03-01'));
-    setEndDate(DateTime.fromISO('2020-04-01'));
-  }, []);
-
-  useEffect(() => {
-    if (studentName != 'All students') {
-      setCommitResults(
-        commits?.results.filter((commit) => commit.author_name == studentName),
-      );
-      setMergeResults([]); // Empty until backend implements call
-    } else {
-      setCommitResults(commits?.results);
-      setMergeResults([]);
-    }
-  }, [repoMembers, studentName]);
-
-  const createGraphData = (date: DateTime, commits: any[], merges: any[]) => {
-    let commitCount = 0;
-    let mergeCount = 0;
-    for (const result of commits) {
-      if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
-        commitCount += result.count;
-      }
-    }
-    for (const result of merges) {
-      if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
-        mergeCount += result.count;
-      }
-    }
-    return {
-      date: date.toLocaleString(DateTime.DATE_SHORT),
-      commitCount,
-      mergeCount,
-    };
-  };
-
-  useEffect(() => {
-    if (commitResults && mergeResults && startDate && endDate) {
-      let date = startDate;
+    if (startDate && endDate) {
+      let date = DateTime.fromISO(startDate);
       const countsByDay = [];
-      do {
-        countsByDay.push(createGraphData(date, commitResults, mergeResults));
-        date = date.plus({ days: 1 });
-      } while (date <= endDate);
+      if (graphType == 0) {
+        do {
+          countsByDay.push(getCodeData(date, commits?.results || [], []));
+          date = date.plus({ days: 1 });
+        } while (date <= DateTime.fromISO(endDate));
+      } else if (graphType == 1) {
+        do {
+          countsByDay.push(getScoreData(date, commits?.results || []));
+          date = date.plus({ days: 1 });
+        } while (date <= DateTime.fromISO(endDate));
+      } else {
+        do {
+          countsByDay.push(getCommentData(date, []));
+          date = date.plus({ days: 1 });
+        } while (date <= DateTime.fromISO(endDate));
+      }
       setGraphData(countsByDay);
     }
-  }, [commitResults, startDate, endDate]);
+  }, [graphType, commits?.results, /* merges?.results, */ startDate, endDate]);
 
-  const handleChange = (
-    event: React.ChangeEvent<unknown>,
-    newValue: number,
-  ) => {
-    setValue(newValue);
+  const handleTabs = (event: React.ChangeEvent<unknown>, newType: number) => {
+    setGraphType(newType);
   };
 
   return (
     <>
-      <Grid container direction='column' spacing={2} className={classes.root}>
-        <Grid item>
-          <Typography className={classes.title}>Contribution Graph</Typography>
-        </Grid>
-        <Grid
-          item
-          container
-          direction='row'
-          justify='space-between'
-          className={classes.tabs}
-        >
-          <Grid item>
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              variant='fullWidth'
-              indicatorColor='primary'
-              textColor='primary'
-            >
-              <Tab label='Codes' />
-              <Tab label='Scores' />
-              <Tab label='Comments' />
-            </Tabs>
+      <Container>
+        <DefaultPageTitleFormat>Contribution Graph</DefaultPageTitleFormat>
+        <Container maxWidth='md'>
+          <Grid container alignItems='flex-end' spacing={1}>
+            <Grid item xs={8}>
+              <CalendarFilter />
+            </Grid>
+            <Grid item xs={4}>
+              <Box mb={1}>
+                <MemberDropdown
+                  repositoryId={id}
+                  onChange={(newEmails) => {
+                    setEmails(newEmails);
+                  }}
+                />
+              </Box>
+            </Grid>
           </Grid>
-          <Grid item>
-            <StudentDropdownMenu
-              repoMembers={repoMembers}
-              studentName={studentName}
-              setStudentName={setStudentName}
-            />
-          </Grid>
+        </Container>
+        <Box my={2}>
+          <Tabs
+            value={graphType}
+            onChange={handleTabs}
+            indicatorColor='primary'
+            textColor='primary'
+            centered
+          >
+            <Tab label='Codes' />
+            <Tab label='Scores' />
+            <Tab label='Comments' />
+          </Tabs>
+        </Box>
+        <Grid justify='center' container>
+          <DynamicBarChart graphData={graphData} graphType={graphType} />
         </Grid>
-        <Grid item>
-          <BarChart width={1000} height={500} data={graphData}>
-            <XAxis dataKey='date' />
-            <YAxis />
-            <Tooltip />
-            <Legend layout='vertical' align='right' verticalAlign='top' />
-            <Bar
-              dataKey='commitCount'
-              name='Commits'
-              stackId='a'
-              fill='#0A4D63'
-            />
-            <Bar
-              dataKey='mergeCount'
-              name='Merge Requests'
-              stackId='a'
-              fill='#e37500'
-            />
-          </BarChart>
-        </Grid>
-      </Grid>
+      </Container>
     </>
   );
 };

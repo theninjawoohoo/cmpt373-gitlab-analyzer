@@ -9,6 +9,8 @@ import InsertChart from '@material-ui/icons/InsertChart';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PeopleIcon from '@material-ui/icons/People';
+import ListIcon from '@material-ui/icons/List';
+import ScoreIcon from '@material-ui/icons/Score';
 
 export default function Icon(props: any) {
   switch (props.icon) {
@@ -23,15 +25,19 @@ export default function Icon(props: any) {
     case 'collapse':
       return <ExitToAppIcon />;
     case 'graph':
-      return <InsertChart />;
+      return <InsertChart fontSize={props.size} />;
     case 'merge':
-      return <MergeType />;
+      return <MergeType fontSize={props.size} />;
     case 'commit':
-      return <ArrowUpwardIcon />;
+      return <ArrowUpwardIcon fontSize={props.size} />;
     case 'operation':
       return <PlayArrowIcon />;
     case 'members':
-      return <PeopleIcon />;
+      return <PeopleIcon fontSize={props.size} />;
+    case 'list':
+      return <ListIcon />;
+    case 'scoring':
+      return <ScoreIcon />;
   }
   return <ErrorIcon />;
 }

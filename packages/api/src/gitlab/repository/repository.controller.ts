@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { IdParam } from '../../common/id-param';
 import { paginatedToResponse } from '../../common/pagination';
-import { QueryDto } from '../../common/query-dto';
 import { CommitAuthorService } from './commit/author/commit-author.service';
 import { RepositoryMemberService } from './repository-member/repository-member.service';
 import { RepositoryService } from './repository.service';
@@ -20,12 +19,11 @@ import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { VerifiedUser } from '../../auth/types/VerifiedUser';
 import { MergeRequestService } from '../merge-request/merge-request.service';
-import { CommitService } from './commit/commit.service';
+import { RepositoryQueryDto } from './repository-query.dto';
 
 @Controller('repository')
 export class RepositoryController {
   constructor(
-    private readonly commitService: CommitService,
     private readonly repositoryService: RepositoryService,
     private readonly repositoryMemberService: RepositoryMemberService,
     private readonly mergeRequestService: MergeRequestService,
@@ -96,25 +94,11 @@ export class RepositoryController {
     return this.repositoryMemberService.findAllForRepository(repository);
   }
 
-  @Post(':id/commits/sync')
-  async syncProjectCommits(
-    @Param() { id }: IdParam,
-    @GitlabToken() token: string,
-  ) {
-    const repository = await this.repositoryService.findOne(id);
-    await this.commitService.fetchForRepository(repository, token);
-  }
-
-  @Get('/:id/commits')
-  async fetchCommits(@Param() { id }: IdParam) {
-    const repository = await this.repositoryService.findOne(id);
-    return this.commitService.findAllForRepository(repository);
-  }
-
   @Get()
-  search(@Auth() user: VerifiedUser, @Query() query: QueryDto) {
-    const filters = { ...query, userId: user.sub };
-    return paginatedToResponse(this.repositoryService.search(filters));
+  search(@Auth() { user }: VerifiedUser, @Query() query: RepositoryQueryDto) {
+    return paginatedToResponse(
+      this.repositoryService.search({ ...query, user }),
+    );
   }
 
   @Get(':id')
@@ -124,14 +108,5 @@ export class RepositoryController {
       return repo;
     }
     throw new NotFoundException(`Could not find a repository with id: ${id}`);
-  }
-
-  @Post()
-  @HttpCode(204)
-  async fetchRepositories(
-    @Auth() user: VerifiedUser,
-    @GitlabToken() token: string,
-  ) {
-    await this.repositoryService.fetchForUser(user.user, token);
   }
 }

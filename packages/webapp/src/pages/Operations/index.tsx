@@ -2,21 +2,17 @@ import { Operation } from '@ceres/types';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
-import React, { useEffect } from 'react';
+import React from 'react';
 import DefaultPageLayout from '../../components/DefaultPageLayout';
-import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import OperationGroup from './components/OperationGroup';
+import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 
 const OperationsPage: React.FC = () => {
-  const { repositoryId, setRepositoryId } = useRepositoryContext();
-  useEffect(() => {
-    setRepositoryId('');
-  }, [repositoryId]);
   return (
     <>
       <DefaultPageLayout>
         <Container>
-          <Typography variant='h1'>Operations</Typography>
+          <DefaultPageTitleFormat>Operations</DefaultPageTitleFormat>
           <Box my={2}>
             <Typography variant='h2'>In progress</Typography>
           </Box>

@@ -6,7 +6,7 @@ import {
 import { VerifiedUser as VerifiedUserType } from '../types/VerifiedUser';
 
 export const Auth = createParamDecorator(
-  (data: unknown, context: ExecutionContext) => {
+  (_data: unknown, context: ExecutionContext): VerifiedUserType => {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     if (!user) {

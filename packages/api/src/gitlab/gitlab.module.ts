@@ -16,6 +16,6 @@ import { MergeRequestModule } from './merge-request/merge-request.module';
   ],
   controllers: [GitlabTokenController],
   providers: [GitlabTokenService],
-  exports: [GitlabTokenService],
+  exports: [GitlabTokenService, RepositoryModule, MergeRequestModule],
 })
 export class GitlabModule {}

@@ -1,4 +1,11 @@
-export interface Commit {
+import { WithExtensions } from "./WithExtensions";
+
+interface CommitExtensions {
+  lastSync?: string;
+  score?: number;
+}
+
+export interface Commit extends WithExtensions<CommitExtensions> {
   id: string;
   short_id: string;
   created_at: string;
@@ -20,10 +27,12 @@ export namespace Commit {
     author_email: string;
     repository_member_id?: string;
   }
+  
   export interface DailyCount {
     author_email: string;
     author_name: string;
     date: string;
     count: number;
+    total_score: number; 
   }
 }

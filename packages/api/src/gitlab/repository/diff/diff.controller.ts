@@ -15,4 +15,13 @@ export class DiffController {
     }
     return paginatedToResponse(this.diffService.search(query));
   }
+
+  @Get('/score')
+  score(@Query() query: DiffQueryDto) {
+    const { merge_request, commit } = query;
+    if (!merge_request && !commit) {
+      throw new BadRequestException('repository or commit must be provided');
+    }
+    return this.diffService.calculateDiffScore(query);
+  }
 }

@@ -6,10 +6,19 @@ import { Commit } from '../commit/commit.entity';
 import { DiffQueryDto } from './diff-query.dto';
 import { Diff as DiffEntity } from './diff.entity';
 import { DeepPartial, Repository as TypeORMRepository } from 'typeorm';
-import { Diff } from '@ceres/types';
+import {
+  Diff,
+  Extensions,
+  FileType,
+  GlobWeight,
+  Line,
+  LINE_SCORING,
+} from '@ceres/types';
 import { parsePatch } from 'diff';
+import DiffInterpreter from './helpers/DiffInterpreter';
+import { isMatch } from 'picomatch';
 
-type GitlabDiff = Omit<Diff, 'hunks'>;
+type GitlabDiff = Omit<Diff, 'hunks' | 'lines'>;
 
 @Injectable()
 export class DiffService {
@@ -43,17 +52,42 @@ export class DiffService {
     await this.diffRepository.delete({ commit: commit });
     do {
       diffs = await this.fetchPageForCommit(commit, token, page);
-      await this.createAll({ commit }, diffs.map(this.addParsedDefinitions));
+      const parsedDiffs = await Promise.all(
+        diffs.map(this.addParsedDefinitions),
+      );
+      await this.createAll({ commit }, parsedDiffs);
       page++;
     } while (diffs.length > 0);
   }
 
+  async calculateDiffScore(filters: DiffQueryDto, weights: GlobWeight[] = []) {
+    filters.pageSize = 50000;
+    const [diffs] = await this.search(filters);
+    const updatedDiffs = diffs.map((diff) => {
+      const summary = diff.resource?.summary;
+      let score = 0;
+      if (summary) {
+        score = Object.keys(summary)
+          .map((lineType) => LINE_SCORING[lineType] * (summary[lineType] || 0))
+          .reduce((a, b) => a + b, 0);
+      }
+      const weight = this.getWeight(diff.resource.new_path, weights);
+      diff.resource = Extensions.updateExtensions(diff.resource, {
+        score: score * weight.weight,
+        ...weight,
+      });
+      return diff;
+    });
+    await this.diffRepository.save(updatedDiffs);
+    return updatedDiffs
+      .map((diff) => diff.resource?.extensions?.score || 0)
+      .reduce((a, b) => a + b, 0);
+  }
+
   async syncForMergeRequest(mergeRequest: MergeRequest, token: string) {
     const diffs = await this.fetchForMergeRequest(mergeRequest, token);
-    await this.createAll(
-      { mergeRequest },
-      diffs.map(this.addParsedDefinitions),
-    );
+    const parsedDiffs = await Promise.all(diffs.map(this.addParsedDefinitions));
+    await this.createAll({ mergeRequest }, parsedDiffs);
   }
 
   private async createAll(
@@ -69,10 +103,19 @@ export class DiffService {
     return this.diffRepository.save(entities);
   }
 
-  private addParsedDefinitions(diff: GitlabDiff): Diff {
+  private async addParsedDefinitions(diff: GitlabDiff): Promise<Diff> {
+    const hunks = parsePatch(diff.diff)[0].hunks;
+    const interpreter = new DiffInterpreter(hunks, FileType.typescript);
+    const lines = await interpreter.parse();
+    const summary = {};
+    Object.values(Line.Type).forEach((lineType) => {
+      summary[lineType] = lines.filter((line) => line.type === lineType).length;
+    });
     return {
       ...diff,
-      hunks: parsePatch(diff.diff)[0].hunks,
+      hunks,
+      lines,
+      summary,
     };
   }
 
@@ -109,5 +152,21 @@ export class DiffService {
       })
       .toPromise();
     return axiosResponse.data;
+  }
+
+  private getWeight(path: string, weights: GlobWeight[] = []) {
+    for (let i = weights.length - 1; i >= 0; i--) {
+      if (
+        isMatch(path, weights[i].glob, {
+          basename: !weights[i].glob.includes('/'),
+        })
+      ) {
+        return weights[i];
+      }
+    }
+    return {
+      weight: 1,
+      glob: '*',
+    };
   }
 }

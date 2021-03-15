@@ -1,4 +1,7 @@
 // Generated using: http://json2ts.com/
+import { ScoringConfig } from './ScoringConfig';
+import { WithExtensions } from './WithExtensions';
+
 interface Namespace {
   id: number;
   name: string;
@@ -36,7 +39,7 @@ interface ContainerExpirationPolicy {
   older_than: string;
   name_regex: string;
   name_regex_keep?: any;
-  next_run_at: Date;
+  next_run_at: string;
 }
 
 interface ProjectAccess {
@@ -54,14 +57,23 @@ interface Permissions {
   group_access: GroupAccess;
 }
 
-export interface Repository {
+interface RepositoryExtensions {
+  lastSync?: string;
+  scoringConfig?: {
+    config?: ScoringConfig;
+    id?: string;
+    lastRan?: string;
+  };
+}
+
+export interface Repository extends WithExtensions<RepositoryExtensions> {
   id: number;
   description: string;
   name: string;
   name_with_namespace: string;
   path: string;
   path_with_namespace: string;
-  created_at: Date;
+  created_at: string;
   default_branch: string;
   tag_list: any[];
   ssh_url_to_repo: string;
@@ -71,7 +83,7 @@ export interface Repository {
   avatar_url: string;
   forks_count: number;
   star_count: number;
-  last_activity_at: Date;
+  last_activity_at: string;
   namespace: Namespace;
   _links: Links;
   packages_enabled?: boolean;

@@ -8,7 +8,9 @@ import Typography from '@material-ui/core/Typography';
 import React from 'react';
 import { ApiResource } from '../../api/base';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
+import SmartDate from '../SmartDate';
 import UndecoratedLink from '../UndecoratedLink';
+import WarningIcon from '@material-ui/icons/Warning';
 
 interface RepositoryCardProps {
   repository: ApiResource<Repository>;
@@ -22,6 +24,7 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
   syncRepository,
 }) => {
   const { setRepositoryId } = useRepositoryContext();
+  const hasBeenSynced = !!repository?.extensions?.lastSync;
   const handleClick = () => {
     setRepositoryId(repository.meta.id);
   };
@@ -29,7 +32,7 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
     <Box my={3} position='relative'>
       <UndecoratedLink
         onClick={handleClick}
-        to={`/merge/${repository.meta.id}`}
+        to={hasBeenSynced ? `/repository/${repository.meta.id}` : undefined}
       >
         <Box component={Paper} p={3} bgcolor='#F3FCFF'>
           <Grid container justify='space-between' alignItems='center'>
@@ -39,10 +42,19 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
                   <Box height='5rem' width='5rem' bgcolor='#DBD6FF' />
                 </Grid>
                 <Grid item>
-                  <Typography variant='h4'>
-                    {repository.namespace.path} /{' '}
-                    <strong>{repository.name}</strong>
-                  </Typography>
+                  <Grid alignItems='center' container>
+                    {!hasBeenSynced && <Box component={WarningIcon} mr={2} />}
+                    <Typography variant='h4'>
+                      {repository.namespace.path} /{' '}
+                      <strong>{repository.name}</strong>
+                    </Typography>
+                  </Grid>
+                  {hasBeenSynced && (
+                    <Typography variant='body2'>
+                      Last Synced:{' '}
+                      <SmartDate>{repository?.extensions?.lastSync}</SmartDate>
+                    </Typography>
+                  )}
                 </Grid>
               </Grid>
             </Grid>
