@@ -62,7 +62,6 @@ const ListMergeRequestPage = () => {
   });
 
   useEffect(() => {
-    console.log(emails);
     if (loadMoreInView) {
       void fetchNextPage();
     }
@@ -100,8 +99,11 @@ const ListMergeRequestPage = () => {
                   <Grid item xs={3}>
                     <Typography>Author</Typography>
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid item xs={2}>
                     <Typography>Date</Typography>
+                  </Grid>
+                  <Grid item xs={1}>
+                    <Typography>Score</Typography>
                   </Grid>
                 </Grid>
               </Box>
@@ -113,6 +115,7 @@ const ListMergeRequestPage = () => {
                     key={mergeRequest.meta.id}
                     mergeRequest={mergeRequest}
                     active={active}
+                    shrink={!!activeMergeRequest}
                     onClickSummary={() => {
                       setActiveCommit(undefined);
                       setActiveMergeRequest(active ? undefined : mergeRequest);

@@ -14,13 +14,15 @@ interface MergeRequestRendererProps {
   mergeRequest: ApiResource<MergeRequest>;
   active?: boolean;
   onClickSummary?: () => void;
+  shrink?: boolean;
 }
 
-function shortenTitle(title: string) {
-  if (title.length < 60) {
+function shortenTitle(title: string, shrink?: boolean) {
+  const maxLength = shrink ? 50 : 60;
+  if (title.length < maxLength) {
     return title;
   }
-  return title.substr(0, 60) + '...';
+  return title.substr(0, maxLength) + '...';
 }
 
 const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
@@ -28,22 +30,55 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
   mergeRequest,
   onClickSummary,
   children,
+  shrink,
 }) => {
   return (
     <Accordion expanded={active} TransitionProps={{ timeout: 0 }}>
       <AccordionSummary expandIcon={<ExpandMore />} onClick={onClickSummary}>
         <Grid container>
-          <Grid item xs={6}>
-            <Typography>{shortenTitle(mergeRequest.title)}</Typography>
+          <Grid item xs={shrink ? 9 : 6}>
+            <Typography>{shortenTitle(mergeRequest.title, shrink)}</Typography>
+            {shrink && (
+              <Grid container spacing={2}>
+                <Grid item>
+                  <Typography>
+                    <strong>Score:</strong>{' '}
+                    {mergeRequest.extensions?.diffScore?.toFixed(1)}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography>
+                    <strong>Commit scores sum:</strong>{' '}
+                    {mergeRequest.extensions?.commitScoreSum?.toFixed(1)}
+                  </Typography>
+                </Grid>
+              </Grid>
+            )}
           </Grid>
-          <Grid item xs={3}>
-            <Typography>{mergeRequest.author.name}</Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography>
-              <SmartDate>{mergeRequest.merged_at}</SmartDate>
-            </Typography>
-          </Grid>
+          {shrink ? (
+            <Grid item>
+              <Typography>{mergeRequest.author.name}</Typography>
+              <Typography>
+                <SmartDate>{mergeRequest.merged_at}</SmartDate>
+              </Typography>
+            </Grid>
+          ) : (
+            <>
+              <Grid item xs={3}>
+                <Typography>{mergeRequest.author.name}</Typography>
+              </Grid>
+              <Grid item xs={2}>
+                <Typography>
+                  <SmartDate>{mergeRequest.merged_at}</SmartDate>
+                </Typography>
+              </Grid>
+              <Grid item xs={1}>
+                <Typography>
+                  {mergeRequest.extensions?.diffScore?.toFixed(1)}
+                </Typography>
+              </Grid>
+            </>
+          )}
         </Grid>
       </AccordionSummary>
       <Box component={AccordionDetails} display='block'>
