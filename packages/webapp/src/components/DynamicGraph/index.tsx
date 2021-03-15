@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -11,26 +10,8 @@ import MemberDropdown from '../MemberDropdown';
 import { useFilterContext } from '../../contexts/FilterContext';
 import CalendarFilter from '../CalendarFilter';
 import DynamicBarChart from './BarChartComponent';
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      padding: '2rem',
-      display: 'flex',
-      width: '100vw',
-      alignContent: 'flex-start',
-    },
-    title: {
-      fontSize: '2rem',
-      fontWeight: 'bold',
-      color: theme.palette.primary.main,
-    },
-    tabs: {
-      padding: '2rem',
-      width: '70vw', //TODO: fix tab bar layout
-    },
-  }),
-);
+import Container from '@material-ui/core/Container';
+import Box from '@material-ui/core/Box';
 
 const getCodeData = (date: DateTime, commits: any[], merges: any[]) => {
   let commitCount = 0;
@@ -79,7 +60,6 @@ const getCommentData = (date: DateTime, wordCounts: any[]) => {
 };
 
 const DynamicGraph: React.FC = () => {
-  const classes = useStyles();
   const { startDate, endDate } = useFilterContext();
   const { id } = useParams<{ id: string }>();
   const [emails, setEmails] = useState<string[]>([]);
@@ -131,46 +111,42 @@ const DynamicGraph: React.FC = () => {
 
   return (
     <>
-      <Grid container direction='column' spacing={2} className={classes.root}>
-        <Grid item>
-          <DefaultPageTitleFormat>Contribution Graph</DefaultPageTitleFormat>
-        </Grid>
-        <Grid item>
-          <CalendarFilter />
-        </Grid>
-        <Grid
-          item
-          container
-          direction='row'
-          justify='space-between'
-          className={classes.tabs}
-        >
-          <Grid item>
-            <Tabs
-              value={graphType}
-              onChange={handleTabs}
-              variant='fullWidth'
-              indicatorColor='primary'
-              textColor='primary'
-            >
-              <Tab label='Codes' />
-              <Tab label='Scores' />
-              <Tab label='Comments' />
-            </Tabs>
+      <Container>
+        <DefaultPageTitleFormat>Contribution Graph</DefaultPageTitleFormat>
+        <Container maxWidth='md'>
+          <Grid container alignItems='flex-end' spacing={1}>
+            <Grid item xs={8}>
+              <CalendarFilter />
+            </Grid>
+            <Grid item xs={4}>
+              <Box mb={1}>
+                <MemberDropdown
+                  repositoryId={id}
+                  onChange={(newEmails) => {
+                    setEmails(newEmails);
+                  }}
+                />
+              </Box>
+            </Grid>
           </Grid>
-          <Grid item>
-            <MemberDropdown
-              repositoryId={id}
-              onChange={(newEmails) => {
-                setEmails(newEmails);
-              }}
-            />
-          </Grid>
-        </Grid>
-        <Grid item>
+        </Container>
+        <Box my={2}>
+          <Tabs
+            value={graphType}
+            onChange={handleTabs}
+            indicatorColor='primary'
+            textColor='primary'
+            centered
+          >
+            <Tab label='Codes' />
+            <Tab label='Scores' />
+            <Tab label='Comments' />
+          </Tabs>
+        </Box>
+        <Grid justify='center' container>
           <DynamicBarChart graphData={graphData} graphType={graphType} />
         </Grid>
-      </Grid>
+      </Container>
     </>
   );
 };

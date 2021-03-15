@@ -46,33 +46,37 @@ const CalendarFilter: React.FC = () => {
 
   return (
     <MuiPickersUtilsProvider utils={LuxonUtils}>
-      <Grid container justify='space-around'>
-        <KeyboardDatePicker
-          disableToolbar
-          variant='inline'
-          format='MM/dd/yyyy'
-          margin='normal'
-          id='date-picker-inline'
-          label='Start Date'
-          value={componentStartDate.toString()}
-          onChange={handleStartDateChange}
-          KeyboardButtonProps={{
-            'aria-label': 'change date',
-          }}
-        />
-        <KeyboardDatePicker
-          disableToolbar
-          variant='inline'
-          format='MM/dd/yyyy'
-          margin='normal'
-          id='date-picker-inline'
-          label='End Date'
-          value={componentEndDate.toString()}
-          onChange={handleEndDateChange}
-          KeyboardButtonProps={{
-            'aria-label': 'change date',
-          }}
-        />
+      <Grid container spacing={1}>
+        <Grid item xs={6}>
+          <KeyboardDatePicker
+            disableToolbar
+            variant='inline'
+            format='MM/dd/yyyy'
+            margin='normal'
+            id='date-picker-inline'
+            label='Start Date'
+            value={componentStartDate.toString()}
+            onChange={handleStartDateChange}
+            KeyboardButtonProps={{
+              'aria-label': 'change date',
+            }}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <KeyboardDatePicker
+            disableToolbar
+            variant='inline'
+            format='MM/dd/yyyy'
+            margin='normal'
+            id='date-picker-inline'
+            label='End Date'
+            value={componentEndDate.toString()}
+            onChange={handleEndDateChange}
+            KeyboardButtonProps={{
+              'aria-label': 'change date',
+            }}
+          />
+        </Grid>
       </Grid>
     </MuiPickersUtilsProvider>
   );
