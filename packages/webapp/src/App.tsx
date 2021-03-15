@@ -4,17 +4,17 @@ import { Router } from './components/Router';
 import ThemeProvider from './components/ThemeProvider';
 import { AuthContextProvider } from './contexts/AuthContext';
 import { RepositoryContextProvider } from './contexts/RepositoryContext';
-import { DateFilterContextProvider } from './contexts/DateFilterContext';
+import { FilterContextProvider } from './contexts/FilterContext';
 
 const App = () => {
   return (
     <AuthContextProvider>
       <RepositoryContextProvider>
-        <DateFilterContextProvider>
+        <FilterContextProvider>
           <ThemeProvider>
             <Router />
           </ThemeProvider>
-        </DateFilterContextProvider>
+        </FilterContextProvider>
       </RepositoryContextProvider>
     </AuthContextProvider>
   );

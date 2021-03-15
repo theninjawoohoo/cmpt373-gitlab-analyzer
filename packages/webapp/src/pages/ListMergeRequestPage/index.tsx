@@ -17,6 +17,8 @@ import MemberDropdown from '../../components/MemberDropdown';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 import styled from 'styled-components';
+import { useFilterContext } from '../../contexts/FilterContext';
+import CalendarFilter from '../../components/CalendarFilter';
 
 const IndependentScrollGrid = styled(Grid)`
   height: 100vh;
@@ -40,6 +42,7 @@ const IndependentScrollGrid = styled(Grid)`
 
 const ListMergeRequestPage = () => {
   const { id } = useParams<{ id: string }>();
+  const { startDate, endDate } = useFilterContext();
   const { repositoryId } = useRepositoryContext();
   const [emails, setEmails] = useState<string[]>([]);
   const [activeMergeRequest, setActiveMergeRequest] = useState<
@@ -54,6 +57,8 @@ const ListMergeRequestPage = () => {
   } = useInfiniteMergeRequest({
     repository: id,
     author_email: emails,
+    merged_start_date: startDate.toString(),
+    merged_end_date: endDate.toString(),
   });
 
   useEffect(() => {
@@ -85,6 +90,7 @@ const ListMergeRequestPage = () => {
                     setEmails(newEmails);
                   }}
                 />
+                <CalendarFilter />
               </Grid>
               <Box pr={6} pl={2} py={1}>
                 <Grid container>

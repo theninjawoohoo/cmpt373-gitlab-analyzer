@@ -12,7 +12,7 @@ import Button from '@material-ui/core/Button/Button';
 import Box from '@material-ui/core/Box';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import MemberDropdown from '../MemberDropdown';
-import { useDateFilterContext } from '../../contexts/DateFilterContext';
+import { useFilterContext } from '../../contexts/FilterContext';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 
 const CommitList: React.FC = () => {
@@ -29,7 +29,7 @@ const CommitList: React.FC = () => {
     },
     page,
   );
-  const { elements } = useDateFilterContext();
+  const { elements } = useFilterContext();
   console.log(elements);
   return (
     <Container>

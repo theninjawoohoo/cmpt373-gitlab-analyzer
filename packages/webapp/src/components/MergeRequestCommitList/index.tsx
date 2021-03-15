@@ -21,6 +21,7 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import MemberDropdown from '../MemberDropdown';
+import CalendarFilter from '../CalendarFilter';
 import { useParams } from 'react-router-dom';
 import { useCommitsForMergeRequest } from '../../api/commit';
 
@@ -173,6 +174,9 @@ const MergeRequestCommitList: React.FC = () => {
 
   return (
     <>
+      <div style={{ float: 'left' }}>
+        <CalendarFilter />
+      </div>
       <div style={{ float: 'right' }}>
         <MemberDropdown
           repositoryId={id}
