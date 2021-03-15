@@ -83,13 +83,23 @@ const ListMergeRequestPage = () => {
                 <DefaultPageTitleFormat>Merge Requests</DefaultPageTitleFormat>
               </Box>
               <Grid item>
-                <MemberDropdown
-                  repositoryId={repositoryId}
-                  onChange={(newEmails) => {
-                    setEmails(newEmails);
-                  }}
-                />
-                <CalendarFilter />
+                <Container maxWidth='md'>
+                  <Grid container alignItems='flex-end' spacing={1}>
+                    <Grid item xs={8}>
+                      <CalendarFilter />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Box mb={1}>
+                        <MemberDropdown
+                          repositoryId={repositoryId}
+                          onChange={(newEmails) => {
+                            setEmails(newEmails);
+                          }}
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </Container>
               </Grid>
               {!activeMergeRequest && (
                 <Box pr={6} pl={2} py={1}>
