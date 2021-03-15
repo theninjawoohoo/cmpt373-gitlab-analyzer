@@ -38,7 +38,6 @@ export class RepositoryService extends BaseService<
         },
       );
     }
-
     return query;
   }
   buildSort(
@@ -55,6 +54,8 @@ export class RepositoryService extends BaseService<
         );
       case 'project_created':
         return query.orderBy("repository.resource #>> '{created_at}'", order);
+      case 'project_name':
+        return query.orderBy("repository.resource #> '{name}'", order);
     }
     return query;
   }
