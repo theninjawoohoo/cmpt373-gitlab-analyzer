@@ -34,7 +34,9 @@ const HomeLogin: React.FC = () => {
   return (
     <Grid container direction='column' spacing={2} className={classes.root}>
       <Grid item>
-        <Typography className={classes.title}>GitLab Analyzer</Typography>
+        <Typography className={classes.title}>
+          GitLab Iteration Analyzer
+        </Typography>
       </Grid>
       <Grid item>
         <Button
