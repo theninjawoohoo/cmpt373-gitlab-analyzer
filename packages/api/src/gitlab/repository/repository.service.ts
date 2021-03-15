@@ -42,7 +42,7 @@ export class RepositoryService extends BaseService<
   }
   buildSort(
     query: SelectQueryBuilder<RepositoryEntity>,
-    sortKey = 'project_synced',
+    sortKey = 'project_created',
     order: 'ASC' | 'DESC' = 'DESC',
   ): SelectQueryBuilder<RepositoryEntity> {
     switch (sortKey) {

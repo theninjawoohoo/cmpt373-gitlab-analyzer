@@ -1,12 +1,11 @@
 import { Operation } from '@ceres/types';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   useFetchRepositories,
   useGetOperations,
   useSyncRepository,
 } from '../../api/operation';
 import { useRepository } from '../../api/repository';
-import { ProgressCircle } from '../Common/CircularProgress';
 import RepositoryCard from './RepositoryCard';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 import {
@@ -20,6 +19,7 @@ import {
   MenuItem,
   Select,
 } from '@material-ui/core';
+import { TextField } from '@material-ui/core';
 
 function hasPendingSync(operations: Operation[], id: string) {
   return (
@@ -29,9 +29,9 @@ function hasPendingSync(operations: Operation[], id: string) {
 }
 
 const Repository: React.FC = () => {
-  const { data: asc_repos } = useRepository({ sort: '+project_synced' });
-  const { data: desc_repos } = useRepository({ sort: '-project_synced' });
-  let repos = desc_repos;
+  const [sort, setSort] = useState('-project_created');
+  const [search, setSearch] = useState('');
+  const { data } = useRepository({ sort, name: search });
   const {
     data: operationsData,
     invalidate: invalidateOperations,
@@ -48,10 +48,7 @@ const Repository: React.FC = () => {
   });
   const { sync } = useSyncRepository();
   const { fetch } = useFetchRepositories();
-  const openCircularProgress = false;
-  const progress = 0;
   const isFetchingRepositories = pendingFetches?.total > 0;
-  const [orderState, setOrder] = useState('DESC');
 
   const syncRepository = (id: string) => {
     sync(id, {
@@ -69,59 +66,15 @@ const Repository: React.FC = () => {
   };
 
   const message =
-    repos?.results.length == 0 ? (
+    data?.results.length == 0 ? (
       <h3>You have no repositories on your profile</h3>
     ) : null;
-
-  useEffect(() => {
-    if (orderState === 'DESC') {
-      console.log('in!');
-      repos = desc_repos;
-    } else {
-      console.log('out');
-      repos = asc_repos;
-    }
-    console.log(repos);
-  }, [repos, orderState]);
-
-  const handleChange = (e) => {
-    console.log('now', orderState);
-    console.log('target', e.target.value);
-    setOrder(e.target.value as string);
-    console.log('this', repos);
-  };
 
   return (
     <Container>
       <Grid container justify='space-between' alignItems='center'>
         <Grid item>
           <DefaultPageTitleFormat>Projects</DefaultPageTitleFormat>
-        </Grid>
-        <Grid item>
-          <input
-            style={{ minWidth: '15rem', minHeight: '3rem', fontSize: '20px' }}
-            key='random1'
-            // value={keyword}
-            placeholder={'not implemented yet search'}
-            // onChange={(e) => setKeyword(e.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <FormControl variant='filled'>
-            <InputLabel shrink id='sort-order-label'>
-              Select sort order:
-            </InputLabel>
-            <Select
-              labelId='sort-order-label'
-              id='sort-order-label-options'
-              value={orderState}
-              onChange={handleChange}
-              style={{ minWidth: '15rem' }}
-            >
-              <MenuItem value='DESC'>Recently Synced</MenuItem>
-              <MenuItem value='ASC'>Oldest Synced</MenuItem>
-            </Select>
-          </FormControl>
         </Grid>
         <Grid item>
           <Box position='relative'>
@@ -142,10 +95,40 @@ const Repository: React.FC = () => {
           </Box>
         </Grid>
       </Grid>
+      <Grid container spacing={2}>
+        <Grid item xs={8}>
+          <TextField
+            label='Search'
+            variant='outlined'
+            fullWidth
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <FormControl variant='filled' fullWidth>
+            <InputLabel shrink id='sort-order-label'>
+              Sort
+            </InputLabel>
+            <Select
+              labelId='sort-order-label'
+              id='sort-order-label-options'
+              value={sort}
+              onChange={(e) => setSort(e.target.value as string)}
+              style={{ minWidth: '15rem' }}
+              fullWidth
+            >
+              <MenuItem value='-project_synced'>Recently Synced</MenuItem>
+              <MenuItem value='+project_synced'>Oldest Synced</MenuItem>
+              <MenuItem value='-project_created'>Recently Created</MenuItem>
+              <MenuItem value='+project_created'>Oldest Created</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
       {message}
-      {openCircularProgress && <ProgressCircle progress={progress} />}
       <React.Fragment>
-        {repos?.results.map((repo) => {
+        {data?.results.map((repo) => {
           const isSyncing = hasPendingSync(
             operationsData?.results || [],
             repo.meta.id,

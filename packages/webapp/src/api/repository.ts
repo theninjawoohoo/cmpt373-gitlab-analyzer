@@ -7,6 +7,7 @@ import {
 import { Repository } from '@ceres/types';
 
 interface QueryParams {
+  name?: string;
   sort?: string;
 }
 
