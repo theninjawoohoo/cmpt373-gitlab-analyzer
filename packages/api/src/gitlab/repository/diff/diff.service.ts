@@ -6,9 +6,17 @@ import { Commit } from '../commit/commit.entity';
 import { DiffQueryDto } from './diff-query.dto';
 import { Diff as DiffEntity } from './diff.entity';
 import { DeepPartial, Repository as TypeORMRepository } from 'typeorm';
-import { Diff, Extensions, FileType, Line, LINE_SCORING } from '@ceres/types';
+import {
+  Diff,
+  Extensions,
+  FileType,
+  GlobWeight,
+  Line,
+  LINE_SCORING,
+} from '@ceres/types';
 import { parsePatch } from 'diff';
 import DiffInterpreter from './helpers/DiffInterpreter';
+import { isMatch } from 'picomatch';
 
 type GitlabDiff = Omit<Diff, 'hunks' | 'lines'>;
 
@@ -52,7 +60,7 @@ export class DiffService {
     } while (diffs.length > 0);
   }
 
-  async calculateDiffScore(filters: DiffQueryDto) {
+  async calculateDiffScore(filters: DiffQueryDto, weights: GlobWeight[] = []) {
     filters.pageSize = 50000;
     const [diffs] = await this.search(filters);
     const updatedDiffs = diffs.map((diff) => {
@@ -63,10 +71,10 @@ export class DiffService {
           .map((lineType) => LINE_SCORING[lineType] * (summary[lineType] || 0))
           .reduce((a, b) => a + b, 0);
       }
+      const weight = this.getWeight(diff.resource.new_path, weights);
       diff.resource = Extensions.updateExtensions(diff.resource, {
-        score,
-        glob: '*',
-        weight: 1,
+        score: score * weight.weight,
+        ...weight,
       });
       return diff;
     });
@@ -144,5 +152,21 @@ export class DiffService {
       })
       .toPromise();
     return axiosResponse.data;
+  }
+
+  private getWeight(path: string, weights: GlobWeight[] = []) {
+    for (let i = weights.length - 1; i >= 0; i--) {
+      if (
+        isMatch(path, weights[i].glob, {
+          basename: !weights[i].glob.includes('/'),
+        })
+      ) {
+        return weights[i];
+      }
+    }
+    return {
+      weight: 1,
+      glob: '*',
+    };
   }
 }

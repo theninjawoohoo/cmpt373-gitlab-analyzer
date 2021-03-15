@@ -29,8 +29,12 @@ export class ScoringController {
     await Promise.all([
       this.mergeRequestService.updateMergeRequestScoreByRepository(
         config.repositoryId,
+        scoringConfig?.resource?.weights,
       ),
-      this.commitService.updateCommitScoreByRepository(config.repositoryId),
+      this.commitService.updateCommitScoreByRepository(
+        config.repositoryId,
+        scoringConfig?.resource?.weights,
+      ),
     ]);
     await this.repositoryService.updateScoringConfig(repository, {
       config: scoringConfig?.resource,
