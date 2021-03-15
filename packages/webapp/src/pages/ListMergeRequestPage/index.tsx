@@ -62,7 +62,6 @@ const ListMergeRequestPage = () => {
   });
 
   useEffect(() => {
-    console.log(emails);
     if (loadMoreInView) {
       void fetchNextPage();
     }
@@ -92,19 +91,24 @@ const ListMergeRequestPage = () => {
                 />
                 <CalendarFilter />
               </Grid>
-              <Box pr={6} pl={2} py={1}>
-                <Grid container>
-                  <Grid item xs={6}>
-                    <Typography>Title</Typography>
+              {!activeMergeRequest && (
+                <Box pr={6} pl={2} py={1}>
+                  <Grid container>
+                    <Grid item xs={6}>
+                      <Typography>Title</Typography>
+                    </Grid>
+                    <Grid item xs={2}>
+                      <Typography>Author</Typography>
+                    </Grid>
+                    <Grid item xs={2}>
+                      <Typography>Date</Typography>
+                    </Grid>
+                    <Grid item xs={2}>
+                      <Typography>Score</Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={3}>
-                    <Typography>Author</Typography>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Typography>Date</Typography>
-                  </Grid>
-                </Grid>
-              </Box>
+                </Box>
+              )}
               {reducedMergeRequests.map((mergeRequest) => {
                 const active =
                   mergeRequest.meta.id === activeMergeRequest?.meta.id;
@@ -113,6 +117,7 @@ const ListMergeRequestPage = () => {
                     key={mergeRequest.meta.id}
                     mergeRequest={mergeRequest}
                     active={active}
+                    shrink={!!activeMergeRequest}
                     onClickSummary={() => {
                       setActiveCommit(undefined);
                       setActiveMergeRequest(active ? undefined : mergeRequest);
