@@ -64,7 +64,7 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
             </Grid>
           ) : (
             <>
-              <Grid item xs={3}>
+              <Grid item xs={2}>
                 <Typography>{mergeRequest.author.name}</Typography>
               </Grid>
               <Grid item xs={2}>
@@ -72,10 +72,19 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
                   <SmartDate>{mergeRequest.merged_at}</SmartDate>
                 </Typography>
               </Grid>
-              <Grid item xs={1}>
-                <Typography>
-                  {mergeRequest.extensions?.diffScore?.toFixed(1)}
-                </Typography>
+              <Grid item xs={2}>
+                <Grid container>
+                  <Grid item xs={6}>
+                    <Typography>
+                      {mergeRequest.extensions?.diffScore?.toFixed(1)}
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Typography>
+                      {mergeRequest.extensions?.commitScoreSum?.toFixed(1)}
+                    </Typography>
+                  </Grid>
+                </Grid>
               </Grid>
             </>
           )}
