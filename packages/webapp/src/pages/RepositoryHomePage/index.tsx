@@ -4,11 +4,12 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { useGetRepository } from '../../api/repository';
+import { useAddCollaborator, useGetRepository } from '../../api/repository';
 import DefaultPageLayout from '../../components/DefaultPageLayout';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 import SmartDate from '../../components/SmartDate';
 import CancelIcon from '@material-ui/icons/Cancel';
+import Collaborators from './components/Collaborators';
 import LinkGrid from './components/LinkGrid';
 import MembersWarning from './components/MembersWarning';
 import Box from '@material-ui/core/Box';
@@ -26,6 +27,7 @@ const RepositoryPage: React.FC = () => {
     isLoading: updateScoreLoading,
   } = useUpdateScoring();
   const { data, invalidate } = useGetRepository(id);
+  const { mutate: addCollaborator } = useAddCollaborator(id);
 
   const handleUpdateScore = (scoringConfig: ApiResource<ScoringConfig>) => {
     updateScoring(
@@ -76,6 +78,14 @@ const RepositoryPage: React.FC = () => {
         <Box my={3}>
           <ScoringConfigWarning repository={data} />
         </Box>
+        {data && (
+          <Box my={3}>
+            <Collaborators
+              repository={data}
+              onAddCollaborator={addCollaborator}
+            />
+          </Box>
+        )}
         {data && (
           <Box my={3}>
             <ScoringConfigSelector
