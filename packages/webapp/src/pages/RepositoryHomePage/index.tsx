@@ -131,7 +131,7 @@ const RepositoryPage: React.FC = () => {
             />
           </Box>
         )}
-        {data && (
+        {data && isOwner && (
           <Box my={3}>
             <ScoringConfigSelector
               isLoading={updateScoreLoading}
