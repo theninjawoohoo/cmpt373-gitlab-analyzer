@@ -21,12 +21,18 @@ import Collaborators from './components/Collaborators';
 import LeaveRepository from './components/LeaveRepository';
 import LinkGrid from './components/LinkGrid';
 import MembersWarning from './components/MembersWarning';
-import Box from '@material-ui/core/Box';
 import ScoringConfigWarning from './components/ScoringConfigWarning';
 import ScoringConfigSelector from './components/ScoringConfigSelector';
 import { useUpdateScoring } from '../../api/scoring';
 import { ApiResource } from '../../api/base';
 import { ScoringConfig } from '@ceres/types';
+import styled from 'styled-components';
+
+const MainContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 1rem;
+`;
 
 const RepositoryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -111,36 +117,28 @@ const RepositoryPage: React.FC = () => {
             </Typography>
           </Grid>
         </Grid>
-        <Box my={3}>
+        <MainContainer>
           <MembersWarning repositoryId={id} />
-        </Box>
-        <Box my={3}>
           <ScoringConfigWarning repository={data} />
-        </Box>
-        {data && !isOwner && (
-          <Box my={3}>
+          {data && !isOwner && (
             <LeaveRepository repository={data} onLeave={handleLeave} />
-          </Box>
-        )}
-        {data && isOwner && (
-          <Box my={3}>
+          )}
+          {data && isOwner && (
             <Collaborators
               repository={data}
               onAddCollaborator={handleAddCollaborator}
               onRemoveCollaborator={handleRemoveCollaborator}
             />
-          </Box>
-        )}
-        {data && isOwner && (
-          <Box my={3}>
+          )}
+          {data && isOwner && (
             <ScoringConfigSelector
               isLoading={updateScoreLoading}
               onSubmit={handleUpdateScore}
               repository={data}
             />
-          </Box>
-        )}
-        <LinkGrid repositoryId={id} />
+          )}
+          <LinkGrid repositoryId={id} />
+        </MainContainer>
       </Container>
     </DefaultPageLayout>
   );
