@@ -4,7 +4,13 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { useAddCollaborator, useGetRepository } from '../../api/repository';
+import {
+  AddCollaboratorPayload,
+  RemoveCollaboratorPayload,
+  useAddCollaborator,
+  useGetRepository,
+  useRemoveCollaborator,
+} from '../../api/repository';
 import DefaultPageLayout from '../../components/DefaultPageLayout';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 import SmartDate from '../../components/SmartDate';
@@ -28,6 +34,7 @@ const RepositoryPage: React.FC = () => {
   } = useUpdateScoring();
   const { data, invalidate } = useGetRepository(id);
   const { mutate: addCollaborator } = useAddCollaborator(id);
+  const { mutate: removeCollaborator } = useRemoveCollaborator(id);
 
   const handleUpdateScore = (scoringConfig: ApiResource<ScoringConfig>) => {
     updateScoring(
@@ -41,6 +48,18 @@ const RepositoryPage: React.FC = () => {
         },
       },
     );
+  };
+
+  const handleAddCollaborator = (payload: AddCollaboratorPayload) => {
+    addCollaborator(payload, {
+      onSuccess: invalidate,
+    });
+  };
+
+  const handleRemoveCollaborator = (payload: RemoveCollaboratorPayload) => {
+    removeCollaborator(payload, {
+      onSuccess: invalidate,
+    });
   };
 
   return (
@@ -82,7 +101,8 @@ const RepositoryPage: React.FC = () => {
           <Box my={3}>
             <Collaborators
               repository={data}
-              onAddCollaborator={addCollaborator}
+              onAddCollaborator={handleAddCollaborator}
+              onRemoveCollaborator={handleRemoveCollaborator}
             />
           </Box>
         )}

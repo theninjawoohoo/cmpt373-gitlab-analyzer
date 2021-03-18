@@ -35,3 +35,14 @@ export function useAddCollaborator(id: string) {
     'POST',
   );
 }
+
+export interface RemoveCollaboratorPayload {
+  collaboratorId: string;
+}
+
+export function useRemoveCollaborator(id: string) {
+  return useApiMutation<ApiResource<Repository>, RemoveCollaboratorPayload>(
+    `/repository/${id}/collaborator`,
+    'DELETE',
+  );
+}

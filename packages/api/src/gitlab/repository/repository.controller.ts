@@ -17,13 +17,17 @@ import { paginatedToResponse } from '../../common/pagination';
 import { UserService } from '../../user/services/user.service';
 import { CommitAuthorService } from './commit/author/commit-author.service';
 import { RepositoryMemberService } from './repository-member/repository-member.service';
-import { AddCollaboratorPayload } from './repository.payloads';
+import {
+  AddCollaboratorPayload,
+  RemoveCollaboratorPayload,
+} from './repository.payloads';
 import { RepositoryService } from './repository.service';
 import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { VerifiedUser } from '../../auth/types/VerifiedUser';
 import { MergeRequestService } from '../merge-request/merge-request.service';
 import { RepositoryQueryDto } from './repository-query.dto';
+import { Delete } from '@nestjs/common';
 
 @Controller('repository')
 export class RepositoryController {
@@ -141,5 +145,29 @@ export class RepositoryController {
       collaborator,
       accessLevel,
     );
+  }
+
+  @Delete(':id/collaborator')
+  async removeCollaborator(
+    @Param() { id }: IdParam,
+    @Body() { collaboratorId }: RemoveCollaboratorPayload,
+    @Auth() { user }: VerifiedUser,
+  ) {
+    const collaborator = await this.userService.findOne(collaboratorId);
+    if (!collaborator) {
+      throw new NotFoundException(
+        `User with id: ${collaboratorId} does not exist`,
+      );
+    }
+    const repository = await this.repositoryService.findOne(id);
+    if (
+      user.id !== repository?.resource?.extensions?.owner?.id &&
+      collaboratorId != user.id
+    ) {
+      throw new ForbiddenException(
+        'Only the repository owner can remove other members',
+      );
+    }
+    return this.repositoryService.removeCollaborator(repository, collaborator);
   }
 }

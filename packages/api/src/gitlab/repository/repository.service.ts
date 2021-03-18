@@ -120,6 +120,15 @@ export class RepositoryService extends BaseService<
     return this.update(repository);
   }
 
+  removeCollaborator(repository: RepositoryEntity, user: User) {
+    const collaborators = repository.resource.extensions?.collaborators || [];
+    const filtered = collaborators.filter((c) => c.id !== user.id);
+    repository.resource = Extensions.updateExtensions(repository.resource, {
+      collaborators: filtered,
+    });
+    return this.update(repository);
+  }
+
   async fetchFromGitlabForUser(user: User, token: string) {
     let repositories: Repository[] = [];
     let page = 1;

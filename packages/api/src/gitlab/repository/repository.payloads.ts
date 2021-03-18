@@ -1,5 +1,5 @@
 import { Repository } from '@ceres/types';
-import { IsEnum, IsString } from 'class-validator';
+import { IsEnum, IsString, IsUUID } from 'class-validator';
 
 export class AddCollaboratorPayload {
   @IsString()
@@ -7,4 +7,8 @@ export class AddCollaboratorPayload {
 
   @IsEnum(Repository.AccessLevel)
   accessLevel: Repository.AccessLevel;
+}
+export class RemoveCollaboratorPayload {
+  @IsUUID()
+  collaboratorId: string;
 }

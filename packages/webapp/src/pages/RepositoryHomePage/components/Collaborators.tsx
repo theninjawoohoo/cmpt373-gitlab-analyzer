@@ -1,26 +1,82 @@
 import { Repository } from '@ceres/types';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import DeleteIcon from '@material-ui/icons/Delete';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import React, { useState } from 'react';
-import { AddCollaboratorPayload } from '../../../api/repository';
+import {
+  AddCollaboratorPayload,
+  RemoveCollaboratorPayload,
+} from '../../../api/repository';
 import { ApiResource } from '../../../api/base';
 
 const NoCollaborators = () => (
   <Typography>There are no collaborators in this project</Typography>
 );
 
+interface CollaboratorListProps {
+  collaborators: Repository['extensions']['collaborators'];
+  onRemoveCollaborator: CollaboratorsProps['onRemoveCollaborator'];
+}
+
+const CollaboratorList: React.FC<CollaboratorListProps> = ({
+  collaborators,
+  onRemoveCollaborator,
+}) => {
+  return (
+    <div>
+      <Grid container>
+        <Grid item xs={2} />
+        <Grid item xs={5}>
+          <Typography style={{ textDecoration: 'underline' }}>
+            <strong>SFU id</strong>
+          </Typography>
+        </Grid>
+        <Grid item xs={5}>
+          <Typography style={{ textDecoration: 'underline' }}>
+            <strong>Access Level</strong>
+          </Typography>
+        </Grid>
+      </Grid>
+      {collaborators.map((collaborator) => (
+        <Grid container key={collaborator.id} alignItems='center'>
+          <Grid item xs={2}>
+            <IconButton
+              onClick={() => {
+                onRemoveCollaborator({ collaboratorId: collaborator.id });
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Grid>
+          <Grid item xs={5}>
+            <Typography>{collaborator.display}</Typography>
+          </Grid>
+          <Grid item xs={5}>
+            <Typography>{collaborator.accessLevel}</Typography>
+          </Grid>
+        </Grid>
+      ))}
+    </div>
+  );
+};
+
 interface CollaboratorsProps {
   repository?: ApiResource<Repository>;
   onAddCollaborator?: (payload: AddCollaboratorPayload) => void;
+  onRemoveCollaborator?: (payload: RemoveCollaboratorPayload) => void;
 }
 
 const AddCollaboratorForm = ({
@@ -83,17 +139,25 @@ const AddCollaboratorForm = ({
 
 const Collaborators: React.FC<CollaboratorsProps> = ({
   onAddCollaborator,
+  onRemoveCollaborator,
   repository,
 }) => {
   const collaborators = repository?.extensions?.collaborators || [];
   return (
-    <Paper>
-      <Box p={2}>
-        <Typography variant='h2'>Collaborators</Typography>
+    <Accordion>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Typography>
+          Sharing · {collaborators.length} Collaborator(s)
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails>
         <Grid container>
           <Grid item xs={6}>
             {collaborators.length > 0 ? (
-              <div>Here be members.</div>
+              <CollaboratorList
+                collaborators={collaborators}
+                onRemoveCollaborator={onRemoveCollaborator}
+              />
             ) : (
               <NoCollaborators />
             )}
@@ -104,8 +168,8 @@ const Collaborators: React.FC<CollaboratorsProps> = ({
             </Container>
           </Grid>
         </Grid>
-      </Box>
-    </Paper>
+      </AccordionDetails>
+    </Accordion>
   );
 };
 
