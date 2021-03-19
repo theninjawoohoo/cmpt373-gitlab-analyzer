@@ -2,6 +2,7 @@ import React, { useEffect, useContext, useState, useMemo } from 'react';
 import { useProfile } from '../api/user';
 import { User } from '@ceres/types';
 import axios from '../util/axios';
+import { DateTime } from 'luxon';
 
 export function useAuthContext() {
   return useContext(AuthContext);
@@ -51,6 +52,10 @@ const authContextDefault: AuthContextState = {
 const AuthContext = React.createContext<AuthContextState>(authContextDefault);
 
 const LOCAL_STORAGE_KEY = 'access_token';
+const REPOSITORY_LOCAL_STORAGE_KEY = 'repository_context';
+const START_DATE_LOCAL_STORAGE_KEY = 'start_date_context';
+const END_DATE_LOCAL_STORAGE_KEY = 'end_date_context';
+const AUTHOR_LOCAL_STORAGE_KEY = 'author_context';
 
 function getToken() {
   return localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -64,6 +69,13 @@ function login(token: string) {
 function logout() {
   axios.defaults.headers['Authorization'] = undefined;
   localStorage.clear();
+  localStorage.setItem(REPOSITORY_LOCAL_STORAGE_KEY, '');
+  localStorage.setItem(
+    START_DATE_LOCAL_STORAGE_KEY,
+    DateTime.now().minus({ days: 7 }).toISO(),
+  );
+  localStorage.setItem(END_DATE_LOCAL_STORAGE_KEY, DateTime.now().toISO());
+  localStorage.setItem(AUTHOR_LOCAL_STORAGE_KEY, 'all');
 }
 
 export const AuthContextProvider: React.FC = ({ children }) => {
