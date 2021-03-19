@@ -63,7 +63,7 @@ function login(token: string) {
 
 function logout() {
   axios.defaults.headers['Authorization'] = undefined;
-  localStorage.removeItem(LOCAL_STORAGE_KEY);
+  localStorage.clear();
 }
 
 export const AuthContextProvider: React.FC = ({ children }) => {
