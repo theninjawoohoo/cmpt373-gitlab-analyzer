@@ -8,6 +8,9 @@ import {
   KeyboardDatePicker,
 } from '@material-ui/pickers';
 import { useGetCommits } from '../../api/commit';
+import Paper from '@material-ui/core/Paper';
+import Box from '@material-ui/core/Box';
+import Typography from '@material-ui/core/Typography';
 
 const CalendarFilter: React.FC = () => {
   const { repositoryId } = useRepositoryContext();
@@ -45,40 +48,45 @@ const CalendarFilter: React.FC = () => {
   };
 
   return (
-    <MuiPickersUtilsProvider utils={LuxonUtils}>
-      <Grid container spacing={1}>
-        <Grid item xs={6}>
-          <KeyboardDatePicker
-            disableToolbar
-            variant='inline'
-            format='MM/dd/yyyy'
-            margin='normal'
-            id='date-picker-inline'
-            label='Start Date'
-            value={componentStartDate.toString()}
-            onChange={handleStartDateChange}
-            KeyboardButtonProps={{
-              'aria-label': 'change date',
-            }}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <KeyboardDatePicker
-            disableToolbar
-            variant='inline'
-            format='MM/dd/yyyy'
-            margin='normal'
-            id='date-picker-inline'
-            label='End Date'
-            value={componentEndDate.toString()}
-            onChange={handleEndDateChange}
-            KeyboardButtonProps={{
-              'aria-label': 'change date',
-            }}
-          />
-        </Grid>
-      </Grid>
-    </MuiPickersUtilsProvider>
+    <Paper>
+      <Box p={2}>
+        <Typography variant='h2'>Date Filter Config</Typography>
+        <MuiPickersUtilsProvider utils={LuxonUtils}>
+          <Grid container spacing={1}>
+            <Grid item xs={3}>
+              <KeyboardDatePicker
+                disableToolbar
+                variant='inline'
+                format='MM/dd/yyyy'
+                margin='normal'
+                id='date-picker-inline'
+                label='Start Date'
+                value={componentStartDate.toString()}
+                onChange={handleStartDateChange}
+                KeyboardButtonProps={{
+                  'aria-label': 'change date',
+                }}
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <KeyboardDatePicker
+                disableToolbar
+                variant='inline'
+                format='MM/dd/yyyy'
+                margin='normal'
+                id='date-picker-inline'
+                label='End Date'
+                value={componentEndDate.toString()}
+                onChange={handleEndDateChange}
+                KeyboardButtonProps={{
+                  'aria-label': 'change date',
+                }}
+              />
+            </Grid>
+          </Grid>
+        </MuiPickersUtilsProvider>
+      </Box>
+    </Paper>
   );
 };
 

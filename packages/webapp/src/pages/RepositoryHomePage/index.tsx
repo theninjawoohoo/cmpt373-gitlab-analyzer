@@ -17,6 +17,7 @@ import ScoringConfigSelector from './components/ScoringConfigSelector';
 import { useUpdateScoring } from '../../api/scoring';
 import { ApiResource } from '../../api/base';
 import { ScoringConfig } from '@ceres/types';
+import CalendarFilter from '../../components/CalendarFilter';
 
 const RepositoryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -85,6 +86,9 @@ const RepositoryPage: React.FC = () => {
             />
           </Box>
         )}
+        <Box my={3}>
+          <CalendarFilter />
+        </Box>
         <LinkGrid repositoryId={id} />
       </Container>
     </DefaultPageLayout>

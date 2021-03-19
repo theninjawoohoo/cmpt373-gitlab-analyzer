@@ -18,7 +18,6 @@ import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 import styled from 'styled-components';
 import { useFilterContext } from '../../contexts/FilterContext';
-import CalendarFilter from '../../components/CalendarFilter';
 
 const IndependentScrollGrid = styled(Grid)`
   height: 100vh;
@@ -85,9 +84,6 @@ const ListMergeRequestPage = () => {
               <Grid item>
                 <Container maxWidth='md'>
                   <Grid container alignItems='flex-end' spacing={1}>
-                    <Grid item xs={8}>
-                      <CalendarFilter />
-                    </Grid>
                     <Grid item xs={4}>
                       <Box mb={1}>
                         <MemberDropdown

@@ -8,7 +8,6 @@ import { DateTime } from 'luxon';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 import MemberDropdown from '../MemberDropdown';
 import { useFilterContext } from '../../contexts/FilterContext';
-import CalendarFilter from '../CalendarFilter';
 import DynamicBarChart from './BarChartComponent';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
@@ -115,9 +114,6 @@ const DynamicGraph: React.FC = () => {
         <DefaultPageTitleFormat>Contribution Graph</DefaultPageTitleFormat>
         <Container maxWidth='md'>
           <Grid container alignItems='flex-end' spacing={1}>
-            <Grid item xs={8}>
-              <CalendarFilter />
-            </Grid>
             <Grid item xs={4}>
               <Box mb={1}>
                 <MemberDropdown
