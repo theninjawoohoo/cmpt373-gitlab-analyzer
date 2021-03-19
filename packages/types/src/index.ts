@@ -1,7 +1,7 @@
 export * from './Commit';
 export * from './Diff';
 export * from './FileType';
-export * from './Issue'
+export * from './Issue';
 export * from './Line';
 export * from './MergeRequest';
 export * from './MergeRequestParticipant';
@@ -14,3 +14,4 @@ export * from './ScoreOverride';
 export * from './ScoringConfig';
 export * from './User';
 export * from './WithExtensions';
+export * from './Group';
