@@ -6,7 +6,6 @@ import { useParams } from 'react-router-dom';
 import { useCommitDailyCounts } from '../../api/commit';
 import { DateTime } from 'luxon';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
-import MemberDropdown from '../MemberDropdown';
 import { useFilterContext } from '../../contexts/FilterContext';
 import DynamicBarChart from './BarChartComponent';
 import Container from '@material-ui/core/Container';
@@ -59,9 +58,8 @@ const getCommentData = (date: DateTime, wordCounts: any[]) => {
 };
 
 const DynamicGraph: React.FC = () => {
-  const { startDate, endDate } = useFilterContext();
+  const { startDate, endDate, emails } = useFilterContext();
   const { id } = useParams<{ id: string }>();
-  const [emails, setEmails] = useState<string[]>([]);
   const { data: commits } = useCommitDailyCounts(
     {
       repository: id,
@@ -112,20 +110,6 @@ const DynamicGraph: React.FC = () => {
     <>
       <Container>
         <DefaultPageTitleFormat>Contribution Graph</DefaultPageTitleFormat>
-        <Container maxWidth='md'>
-          <Grid container alignItems='flex-end' spacing={1}>
-            <Grid item xs={4}>
-              <Box mb={1}>
-                <MemberDropdown
-                  repositoryId={id}
-                  onChange={(newEmails) => {
-                    setEmails(newEmails);
-                  }}
-                />
-              </Box>
-            </Grid>
-          </Grid>
-        </Container>
         <Box my={2}>
           <Tabs
             value={graphType}

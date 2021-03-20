@@ -11,8 +11,9 @@ import { useGetCommits } from '../../api/commit';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
+import MemberDropdown from '../../components/MemberDropdown';
 
-const CalendarFilter: React.FC = () => {
+const RepoFilter: React.FC = () => {
   const { repositoryId } = useRepositoryContext();
   const {
     startDate,
@@ -83,6 +84,15 @@ const CalendarFilter: React.FC = () => {
                 }}
               />
             </Grid>
+            <Grid item>
+              <Grid container alignItems='flex-end' spacing={1}>
+                <Grid item xs={4}>
+                  <Box mb={1}>
+                    <MemberDropdown repositoryId={repositoryId} />
+                  </Box>
+                </Grid>
+              </Grid>
+            </Grid>
           </Grid>
         </MuiPickersUtilsProvider>
       </Box>
@@ -90,4 +100,4 @@ const CalendarFilter: React.FC = () => {
   );
 };
 
-export default CalendarFilter;
+export default RepoFilter;
