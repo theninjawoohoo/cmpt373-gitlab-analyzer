@@ -71,16 +71,6 @@ export class MergeRequestService {
     return query.getManyAndCount();
   }
 
-  async updateLastSync(
-    mergeRequest: MergeRequestEntity,
-    timestamp = new Date(),
-  ) {
-    mergeRequest.resource = Extensions.updateExtensions(mergeRequest.resource, {
-      lastSync: timestamp.toISOString(),
-    });
-    return this.repository.save(mergeRequest);
-  }
-
   async fetchAllParticipantsForRepository(
     repository: Repository,
     token: string,
