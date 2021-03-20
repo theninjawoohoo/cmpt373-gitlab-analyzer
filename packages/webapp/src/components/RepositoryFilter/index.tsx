@@ -84,8 +84,8 @@ const RepoFilter: React.FC = () => {
                 }}
               />
             </Grid>
-            <Grid item>
-              <Grid container alignItems='flex-end' spacing={1}>
+            <Grid item alignItems='center'>
+              <Grid container spacing={1}>
                 <Grid item xs={4}>
                   <Box mb={1}>
                     <MemberDropdown repositoryId={repositoryId} />
