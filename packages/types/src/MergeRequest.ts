@@ -134,5 +134,6 @@ export namespace MergeRequest {
   export interface DailyCount {
     date: string;
     count: number;
+    score: number;
   }
 }

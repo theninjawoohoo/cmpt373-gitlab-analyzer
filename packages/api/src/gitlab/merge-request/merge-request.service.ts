@@ -86,7 +86,11 @@ export class MergeRequestService extends BaseService<
     let query = this.serviceRepository.createQueryBuilder('merge_request');
     query = this.buildFilters(query, filters);
     query.select("DATE(merge_request.resource #>>'{merged_at}')", 'date');
-    query.addSelect('count(*)', 'count');
+    query.addSelect('count(*)::integer', 'count');
+    query.addSelect(
+      "sum((merge_request.resource #>> '{extensions,diffScore}')::float)",
+      'score',
+    );
     query.groupBy('date');
     query.orderBy('date', 'ASC');
     return query.getRawMany<MergeRequest.DailyCount>();
