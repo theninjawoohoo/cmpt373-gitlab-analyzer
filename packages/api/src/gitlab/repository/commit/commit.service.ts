@@ -118,20 +118,6 @@ export class CommitService {
     return rows as Commit.Author[];
   }
 
-  async getByAuthors(repository: Repository, author: [string]) {
-    const rows = await this.commitRepository
-      .createQueryBuilder('commit')
-      .select('commit.id', 'commit_id')
-      .where('commit.repository_id = :repositoryId', {
-        repositoryId: repository.id,
-      })
-      .andWhere('commit.resource.author_email = :author_email', {
-        author_email: author,
-      })
-      .getRawMany();
-    return rows as Commit[];
-  }
-
   async fetchForRepository(repository: Repository, token: string) {
     let commits: Commit[] = [];
     let page = 1;
