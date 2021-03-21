@@ -40,7 +40,6 @@ const IndependentScrollGrid = styled(Grid)`
 const ListMergeRequestPage = () => {
   const { id } = useParams<{ id: string }>();
   const { startDate, endDate, emails } = useFilterContext();
-  console.log(emails);
   const [activeMergeRequest, setActiveMergeRequest] = useState<
     ApiResource<MergeRequest>
   >();

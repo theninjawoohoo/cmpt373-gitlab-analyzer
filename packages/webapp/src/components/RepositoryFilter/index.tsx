@@ -7,7 +7,6 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from '@material-ui/pickers';
-import { useGetCommits } from '../../api/commit';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
@@ -20,32 +19,19 @@ const RepoFilter: React.FC = () => {
     endDate,
     setStartDateContext,
     setEndDateContext,
-    setArrayContext,
   } = useFilterContext();
 
   const [componentStartDate, setStartDate] = React.useState(startDate);
   const [componentEndDate, setEndDate] = React.useState(endDate);
 
-  const { data: commits } = useGetCommits(
-    {
-      repository: repositoryId,
-      start_date: startDate.toString(),
-      end_date: endDate.toString(),
-    },
-    0,
-    9000,
-  );
-
   const handleStartDateChange = (date) => {
     setStartDate(date.startOf('day'));
     setStartDateContext(date.toString());
-    setArrayContext(commits?.results);
   };
 
   const handleEndDateChange = (date) => {
     setEndDate(date.startOf('day'));
     setEndDateContext(date.toString());
-    setArrayContext(commits?.results);
   };
 
   return (
@@ -87,9 +73,7 @@ const RepoFilter: React.FC = () => {
             <Grid item alignItems='center'>
               <Grid container spacing={1}>
                 <Grid item xs={4}>
-                  <Box mb={1}>
-                    <MemberDropdown repositoryId={repositoryId} />
-                  </Box>
+                  <MemberDropdown repositoryId={repositoryId} />
                 </Grid>
               </Grid>
             </Grid>

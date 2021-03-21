@@ -29,8 +29,6 @@ const CommitList: React.FC = () => {
     },
     page,
   );
-  const { elements } = useFilterContext();
-  console.log(elements);
   return (
     <Container>
       <Grid container justify='space-between' alignItems='center'>
