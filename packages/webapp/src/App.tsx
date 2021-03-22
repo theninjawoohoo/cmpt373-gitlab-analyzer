@@ -1,3 +1,4 @@
+import { SnackbarProvider } from 'notistack';
 import React from 'react';
 import './App.css';
 import { Router } from './components/Router';
@@ -12,7 +13,15 @@ const App = () => {
       <RepositoryContextProvider>
         <FilterContextProvider>
           <ThemeProvider>
-            <Router />
+            <SnackbarProvider
+              maxSnack={3}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+            >
+              <Router />
+            </SnackbarProvider>
           </ThemeProvider>
         </FilterContextProvider>
       </RepositoryContextProvider>
