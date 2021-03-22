@@ -17,6 +17,10 @@ interface AuthorProps {
   allMembers: ApiResource<RepositoryMember>[];
 }
 
+function compareMember(a: RepositoryMember, b: RepositoryMember) {
+  return a.username.localeCompare(b.username);
+}
+
 const Author: React.FC<AuthorProps> = ({ author, member, allMembers }) => {
   const { mutate, isLoading } = useLinkAuthorToMember(author.meta.id);
   const [value, setValue] = useState<string>();
@@ -43,16 +47,16 @@ const Author: React.FC<AuthorProps> = ({ author, member, allMembers }) => {
             <FormControl variant='filled'>
               <InputLabel>Member</InputLabel>
               <Select
-                style={{ minWidth: '15rem' }}
+                style={{ minWidth: '18rem' }}
                 value={value || 'None'}
                 onChange={(e) => {
                   e.preventDefault();
                   setValue(e.target.value as string);
                 }}
               >
-                {allMembers?.map((m) => (
+                {allMembers?.sort(compareMember)?.map((m) => (
                   <MenuItem key={m.meta.id} value={m.meta.id}>
-                    {m.name}
+                    {m.username} - {m.name}
                   </MenuItem>
                 ))}
               </Select>

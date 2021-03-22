@@ -63,6 +63,11 @@ export class MergeRequestController {
     return paginatedToResponse(this.mergeRequestService.search(query));
   }
 
+  @Get('count')
+  dailyCounts(@Query() query: MergeRequestQueryDto) {
+    return this.mergeRequestService.buildDailyCounts(query);
+  }
+
   @Get('/repository/:id')
   async findAllForRepository(@Param() { id }: IdParam) {
     const repository = await this.repositoryService.findOne(id);

@@ -64,6 +64,15 @@ interface RepositoryExtensions {
     id?: string;
     lastRan?: string;
   };
+  owner?: {
+    id: string;
+    display: string;
+  };
+  collaborators?: {
+    id: string;
+    display: string;
+    accessLevel: Repository.AccessLevel;
+  }[];
 }
 
 export interface Repository extends WithExtensions<RepositoryExtensions> {
@@ -138,4 +147,16 @@ export interface Repository extends WithExtensions<RepositoryExtensions> {
   auto_devops_deploy_strategy: string;
   autoclose_referenced_issues: boolean;
   permissions: Permissions;
+}
+
+export namespace Repository {
+  export enum AccessLevel {
+    editor = 'editor',
+    viewer = 'viewer',
+  }
+
+  export enum Role {
+    owner = 'owner',
+    collaborator = 'collaborator',
+  }
 }

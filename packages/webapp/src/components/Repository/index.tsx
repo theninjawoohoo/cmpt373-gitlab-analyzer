@@ -1,4 +1,5 @@
-import { Operation } from '@ceres/types';
+import { Operation, Repository } from '@ceres/types';
+import Tabs from '@material-ui/core/Tabs';
 import React, { useState } from 'react';
 import {
   useFetchRepositories,
@@ -6,6 +7,7 @@ import {
   useSyncRepository,
 } from '../../api/operation';
 import { useRepository } from '../../api/repository';
+import { useAuthContext } from '../../contexts/AuthContext';
 import RepositoryCard from './RepositoryCard';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 import {
@@ -20,6 +22,7 @@ import {
   Select,
 } from '@material-ui/core';
 import { TextField } from '@material-ui/core';
+import Tab from '@material-ui/core/Tab/Tab';
 
 function hasPendingSync(operations: Operation[], id: string) {
   return (
@@ -28,10 +31,28 @@ function hasPendingSync(operations: Operation[], id: string) {
   );
 }
 
-const Repository: React.FC = () => {
+enum TabOption {
+  all = 'all',
+  owned = 'owned',
+  shared = 'shared',
+}
+
+const tabToRoleMappings = {
+  [TabOption.all]: [Repository.Role.owner, Repository.Role.collaborator],
+  [TabOption.owned]: [Repository.Role.owner],
+  [TabOption.shared]: [Repository.Role.collaborator],
+};
+
+const RepositoryList: React.FC = () => {
   const [sort, setSort] = useState('-project_created');
   const [search, setSearch] = useState('');
-  const { data } = useRepository({ sort, name: search });
+  const [tab, setTab] = useState(TabOption.all);
+  const { data } = useRepository({
+    sort,
+    name: search,
+    role: tabToRoleMappings[tab],
+  });
+  const { user } = useAuthContext();
   const {
     data: operationsData,
     invalidate: invalidateOperations,
@@ -126,6 +147,19 @@ const Repository: React.FC = () => {
           </FormControl>
         </Grid>
       </Grid>
+      <Tabs
+        value={tab}
+        onChange={(_e, newTab) => {
+          setTab(newTab);
+        }}
+        indicatorColor='primary'
+        textColor='primary'
+        centered
+      >
+        <Tab value={TabOption.all} label='All' />
+        <Tab value={TabOption.owned} label='Owned by me' />
+        <Tab value={TabOption.shared} label='Shared with me' />
+      </Tabs>
       {message}
       <React.Fragment>
         {data?.results.map((repo) => {
@@ -136,6 +170,7 @@ const Repository: React.FC = () => {
           return (
             <RepositoryCard
               repository={repo}
+              isShared={user?.id !== repo?.extensions?.owner?.id}
               isSyncing={isSyncing}
               syncRepository={syncRepository}
               key={repo.meta.id}
@@ -147,4 +182,4 @@ const Repository: React.FC = () => {
   );
 };
 
-export default Repository;
+export default RepositoryList;
