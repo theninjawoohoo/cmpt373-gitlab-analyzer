@@ -5,6 +5,7 @@ import Form from './Form';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
+import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -35,7 +36,9 @@ const SettingsForm: React.FC = () => {
       <DefaultPageTitleFormat>Settings</DefaultPageTitleFormat>
       <Box my={15}>
         <div className={styles.form}>
-          <h2>{message}</h2>
+          <Typography variant='h5' color='primary'>
+            {message}
+          </Typography>
           <Form />
         </div>
       </Box>
