@@ -13,12 +13,14 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import React from 'react';
 import styled from 'styled-components';
 import Root from './components/root';
+import ScorePopover from './components/ScorePopper';
 
 interface DiffViewProps {
   fileName: string;
   lines: Line[];
   expanded?: boolean;
   extensions?: Diff['extensions'];
+  summary?: Diff['summary'];
   onSummaryClick?: () => void;
 }
 
@@ -108,6 +110,7 @@ const DiffView: React.FC<DiffViewProps> = ({
   lines,
   expanded,
   extensions,
+  summary,
   onSummaryClick,
 }) => {
   return (
@@ -124,7 +127,10 @@ const DiffView: React.FC<DiffViewProps> = ({
               </Typography>
             </Grid>
             <Grid item>
-              <Chip size='small' label={extensions?.score?.toFixed(1) || 0} />
+              <ScorePopover
+                scoreCount={extensions?.score?.toFixed(1)}
+                scoreSummary={summary}
+              />
             </Grid>
             <Grid item>
               <Typography variant='body2'>
