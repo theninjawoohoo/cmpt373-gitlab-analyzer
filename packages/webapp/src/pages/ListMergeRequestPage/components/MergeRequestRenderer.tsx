@@ -43,13 +43,13 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
                 <Grid item>
                   <Typography>
                     <strong>Score:</strong>{' '}
-                    {mergeRequest.extensions?.diffScore?.toFixed(1)}
+                    {mergeRequest.extensions?.diffScore?.toFixed(0)}
                   </Typography>
                 </Grid>
                 <Grid item>
                   <Typography>
-                    <strong>Commit scores sum:</strong>{' '}
-                    {mergeRequest.extensions?.commitScoreSum?.toFixed(1)}
+                    <strong>∑ Commit Scores:</strong>{' '}
+                    {mergeRequest.extensions?.commitScoreSum?.toFixed(0)}
                   </Typography>
                 </Grid>
               </Grid>
@@ -76,12 +76,12 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
                 <Grid container>
                   <Grid item xs={6}>
                     <Typography>
-                      {mergeRequest.extensions?.diffScore?.toFixed(1)}
+                      {mergeRequest.extensions?.diffScore?.toFixed(0)}
                     </Typography>
                   </Grid>
                   <Grid item>
                     <Typography>
-                      {mergeRequest.extensions?.commitScoreSum?.toFixed(1)}
+                      {mergeRequest.extensions?.commitScoreSum?.toFixed(0)}
                     </Typography>
                   </Grid>
                 </Grid>

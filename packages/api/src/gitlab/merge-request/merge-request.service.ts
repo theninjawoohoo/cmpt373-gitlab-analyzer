@@ -315,8 +315,8 @@ export class MergeRequestService {
       diffScore: score,
       commitScoreSum: sumScore,
     });
-    mergeRequest.diffScore = score;
-    mergeRequest.commitScoreSum = sumScore;
+    mergeRequest.diffScore = Math.round(score);
+    mergeRequest.commitScoreSum = Math.round(sumScore);
     await this.repository.save(mergeRequest);
   }
 

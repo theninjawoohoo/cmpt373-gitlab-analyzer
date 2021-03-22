@@ -242,7 +242,7 @@ export class CommitService {
       weights,
     );
     commit.resource = Extensions.updateExtensions(commit.resource, { score });
-    commit.score = score;
+    commit.score = Math.round(score);
     await this.commitRepository.save(commit);
   }
 
