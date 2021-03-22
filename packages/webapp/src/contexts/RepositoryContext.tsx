@@ -4,7 +4,7 @@ interface RepositoryContextState {
   repositoryId: string;
   setRepositoryId: React.Dispatch<React.SetStateAction<string>>;
 }
-const REPOSITORY_LOCAL_STORAGE_KEY = 'repository_context';
+export const REPOSITORY_LOCAL_STORAGE_KEY = 'repository_context';
 
 const repositoryContextDefault: RepositoryContextState = {
   repositoryId: '',
@@ -37,3 +37,7 @@ export const RepositoryContextProvider: React.FC = ({ children }) => {
     </RepositoryContext.Provider>
   );
 };
+
+export function resetContextStorage() {
+  localStorage.setItem(REPOSITORY_LOCAL_STORAGE_KEY, '');
+}

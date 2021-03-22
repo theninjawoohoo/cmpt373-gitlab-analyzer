@@ -12,10 +12,10 @@ interface FilterContextState {
   setAuthorContext: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const START_DATE_LOCAL_STORAGE_KEY = 'start_date_context';
-const END_DATE_LOCAL_STORAGE_KEY = 'end_date_context';
-const AUTHOR_LOCAL_STORAGE_KEY = 'author_context';
-const ELEMENTS_LOCAL_STORAGE_KEY = 'elements_context';
+export const START_DATE_LOCAL_STORAGE_KEY = 'start_date_context';
+export const END_DATE_LOCAL_STORAGE_KEY = 'end_date_context';
+export const AUTHOR_LOCAL_STORAGE_KEY = 'author_context';
+export const ELEMENTS_LOCAL_STORAGE_KEY = 'elements_context';
 
 const FilterContextDefault: FilterContextState = {
   startDate: DateTime.now().minus({ days: 7 }).toISO(),
@@ -98,3 +98,12 @@ export const FilterContextProvider: React.FC = ({ children }) => {
     <FilterContext.Provider value={value}>{children}</FilterContext.Provider>
   );
 };
+
+export function resetFilterStorage() {
+  localStorage.setItem(
+    START_DATE_LOCAL_STORAGE_KEY,
+    DateTime.now().minus({ days: 7 }).toISO(),
+  );
+  localStorage.setItem(END_DATE_LOCAL_STORAGE_KEY, DateTime.now().toISO());
+  localStorage.setItem(AUTHOR_LOCAL_STORAGE_KEY, 'all');
+}
