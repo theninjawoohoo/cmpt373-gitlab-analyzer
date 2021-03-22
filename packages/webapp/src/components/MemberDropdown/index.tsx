@@ -24,19 +24,18 @@ interface MemberDropdownProps {
 }
 
 const MemberDropdown: React.FC<MemberDropdownProps> = ({ repositoryId }) => {
-  const { author, setAuthorContext } = useFilterContext();
-  const { setEmailContext } = useFilterContext();
+  const { author, setAuthor, setEmail } = useFilterContext();
   const [value, setValue] = useState(author);
 
   const { data: members } = useRepositoryMembers(repositoryId);
   const { data: authors } = useRepositoryAuthors(repositoryId);
 
   const handleChangeAuthor = (author) => {
-    setAuthorContext(author);
+    setAuthor(author);
   };
 
   const handleEmailChange = (emails) => {
-    setEmailContext(emails);
+    setEmail(emails);
   };
 
   useEffect(() => {

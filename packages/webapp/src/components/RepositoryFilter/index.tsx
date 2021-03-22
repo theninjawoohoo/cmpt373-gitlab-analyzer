@@ -14,24 +14,19 @@ import MemberDropdown from '../../components/MemberDropdown';
 
 const RepoFilter: React.FC = () => {
   const { repositoryId } = useRepositoryContext();
-  const {
-    startDate,
-    endDate,
-    setStartDateContext,
-    setEndDateContext,
-  } = useFilterContext();
+  const { startDate, endDate, setStartDate, setEndDate } = useFilterContext();
 
-  const [componentStartDate, setStartDate] = React.useState(startDate);
-  const [componentEndDate, setEndDate] = React.useState(endDate);
+  const [componentStartDate, setStartDateComponent] = React.useState(startDate);
+  const [componentEndDate, setEndDateComponent] = React.useState(endDate);
 
   const handleStartDateChange = (date) => {
     setStartDate(date.startOf('day'));
-    setStartDateContext(date.toString());
+    setStartDateComponent(date.toString());
   };
 
   const handleEndDateChange = (date) => {
     setEndDate(date.startOf('day'));
-    setEndDateContext(date.toString());
+    setEndDateComponent(date.toString());
   };
 
   return (

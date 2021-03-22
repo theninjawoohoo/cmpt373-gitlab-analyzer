@@ -21,7 +21,7 @@ const FilterContextDefault: FilterContextState = {
   startDate: DateTime.now().minus({ days: 7 }).toISO(),
   endDate: DateTime.now().toISO(),
   author: '',
-  emails: [],
+  emails: [''],
   setStartDate: () => null,
   setEndDate: () => null,
   setEmail: () => null,
