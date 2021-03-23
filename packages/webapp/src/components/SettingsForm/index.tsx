@@ -8,15 +8,15 @@ import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(() => ({
-  title: {
-    flexGrow: 1,
-    fontSize: '2rem',
-  },
-  gridDimensions: {
-    minHeight: '100vh',
-    display: 'grid',
-    gridTemplateColumns: 'auto 1fr',
-  },
+  // title: {
+  //   flexGrow: 1,
+  //   fontSize: '2rem',
+  // },
+  // gridDimensions: {
+  //   minHeight: '100vh',
+  //   display: 'grid',
+  //   gridTemplateColumns: 'auto 1fr',
+  // },
   form: {
     display: 'flex',
     flexDirection: 'column',
@@ -33,12 +33,10 @@ const SettingsForm: React.FC = () => {
     : 'You have an invalid API Key. Please enter a valid API Key below:';
   return (
     <Container>
-      <DefaultPageTitleFormat>Settings</DefaultPageTitleFormat>
+      <DefaultPageTitleFormat>API Key</DefaultPageTitleFormat>
       <Box my={15}>
         <div className={styles.form}>
-          <Typography variant='h5' color='primary'>
-            {message}
-          </Typography>
+          <Typography variant='h5'>{message}</Typography>
           <Form />
         </div>
       </Box>
