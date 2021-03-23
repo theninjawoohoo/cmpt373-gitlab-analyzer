@@ -16,17 +16,12 @@ const RepoFilter: React.FC = () => {
   const { repositoryId } = useRepositoryContext();
   const { startDate, endDate, setStartDate, setEndDate } = useFilterContext();
 
-  const [componentStartDate, setStartDateComponent] = React.useState(startDate);
-  const [componentEndDate, setEndDateComponent] = React.useState(endDate);
-
   const handleStartDateChange = (date) => {
     setStartDate(date.startOf('day'));
-    setStartDateComponent(date.toString());
   };
 
   const handleEndDateChange = (date) => {
     setEndDate(date.startOf('day'));
-    setEndDateComponent(date.toString());
   };
 
   return (
@@ -43,7 +38,7 @@ const RepoFilter: React.FC = () => {
                 margin='normal'
                 id='date-picker-inline'
                 label='Start Date'
-                value={componentStartDate.toString()}
+                value={startDate.toString()}
                 onChange={handleStartDateChange}
                 KeyboardButtonProps={{
                   'aria-label': 'change date',
@@ -58,7 +53,7 @@ const RepoFilter: React.FC = () => {
                 margin='normal'
                 id='date-picker-inline'
                 label='End Date'
-                value={componentEndDate.toString()}
+                value={endDate.toString()}
                 onChange={handleEndDateChange}
                 KeyboardButtonProps={{
                   'aria-label': 'change date',

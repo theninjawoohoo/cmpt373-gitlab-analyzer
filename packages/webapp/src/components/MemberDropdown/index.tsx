@@ -39,12 +39,11 @@ const MemberDropdown: React.FC<MemberDropdownProps> = ({ repositoryId }) => {
   };
 
   useEffect(() => {
-    console.log(value);
     if (value !== 'all') {
-      const new_emails = findEmailsForMember(value, authors);
-      console.log(new_emails);
+      const newEmails = findEmailsForMember(value, authors);
+      console.log(newEmails);
       handleChangeAuthor(value);
-      handleEmailChange(new_emails);
+      handleEmailChange(newEmails);
     } else {
       handleChangeAuthor(value);
       handleEmailChange([]);
