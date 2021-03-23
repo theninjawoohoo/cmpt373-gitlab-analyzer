@@ -9,6 +9,7 @@ import EditScoringConfigPage from '../../pages/ScoringConfig/Edit';
 import SfuVerify from '../../pages/SfuVerify';
 import Graph from '../../pages/Graph';
 import ListMergeRequestPage from '../../pages/ListMergeRequestPage';
+import ApiSettingPage from '../../pages/ApiSetting';
 import SettingsPage from '../../pages/Settings';
 import { useAuthContext } from '../../contexts/AuthContext';
 import CommitsPage from '../../pages/Commits';
@@ -41,6 +42,12 @@ export function Router() {
         <Route path='/settings' exact>
           <SettingsPage />
         </Route>
+        <Route path='/api' exact>
+          <ApiSettingPage />
+        </Route>
+        <Route path='/scoring' exact>
+          <BrowseScoringConfigsPage />
+        </Route>
         <Route path='/commits' exact>
           <CommitsPage />
         </Route>
@@ -52,9 +59,6 @@ export function Router() {
         </Route>
         <Route path='/diff' exact>
           <Diff />
-        </Route>
-        <Route path='/scoring' exact>
-          <BrowseScoringConfigsPage />
         </Route>
         <Route path='/scoring/edit' exact>
           <EditScoringConfigPage />
