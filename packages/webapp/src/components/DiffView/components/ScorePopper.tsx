@@ -73,27 +73,27 @@ const ScorePopover: React.FC<ScorePopperProps> = ({
       >
         <div className={classes.summaryFlex}>
           <Typography display='inline'>add: </Typography>
-          <Typography display='inline'>{scoreSummary.add}</Typography>
+          <Typography display='inline'>
+            {scoreSummary.add.toFixed(1) || 0}
+          </Typography>
         </div>
         <div className={classes.summaryFlex}>
           <Typography display='inline'>comment: </Typography>
-          <Typography display='inline'>{scoreSummary.comment}</Typography>
+          <Typography display='inline'>
+            {scoreSummary.comment.toFixed(1) || 0}
+          </Typography>
         </div>
         <div className={classes.summaryFlex}>
           <Typography display='inline'>delete: </Typography>
-          <Typography display='inline'>{scoreSummary.delete}</Typography>
-        </div>
-        <div className={classes.summaryFlex}>
-          <Typography display='inline'>gap: </Typography>
-          <Typography display='inline'>{scoreSummary.gap}</Typography>
+          <Typography display='inline'>
+            {scoreSummary.delete.toFixed(1) || 0}
+          </Typography>
         </div>
         <div className={classes.summaryFlex}>
           <Typography display='inline'>syntax: </Typography>
-          <Typography display='inline'>{scoreSummary.syntax}</Typography>
-        </div>
-        <div className={classes.summaryFlex}>
-          <Typography display='inline'>no change: </Typography>
-          <Typography display='inline'>{scoreSummary['no-change']}</Typography>
+          <Typography display='inline'>
+            {scoreSummary.syntax.toFixed(1) || 0}
+          </Typography>
         </div>
       </Popover>
     </div>
