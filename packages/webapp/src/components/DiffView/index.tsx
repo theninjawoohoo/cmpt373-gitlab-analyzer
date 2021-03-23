@@ -124,7 +124,7 @@ const DiffView: React.FC<DiffViewProps> = ({
               </Typography>
             </Grid>
             <Grid item>
-              <Chip size='small' label={extensions?.score?.toFixed(0) || 0} />
+              <Chip size='small' label={extensions?.score?.toFixed(1) || 0} />
             </Grid>
             <Grid item>
               <Typography variant='body2'>
@@ -132,7 +132,7 @@ const DiffView: React.FC<DiffViewProps> = ({
               </Typography>
             </Grid>
             <Grid item>
-              <Chip size='small' label={extensions?.weight?.toFixed(0) || 0} />
+              <Chip size='small' label={extensions?.weight?.toFixed(1) || 0} />
             </Grid>
             <Grid item>
               <Typography variant='body2'>

@@ -54,7 +54,7 @@ const CommitList: React.FC<CommitListProps> = ({
               <Grid item xs={9}>
                 <Typography variant='body2'>{commit.title}</Typography>
                 <Typography>
-                  <strong>Score:</strong> {commit.extensions?.score?.toFixed(0)}
+                  <strong>Score:</strong> {commit.extensions?.score?.toFixed(1)}
                 </Typography>
               </Grid>
               <Grid item xs={3}>

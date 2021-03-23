@@ -97,13 +97,13 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
         disabled
         component={NavLink}
         to={ListItemBoxProps.url}
-        activeStyle={{ color: '#fac326' }}
+        activeStyle={{ color: '#ffff00' }}
         className={styles.buttonStyle}
       >
         <SvgIcon
           className={styles.iconStyle}
           style={{
-            color: activeRoute(ListItemBoxProps.url) ? '#fac326' : 'white',
+            color: activeRoute(ListItemBoxProps.url) ? '#ffff00' : 'white',
           }}
         >
           <Icon icon={ListItemBoxProps.icon} />
@@ -127,13 +127,13 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
       component={NavLink}
       exact
       to={ListItemBoxProps.url}
-      activeStyle={{ color: '#fac326' }}
+      activeStyle={{ color: '#ffff00' }}
       className={styles.buttonStyle}
     >
       <SvgIcon
         className={styles.iconStyle}
         style={{
-          color: activeRoute(ListItemBoxProps.url) ? '#fac326' : 'white',
+          color: activeRoute(ListItemBoxProps.url) ? '#ffff00' : 'white',
         }}
       >
         <Icon icon={ListItemBoxProps.icon} />
