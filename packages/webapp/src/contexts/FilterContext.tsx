@@ -94,3 +94,12 @@ export const FilterContextProvider: React.FC = ({ children }) => {
     <FilterContext.Provider value={value}>{children}</FilterContext.Provider>
   );
 };
+
+export function resetFilterStorage() {
+  localStorage.setItem(
+    START_DATE_LOCAL_STORAGE_KEY,
+    DateTime.now().minus({ days: 7 }).toISO(),
+  );
+  localStorage.setItem(END_DATE_LOCAL_STORAGE_KEY, DateTime.now().toISO());
+  localStorage.setItem(AUTHOR_LOCAL_STORAGE_KEY, 'all');
+}

@@ -2,22 +2,38 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
+import { useSnackbar } from 'notistack';
 import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { useGetRepository } from '../../api/repository';
+import {
+  AddCollaboratorPayload,
+  RemoveCollaboratorPayload,
+  useAddCollaborator,
+  useGetRepository,
+  useRemoveCollaborator,
+} from '../../api/repository';
 import DefaultPageLayout from '../../components/DefaultPageLayout';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 import SmartDate from '../../components/SmartDate';
 import CancelIcon from '@material-ui/icons/Cancel';
+import { useAuthContext } from '../../contexts/AuthContext';
+import Collaborators from './components/Collaborators';
+import LeaveRepository from './components/LeaveRepository';
 import LinkGrid from './components/LinkGrid';
 import MembersWarning from './components/MembersWarning';
-import Box from '@material-ui/core/Box';
 import ScoringConfigWarning from './components/ScoringConfigWarning';
 import ScoringConfigSelector from './components/ScoringConfigSelector';
 import { useUpdateScoring } from '../../api/scoring';
 import { ApiResource } from '../../api/base';
 import { ScoringConfig } from '@ceres/types';
 import RepoFilter from '../../components/RepositoryFilter';
+import styled from 'styled-components';
+
+const MainContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 1rem;
+`;
 
 const RepositoryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -26,7 +42,12 @@ const RepositoryPage: React.FC = () => {
     mutate: updateScoring,
     isLoading: updateScoreLoading,
   } = useUpdateScoring();
+  const { user } = useAuthContext();
   const { data, invalidate } = useGetRepository(id);
+  const { mutate: addCollaborator } = useAddCollaborator(id);
+  const { mutate: removeCollaborator } = useRemoveCollaborator(id);
+  const { enqueueSnackbar } = useSnackbar();
+  const isOwner = user?.id === data?.extensions?.owner?.id;
 
   const handleUpdateScore = (scoringConfig: ApiResource<ScoringConfig>) => {
     updateScoring(
@@ -37,6 +58,32 @@ const RepositoryPage: React.FC = () => {
       {
         onSuccess: () => {
           void invalidate();
+        },
+      },
+    );
+  };
+
+  const handleAddCollaborator = (payload: AddCollaboratorPayload) => {
+    addCollaborator(payload, {
+      onSuccess: invalidate,
+    });
+  };
+
+  const handleRemoveCollaborator = (payload: RemoveCollaboratorPayload) => {
+    removeCollaborator(payload, {
+      onSuccess: invalidate,
+    });
+  };
+
+  const handleLeave = () => {
+    removeCollaborator(
+      { collaboratorId: user.id },
+      {
+        onSuccess: () => {
+          push('/repository');
+          enqueueSnackbar('You have left the snapshot.', {
+            variant: 'success',
+          });
         },
       },
     );
@@ -71,25 +118,31 @@ const RepositoryPage: React.FC = () => {
             </Typography>
           </Grid>
         </Grid>
-        <Box my={3}>
+        <MainContainer>
           <MembersWarning repositoryId={id} />
-        </Box>
-        <Box my={3}>
           <ScoringConfigWarning repository={data} />
-        </Box>
-        {data && (
-          <Box my={3}>
+          {data && !isOwner && (
+            <LeaveRepository repository={data} onLeave={handleLeave} />
+          )}
+          {data && isOwner && (
+            <Collaborators
+              repository={data}
+              onAddCollaborator={handleAddCollaborator}
+              onRemoveCollaborator={handleRemoveCollaborator}
+            />
+          )}
+          {data && isOwner && (
             <ScoringConfigSelector
               isLoading={updateScoreLoading}
               onSubmit={handleUpdateScore}
               repository={data}
             />
-          </Box>
-        )}
-        <Box my={3}>
-          <RepoFilter />
-        </Box>
-        <LinkGrid repositoryId={id} />
+          )}
+          <Grid item xs={12}>
+            <RepoFilter />
+          </Grid>
+          <LinkGrid repositoryId={id} />
+        </MainContainer>
       </Container>
     </DefaultPageLayout>
   );

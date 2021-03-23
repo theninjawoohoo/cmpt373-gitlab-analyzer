@@ -129,3 +129,11 @@ export interface MergeRequest extends WithExtensions<MergeRequestExtensions>{
     blocking_discussions_resolved: boolean;
     approvals_before_merge?: any;
 }
+
+export namespace MergeRequest {
+  export interface DailyCount {
+    date: string;
+    count: number;
+    score: number;
+  }
+}

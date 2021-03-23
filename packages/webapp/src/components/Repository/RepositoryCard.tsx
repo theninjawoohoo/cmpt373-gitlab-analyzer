@@ -11,15 +11,33 @@ import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import SmartDate from '../SmartDate';
 import UndecoratedLink from '../UndecoratedLink';
 import WarningIcon from '@material-ui/icons/Warning';
+import ShareIcon from '@material-ui/icons/Share';
 
 interface RepositoryCardProps {
   repository: ApiResource<Repository>;
+  isShared: boolean;
   isSyncing: boolean;
   syncRepository: (id: string) => void;
 }
 
+const SyncButton = (props: { syncing: boolean; onClick: () => void }) => (
+  <Box position='absolute' right='4rem' top='3rem'>
+    {!props.syncing && (
+      <Button
+        variant='contained'
+        color='secondary'
+        disabled={props.syncing}
+        onClick={props.onClick}
+      >
+        Sync
+      </Button>
+    )}
+  </Box>
+);
+
 const RepositoryCard: React.FC<RepositoryCardProps> = ({
   repository,
+  isShared,
   isSyncing,
   syncRepository,
 }) => {
@@ -28,6 +46,7 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
   const handleClick = () => {
     setRepositoryId(repository.meta.id);
   };
+  const collaboratorsCount = repository?.extensions?.collaborators?.length || 0;
   return (
     <Box my={3} position='relative'>
       <UndecoratedLink
@@ -42,6 +61,25 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
                   <Box height='5rem' width='5rem' bgcolor='#DBD6FF' />
                 </Grid>
                 <Grid item>
+                  {isShared && (
+                    <Typography variant='body2'>
+                      Shared by:{' '}
+                      <strong>{repository?.extensions?.owner?.display}</strong>
+                    </Typography>
+                  )}
+                  {!isShared && collaboratorsCount > 0 && (
+                    <Grid alignItems='center' container spacing={1}>
+                      <Grid item>
+                        <ShareIcon fontSize='inherit' />
+                      </Grid>
+                      <Grid item>
+                        <Typography variant='body2'>
+                          Shared with <strong>{collaboratorsCount}</strong>{' '}
+                          users
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  )}
                   <Grid alignItems='center' container>
                     {!hasBeenSynced && <Box component={WarningIcon} mr={2} />}
                     <Typography variant='h4'>
@@ -66,18 +104,12 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
           </Grid>
         </Box>
       </UndecoratedLink>
-      <Box position='absolute' right='4rem' top='3rem'>
-        {!isSyncing && (
-          <Button
-            variant='contained'
-            color='secondary'
-            disabled={isSyncing}
-            onClick={() => syncRepository(repository.meta.id)}
-          >
-            Sync
-          </Button>
-        )}
-      </Box>
+      {!isShared && (
+        <SyncButton
+          syncing={isSyncing}
+          onClick={() => syncRepository(repository.meta.id)}
+        />
+      )}
       {isSyncing && (
         <Box
           position='absolute'
