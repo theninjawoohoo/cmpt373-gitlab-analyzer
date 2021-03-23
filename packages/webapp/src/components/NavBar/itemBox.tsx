@@ -14,15 +14,15 @@ interface ListItemBoxProps {
 }
 
 const useStyles = makeStyles(() => ({
-  logoutButton: {
-    color: 'white',
-    bottom: '1.5rem',
-    position: 'absolute',
-    display: 'flex',
-    width: '6rem',
-    alignItems: 'center',
-    flexDirection: 'column',
-  },
+  // logoutButton: {
+  //   color: 'white',
+  //   bottom: '1.5rem',
+  //   position: 'absolute',
+  //   display: 'flex',
+  //   width: '6rem',
+  //   alignItems: 'center',
+  //   flexDirection: 'column',
+  // },
   iconStyle: {
     fontSize: '3.5vh',
     color: 'white',
@@ -62,7 +62,7 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
         button
         component={Link}
         to={ListItemBoxProps.url}
-        className={styles.logoutButton}
+        className={styles.buttonStyle}
         onClick={logout}
       >
         <SvgIcon className={styles.iconStyle}>

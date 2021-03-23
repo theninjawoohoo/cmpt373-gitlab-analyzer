@@ -12,12 +12,12 @@ const useStyles = makeStyles((theme) => ({
   root: {
     transition: theme.transitions.create('width'),
     overflow: 'hidden',
-    minHeight: '120vh',
+    minHeight: '100vh',
   },
 
   listCSS: {
-    width: '100rem',
-    position: 'relative',
+    width: '6rem',
+    position: 'fixed',
     height: '100%',
     backgroundColor: '#0A4D63',
   },
