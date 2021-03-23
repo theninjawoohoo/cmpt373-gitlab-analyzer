@@ -3,7 +3,7 @@ import DefaultPageLayout from '../../components/DefaultPageLayout';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import LinkCard from '../RepositoryHomePage/components/LinkCard';
+import LinkCard from '../../components/LinkCard';
 
 const SettingsPage: React.FC = () => {
   return (
