@@ -85,6 +85,7 @@ const DynamicGraph: React.FC = () => {
     0,
     9000,
   );
+  console.log(commits);
   // const { data: merges } = useMergeDailyCounts(
   //   {
   //     repository: id,

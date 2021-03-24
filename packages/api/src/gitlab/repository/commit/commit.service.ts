@@ -88,27 +88,6 @@ export class CommitService {
     });
   }
 
-  async createDailyCache(repository: Repository): Promise<Commit.DailyCount[]> {
-    const rows = await this.commitRepository
-      .createQueryBuilder('commit')
-      .select("commit.resource #>>'{author_email}'", 'author_email')
-      .addSelect("DATE(commit.resource #>>'{created_at}')", 'date')
-      .addSelect("commit.resource #>>'{author_name}'", 'author_name')
-      .addSelect('count(*)', 'count')
-      .addSelect(
-        "sum((commit.resource #>> '{extensions,score}')::float)",
-        'total_score',
-      )
-      .where('commit.repository_id = :repositoryId', {
-        repositoryId: repository.id,
-      })
-      .groupBy('author_email')
-      .addGroupBy('author_name')
-      .addGroupBy('date')
-      .getRawMany();
-    return rows.map((row) => ({ ...row, count: parseInt(row.count) }));
-  }
-
   async getDistinctAuthors(repository: Repository) {
     const rows = await this.commitRepository
       .createQueryBuilder('commit')

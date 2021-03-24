@@ -12,7 +12,7 @@ import Button from '@material-ui/core/Button/Button';
 import Box from '@material-ui/core/Box';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import MemberDropdown from '../MemberDropdown';
-import { useFilterContext } from '../../contexts/FilterContext';
+// import { useFilterContext } from '../../contexts/FilterContext';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 
 const CommitList: React.FC = () => {
@@ -29,8 +29,8 @@ const CommitList: React.FC = () => {
     },
     page,
   );
-  const { elements } = useFilterContext();
-  console.log(elements);
+  // const { elements } = useFilterContext();
+  // console.log(elements);
   return (
     <Container>
       <Grid container justify='space-between' alignItems='center'>
