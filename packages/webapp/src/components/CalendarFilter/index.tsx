@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import LuxonUtils from '@date-io/luxon';
 import {
   MuiPickersUtilsProvider,
-  KeyboardDatePicker,
+  KeyboardDateTimePicker,
 } from '@material-ui/pickers';
 import { useGetCommits } from '../../api/commit';
 
@@ -33,14 +33,14 @@ const CalendarFilter: React.FC = () => {
   );
 
   const handleStartDateChange = (date) => {
-    setStartDate(date.startOf('day'));
-    setStartDateContext(date.toString());
+    setStartDate(date.startOf('second'));
+    setStartDateContext(date.toUTC().toString());
     setArrayContext(commits?.results);
   };
 
   const handleEndDateChange = (date) => {
-    setEndDate(date.startOf('day'));
-    setEndDateContext(date.toString());
+    setEndDate(date.startOf('second'));
+    setEndDateContext(date.toUTC().toString());
     setArrayContext(commits?.results);
   };
 
@@ -48,10 +48,10 @@ const CalendarFilter: React.FC = () => {
     <MuiPickersUtilsProvider utils={LuxonUtils}>
       <Grid container spacing={1}>
         <Grid item xs={6}>
-          <KeyboardDatePicker
-            disableToolbar
+          <KeyboardDateTimePicker
             variant='inline'
-            format='MM/dd/yyyy'
+            ampm={true}
+            format='MM/dd/yyyy hh:mm a'
             margin='normal'
             id='date-picker-inline'
             label='Start Date'
@@ -63,10 +63,10 @@ const CalendarFilter: React.FC = () => {
           />
         </Grid>
         <Grid item xs={6}>
-          <KeyboardDatePicker
-            disableToolbar
+          <KeyboardDateTimePicker
             variant='inline'
-            format='MM/dd/yyyy'
+            ampm={true}
+            format='MM/dd/yyyy hh:mm a'
             margin='normal'
             id='date-picker-inline'
             label='End Date'
