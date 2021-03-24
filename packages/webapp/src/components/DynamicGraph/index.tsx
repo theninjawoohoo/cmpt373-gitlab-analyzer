@@ -13,12 +13,22 @@ import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 
-const getCodeData = (date: DateTime, commits: any[], merges: any[]) => {
+const getCodeData = (
+  date: DateTime,
+  commits: any[],
+  merges: any[],
+  commit_index: number,
+) => {
   let commitCount = 0;
   let mergeCount = 0;
-  for (const result of commits) {
+  let c_index = commit_index;
+  for (let i = c_index; i < commits.length; i++) {
+    const result = commits[i];
     if (DateTime.fromISO(result.authored_date).hasSame(date, 'day')) {
       commitCount += 1;
+    } else {
+      c_index = i;
+      break;
     }
   }
   for (const result of merges) {
@@ -30,6 +40,7 @@ const getCodeData = (date: DateTime, commits: any[], merges: any[]) => {
     date: date.toLocaleString(DateTime.DATE_SHORT),
     commitCount,
     mergeCount,
+    c_index,
   };
 };
 
@@ -69,6 +80,7 @@ const DynamicGraph: React.FC = () => {
       author_email: emails,
       start_date: startDate,
       end_date: endDate,
+      sort_order: 'ASC',
     },
     0,
     9000,
@@ -86,10 +98,19 @@ const DynamicGraph: React.FC = () => {
   useEffect(() => {
     if (startDate && endDate) {
       let date = DateTime.fromISO(startDate);
+      let commit_index = 0;
       const countsByDay = [];
       if (graphType == 0) {
         do {
-          countsByDay.push(getCodeData(date, commits?.results || [], []));
+          const codeData = getCodeData(
+            date,
+            commits?.results || [],
+            [],
+            commit_index,
+          );
+          const { date: day, commitCount, mergeCount } = codeData;
+          commit_index = codeData.c_index;
+          countsByDay.push({ date: day, commitCount, mergeCount });
           date = date.plus({ days: 1 });
         } while (date <= DateTime.fromISO(endDate));
       } else if (graphType == 1) {

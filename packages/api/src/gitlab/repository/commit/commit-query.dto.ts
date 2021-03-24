@@ -21,4 +21,7 @@ export class CommitQueryDto extends QueryDto {
   @IsOptional()
   @IsDateString()
   end_date?: string;
+
+  @IsOptional()
+  sort_order?: 'ASC' | 'DESC';
 }

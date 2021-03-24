@@ -63,7 +63,14 @@ export class CommitService {
       });
     }
 
-    query.orderBy("commit.resource #>> '{authored_date}'", 'DESC');
+    if (filters.sort_order) {
+      query.orderBy(
+        "commit.resource #>> '{authored_date}'",
+        filters.sort_order,
+      );
+    } else {
+      query.orderBy("commit.resource #>> '{authored_date}'", 'DESC');
+    }
     paginate(query, filters);
     return query.getManyAndCount();
   }
