@@ -56,7 +56,7 @@ export class MergeRequestService extends BaseService<
 
     if (filters.merged_start_date) {
       query.andWhere(
-        "DATE(merge_request.resource #>> '{merged_at}') >= DATE(:startDate)",
+        "(merge_request.resource #>> '{merged_at}') >= (:startDate)",
         {
           startDate: filters.merged_start_date,
         },
@@ -65,7 +65,7 @@ export class MergeRequestService extends BaseService<
 
     if (filters.merged_end_date) {
       query.andWhere(
-        "DATE(merge_request.resource #>> '{merged_at}') <= DATE(:endDate)",
+        "(merge_request.resource #>> '{merged_at}') <= (:endDate)",
         {
           endDate: filters.merged_end_date,
         },
