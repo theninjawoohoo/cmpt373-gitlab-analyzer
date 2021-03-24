@@ -1,7 +1,9 @@
 import { RepositoryMember } from '@ceres/types';
 import {
+  BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpCode,
   NotFoundException,
@@ -12,14 +14,20 @@ import {
 } from '@nestjs/common';
 import { IdParam } from '../../common/id-param';
 import { paginatedToResponse } from '../../common/pagination';
+import { UserService } from '../../user/services/user.service';
 import { CommitAuthorService } from './commit/author/commit-author.service';
 import { RepositoryMemberService } from './repository-member/repository-member.service';
+import {
+  AddCollaboratorPayload,
+  RemoveCollaboratorPayload,
+} from './repository.payloads';
 import { RepositoryService } from './repository.service';
 import { GitlabToken } from '../../auth/decorators/gitlab-token.decorator';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { VerifiedUser } from '../../auth/types/VerifiedUser';
 import { MergeRequestService } from '../merge-request/merge-request.service';
 import { RepositoryQueryDto } from './repository-query.dto';
+import { Delete } from '@nestjs/common';
 
 @Controller('repository')
 export class RepositoryController {
@@ -28,6 +36,7 @@ export class RepositoryController {
     private readonly repositoryMemberService: RepositoryMemberService,
     private readonly mergeRequestService: MergeRequestService,
     private readonly commitAuthorService: CommitAuthorService,
+    private readonly userService: UserService,
   ) {}
 
   @Get(':id/participants')
@@ -108,5 +117,57 @@ export class RepositoryController {
       return repo;
     }
     throw new NotFoundException(`Could not find a repository with id: ${id}`);
+  }
+
+  @Post(':id/collaborator')
+  async addCollaborator(
+    @Param() { id }: IdParam,
+    @Body() { sfuId, accessLevel }: AddCollaboratorPayload,
+    @Auth() { user }: VerifiedUser,
+  ) {
+    const collaborator = await this.userService.findBySfuId(sfuId);
+    if (!collaborator) {
+      throw new NotFoundException(`User with SFU id: ${sfuId} does not exist`);
+    }
+    const repository = await this.repositoryService.findOne(id);
+    if (user.id !== repository?.resource?.extensions?.owner?.id) {
+      throw new ForbiddenException(
+        'Only repository owners can add collaborators',
+      );
+    }
+    if (user.auth.userId === sfuId) {
+      throw new BadRequestException(
+        'You cannot be a collaborator on a project you own.',
+      );
+    }
+    return this.repositoryService.addCollaborator(
+      repository,
+      collaborator,
+      accessLevel,
+    );
+  }
+
+  @Delete(':id/collaborator')
+  async removeCollaborator(
+    @Param() { id }: IdParam,
+    @Body() { collaboratorId }: RemoveCollaboratorPayload,
+    @Auth() { user }: VerifiedUser,
+  ) {
+    const collaborator = await this.userService.findOne(collaboratorId);
+    if (!collaborator) {
+      throw new NotFoundException(
+        `User with id: ${collaboratorId} does not exist`,
+      );
+    }
+    const repository = await this.repositoryService.findOne(id);
+    if (
+      user.id !== repository?.resource?.extensions?.owner?.id &&
+      collaboratorId != user.id
+    ) {
+      throw new ForbiddenException(
+        'Only the repository owner can remove other members',
+      );
+    }
+    return this.repositoryService.removeCollaborator(repository, collaborator);
   }
 }

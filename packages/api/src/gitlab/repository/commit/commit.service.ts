@@ -50,7 +50,7 @@ export class CommitService {
 
     if (filters.start_date) {
       query.andWhere(
-        "DATE(commit.resource #>> '{authored_date}') >= DATE(:startDate)",
+        "(commit.resource #>> '{authored_date}') >= (:startDate)",
         {
           startDate: filters.start_date,
         },
@@ -58,12 +58,9 @@ export class CommitService {
     }
 
     if (filters.end_date) {
-      query.andWhere(
-        "DATE(commit.resource #>> '{authored_date}') <= DATE(:endDate)",
-        {
-          endDate: filters.end_date,
-        },
-      );
+      query.andWhere("(commit.resource #>> '{authored_date}') <= (:endDate)", {
+        endDate: filters.end_date,
+      });
     }
 
     query.orderBy("commit.resource #>> '{authored_date}'", 'DESC');

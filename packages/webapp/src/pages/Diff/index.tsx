@@ -39,6 +39,7 @@ const DiffCommit: React.FC = () => {
               key={diff.meta.id}
               fileName={diff.new_path}
               lines={diff.lines}
+              summary={diff.summary}
               expanded={expanded}
               onSummaryClick={() => {
                 if (expanded) {

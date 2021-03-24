@@ -32,21 +32,15 @@ export class CommitDailyCountService {
     }
 
     if (filters.start_date) {
-      query.andWhere(
-        "DATE(daily_count.resource #>> '{date}') >= DATE(:startDate)",
-        {
-          startDate: filters.start_date,
-        },
-      );
+      query.andWhere("(daily_count.resource #>> '{date}') >= (:startDate)", {
+        startDate: filters.start_date,
+      });
     }
 
     if (filters.end_date) {
-      query.andWhere(
-        "DATE(daily_count.resource #>> '{date}') <= DATE(:endDate)",
-        {
-          endDate: filters.end_date,
-        },
-      );
+      query.andWhere("(daily_count.resource #>> '{date}') <= (:endDate)", {
+        endDate: filters.end_date,
+      });
     }
 
     query.orderBy("daily_count.resource #>> '{created_at}'");
