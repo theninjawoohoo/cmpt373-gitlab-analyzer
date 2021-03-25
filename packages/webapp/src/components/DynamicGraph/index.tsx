@@ -5,13 +5,12 @@ import Tab from '@material-ui/core/Tab';
 import { useGetCommits } from '../../api/commit';
 import { DateTime } from 'luxon';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
-import MemberDropdown from '../MemberDropdown';
 import { useFilterContext } from '../../contexts/FilterContext';
-import CalendarFilter from '../CalendarFilter';
 import DynamicBarChart from './BarChartComponent';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
+import RepoFilter from '../../components/RepositoryFilter';
 
 const getCodeData = (date: DateTime, commits: any[], merges: any[]) => {
   let commitCount = 0;
@@ -60,9 +59,8 @@ const getCommentData = (date: DateTime, wordCounts: any[]) => {
 };
 
 const DynamicGraph: React.FC = () => {
-  const { startDate, endDate } = useFilterContext();
+  const { startDate, endDate, emails } = useFilterContext();
   const { repositoryId } = useRepositoryContext();
-  const [emails, setEmails] = useState<string[]>([]);
   const { data: commits } = useGetCommits(
     {
       repository: repositoryId,
@@ -118,17 +116,7 @@ const DynamicGraph: React.FC = () => {
         <Container maxWidth='md'>
           <Grid container alignItems='flex-end' spacing={1}>
             <Grid item xs={8}>
-              <CalendarFilter />
-            </Grid>
-            <Grid item xs={4}>
-              <Box mb={1}>
-                <MemberDropdown
-                  repositoryId={repositoryId}
-                  onChange={(newEmails) => {
-                    setEmails(newEmails);
-                  }}
-                />
-              </Box>
+              <RepoFilter />
             </Grid>
           </Grid>
         </Container>

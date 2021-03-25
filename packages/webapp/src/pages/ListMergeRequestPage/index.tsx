@@ -13,12 +13,9 @@ import CommitList from './components/CommitList';
 import MergeRequestRenderer from './components/MergeRequestRenderer';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import MemberDropdown from '../../components/MemberDropdown';
-import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 import styled from 'styled-components';
 import { useFilterContext } from '../../contexts/FilterContext';
-import CalendarFilter from '../../components/CalendarFilter';
 
 const IndependentScrollGrid = styled(Grid)`
   height: 100vh;
@@ -42,9 +39,7 @@ const IndependentScrollGrid = styled(Grid)`
 
 const ListMergeRequestPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { startDate, endDate } = useFilterContext();
-  const { repositoryId } = useRepositoryContext();
-  const [emails, setEmails] = useState<string[]>([]);
+  const { startDate, endDate, emails } = useFilterContext();
   const [activeMergeRequest, setActiveMergeRequest] = useState<
     ApiResource<MergeRequest>
   >();
@@ -82,25 +77,6 @@ const ListMergeRequestPage = () => {
               <Box my={2}>
                 <DefaultPageTitleFormat>Merge Requests</DefaultPageTitleFormat>
               </Box>
-              <Grid item>
-                <Container maxWidth='md'>
-                  <Grid container alignItems='flex-end' spacing={1}>
-                    <Grid item xs={8}>
-                      <CalendarFilter />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Box mb={1}>
-                        <MemberDropdown
-                          repositoryId={repositoryId}
-                          onChange={(newEmails) => {
-                            setEmails(newEmails);
-                          }}
-                        />
-                      </Box>
-                    </Grid>
-                  </Grid>
-                </Container>
-              </Grid>
               {!activeMergeRequest && (
                 <Box pr={6} pl={2} py={1}>
                   <Grid container>

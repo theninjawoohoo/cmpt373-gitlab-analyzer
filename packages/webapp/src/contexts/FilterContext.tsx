@@ -4,28 +4,28 @@ import { DateTime } from 'luxon';
 interface FilterContextState {
   startDate: string;
   endDate: string;
-  elements: any;
   author: string;
-  setStartDateContext: React.Dispatch<React.SetStateAction<string>>;
-  setEndDateContext: React.Dispatch<React.SetStateAction<string>>;
-  setArrayContext: React.Dispatch<React.SetStateAction<any>>;
-  setAuthorContext: React.Dispatch<React.SetStateAction<string>>;
+  emails: string[];
+  setStartDate: React.Dispatch<React.SetStateAction<string>>;
+  setEndDate: React.Dispatch<React.SetStateAction<string>>;
+  setAuthor: React.Dispatch<React.SetStateAction<string>>;
+  setEmail: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export const START_DATE_LOCAL_STORAGE_KEY = 'start_date_context';
-export const END_DATE_LOCAL_STORAGE_KEY = 'end_date_context';
-export const AUTHOR_LOCAL_STORAGE_KEY = 'author_context';
-export const ELEMENTS_LOCAL_STORAGE_KEY = 'elements_context';
+const START_DATE_LOCAL_STORAGE_KEY = 'start_date_context';
+const END_DATE_LOCAL_STORAGE_KEY = 'end_date_context';
+const AUTHOR_LOCAL_STORAGE_KEY = 'author_context';
+const EMAIL_LOCAL_STORAGE_KEY = 'emails_context';
 
 const FilterContextDefault: FilterContextState = {
   startDate: DateTime.now().minus({ days: 7 }).toISO(),
   endDate: DateTime.now().toISO(),
   author: '',
-  elements: [],
-  setStartDateContext: () => null,
-  setEndDateContext: () => null,
-  setArrayContext: () => null,
-  setAuthorContext: () => null,
+  emails: [''],
+  setStartDate: () => null,
+  setEndDate: () => null,
+  setEmail: () => null,
+  setAuthor: () => null,
 };
 
 const FilterContext = React.createContext<FilterContextState>(
@@ -52,31 +52,27 @@ function useFilterState(): FilterContextState {
   if (!authorValue) {
     localStorage.setItem(AUTHOR_LOCAL_STORAGE_KEY, 'all');
   }
-  const elementsValue = localStorage.getItem(AUTHOR_LOCAL_STORAGE_KEY);
-  if (!elementsValue) {
-    localStorage.setItem(ELEMENTS_LOCAL_STORAGE_KEY, null);
-  }
-  const [startDate, setStartDateContext] = useState<string>(
+  const [startDate, setStartDate] = useState<string>(
     localStorage.getItem(START_DATE_LOCAL_STORAGE_KEY),
   );
-  const [endDate, setEndDateContext] = useState<string>(
+  const [endDate, setEndDate] = useState<string>(
     localStorage.getItem(END_DATE_LOCAL_STORAGE_KEY),
   );
-  const [author, setAuthorContext] = useState<string>(
+  const [author, setAuthor] = useState<string>(
     localStorage.getItem(AUTHOR_LOCAL_STORAGE_KEY),
   );
-  const [elements, setArrayContext] = useState<any>(
-    localStorage.getItem(ELEMENTS_LOCAL_STORAGE_KEY),
+  const [emails, setEmail] = useState<string[]>(
+    JSON.parse(localStorage.getItem(EMAIL_LOCAL_STORAGE_KEY)),
   );
   return {
     startDate,
     endDate,
     author,
-    elements,
-    setStartDateContext,
-    setEndDateContext,
-    setAuthorContext,
-    setArrayContext,
+    emails,
+    setStartDate,
+    setEndDate,
+    setAuthor,
+    setEmail,
   };
 }
 
@@ -92,8 +88,8 @@ export const FilterContextProvider: React.FC = ({ children }) => {
     localStorage.setItem(AUTHOR_LOCAL_STORAGE_KEY, value.author);
   }, [value.author]);
   useEffect(() => {
-    localStorage.setItem(ELEMENTS_LOCAL_STORAGE_KEY, value.elements);
-  }, [value.elements]);
+    localStorage.setItem(EMAIL_LOCAL_STORAGE_KEY, JSON.stringify(value.emails));
+  }, [value.emails]);
   return (
     <FilterContext.Provider value={value}>{children}</FilterContext.Provider>
   );
