@@ -2,21 +2,22 @@ import React, { useState, useEffect } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import { useParams } from 'react-router-dom';
-import { useCommitDailyCounts } from '../../api/commit';
+import { useGetCommits } from '../../api/commit';
 import { DateTime } from 'luxon';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 import { useFilterContext } from '../../contexts/FilterContext';
 import DynamicBarChart from './BarChartComponent';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
+import { useRepositoryContext } from '../../contexts/RepositoryContext';
+import RepoFilter from '../../components/RepositoryFilter';
 
 const getCodeData = (date: DateTime, commits: any[], merges: any[]) => {
   let commitCount = 0;
   let mergeCount = 0;
   for (const result of commits) {
-    if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
-      commitCount += result.count;
+    if (DateTime.fromISO(result.authored_date).hasSame(date, 'day')) {
+      commitCount += 1;
     }
   }
   for (const result of merges) {
@@ -59,11 +60,13 @@ const getCommentData = (date: DateTime, wordCounts: any[]) => {
 
 const DynamicGraph: React.FC = () => {
   const { startDate, endDate, emails } = useFilterContext();
-  const { id } = useParams<{ id: string }>();
-  const { data: commits } = useCommitDailyCounts(
+  const { repositoryId } = useRepositoryContext();
+  const { data: commits } = useGetCommits(
     {
-      repository: id,
+      repository: repositoryId,
       author_email: emails,
+      start_date: startDate,
+      end_date: endDate,
     },
     0,
     9000,
@@ -110,6 +113,13 @@ const DynamicGraph: React.FC = () => {
     <>
       <Container>
         <DefaultPageTitleFormat>Contribution Graph</DefaultPageTitleFormat>
+        <Container maxWidth='md'>
+          <Grid container alignItems='flex-end' spacing={1}>
+            <Grid item xs={8}>
+              <RepoFilter />
+            </Grid>
+          </Grid>
+        </Container>
         <Box my={2}>
           <Tabs
             value={graphType}
