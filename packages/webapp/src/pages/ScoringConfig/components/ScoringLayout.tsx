@@ -11,11 +11,13 @@ import { useHistory } from 'react-router-dom';
 
 interface ScoringLayoutProps {
   showCreateButton?: boolean;
+  showBackButton?: boolean;
 }
 
 const ScoringLayout: React.FC<ScoringLayoutProps> = ({
   children,
   showCreateButton,
+  showBackButton,
 }) => {
   const { push } = useHistory();
   return (
@@ -23,21 +25,19 @@ const ScoringLayout: React.FC<ScoringLayoutProps> = ({
       <Container>
         <Grid container alignItems='center' justify='space-between'>
           <Grid item>
-            <DefaultPageTitleFormat>Scoring Config</DefaultPageTitleFormat>
+            <Grid container alignItems='center'>
+              {showBackButton && (
+                <Grid item>
+                  <IconButton onClick={() => push('/settings')}>
+                    <CancelIcon fontSize='large' />
+                  </IconButton>
+                </Grid>
+              )}
+              <Grid item>
+                <DefaultPageTitleFormat>Scoring Config</DefaultPageTitleFormat>
+              </Grid>
+            </Grid>
           </Grid>
-          <Grid item>
-            <IconButton onClick={() => push('/settings')}>
-              <CancelIcon fontSize='large' />
-            </IconButton>
-          </Grid>
-        </Grid>
-        <Grid
-          container
-          direction='column'
-          alignItems='stretch'
-          justify='space-between'
-          spacing={2}
-        >
           <Grid item>
             {showCreateButton ? (
               <Button
@@ -45,7 +45,7 @@ const ScoringLayout: React.FC<ScoringLayoutProps> = ({
                 color='primary'
                 size='large'
                 component={Link}
-                to='/scoring/edit'
+                to='/settings/scoring/edit'
               >
                 Create
               </Button>
@@ -54,14 +54,14 @@ const ScoringLayout: React.FC<ScoringLayoutProps> = ({
                 variant='contained'
                 color='secondary'
                 component={Link}
-                to='/scoring'
+                to='/settings/scoring'
               >
                 Cancel
               </Button>
             )}
           </Grid>
-          <Grid item>{children}</Grid>
         </Grid>
+        {children}
       </Container>
     </DefaultPageLayout>
   );

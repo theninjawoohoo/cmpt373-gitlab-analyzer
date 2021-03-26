@@ -15,12 +15,12 @@ const SettingsPage: React.FC = () => {
               <DefaultPageTitleFormat>Settings</DefaultPageTitleFormat>
             </Grid>
             <Grid item xs={12}>
-              <LinkCard color='#edd4ff' icon='api' to={`/api`}>
+              <LinkCard color='#edd4ff' icon='api' to='/settings/api'>
                 Change API Key
               </LinkCard>
             </Grid>
             <Grid item xs={12}>
-              <LinkCard color='#ccdfff' icon='scoring' to={`/scoring`}>
+              <LinkCard color='#ccdfff' icon='scoring' to='/settings/scoring'>
                 Score Config
               </LinkCard>
             </Grid>

@@ -102,7 +102,7 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
           <Grid item>
             <Typography>
               You can create and edit scoring configs{' '}
-              <Link to='/scoring'>here</Link>.
+              <Link to='/settings/scoring'>here</Link>.
             </Typography>
           </Grid>
         </Grid>
