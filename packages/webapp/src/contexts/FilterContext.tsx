@@ -62,7 +62,7 @@ function useFilterState(): FilterContextState {
     localStorage.getItem(AUTHOR_LOCAL_STORAGE_KEY),
   );
   const [emails, setEmail] = useState<string[]>(
-    JSON.parse(localStorage.getItem(EMAIL_LOCAL_STORAGE_KEY)),
+    JSON.parse(localStorage.getItem(EMAIL_LOCAL_STORAGE_KEY) || '[]'),
   );
   return {
     startDate,
