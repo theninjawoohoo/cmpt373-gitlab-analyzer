@@ -12,7 +12,7 @@ import ScoringLayout from './components/ScoringLayout';
 const BrowseScoringConfigsPage: React.FC = () => {
   const { data } = useSearchScoringConfigs();
   return (
-    <ScoringLayout showCreateButton>
+    <ScoringLayout showCreateButton showBackButton>
       <Box mx={2}>
         <Grid container>
           <Grid item xs={6}>
@@ -29,7 +29,7 @@ const BrowseScoringConfigsPage: React.FC = () => {
             key={scoringConfig.meta.id}
             button
             component={Link}
-            to={`/scoring/edit?id=${scoringConfig.meta.id}`}
+            to={`/settings/scoring/edit?id=${scoringConfig.meta.id}`}
           >
             <Grid item xs={6}>
               <Typography>{scoringConfig.name}</Typography>

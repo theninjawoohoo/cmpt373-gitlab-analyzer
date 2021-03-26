@@ -14,15 +14,6 @@ interface ListItemBoxProps {
 }
 
 const useStyles = makeStyles(() => ({
-  // logoutButton: {
-  //   color: 'white',
-  //   bottom: '1.5rem',
-  //   position: 'absolute',
-  //   display: 'flex',
-  //   width: '6rem',
-  //   alignItems: 'center',
-  //   flexDirection: 'column',
-  // },
   iconStyle: {
     fontSize: '3.5vh',
     color: 'white',
@@ -42,9 +33,9 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
   const { repositoryId } = useRepositoryContext();
   const activeRoute = (routeName: any) => {
     const location = useLocation();
-    const parsed_location = location.pathname.split('?')[0];
-    const parsed_route = routeName.split('?')[0];
-    return parsed_location === parsed_route;
+    const parsedLocation = location.pathname.split('?')[0];
+    const parsedRoute = routeName.split('?')[0];
+    return parsedLocation.startsWith(parsedRoute);
   };
 
   if (ListItemBoxProps.icon == 'user') {
@@ -85,7 +76,6 @@ const ItemBox: React.FC<ListItemBoxProps> = (ListItemBoxProps) => {
     <ListItem
       button
       component={NavLink}
-      exact
       to={ListItemBoxProps.url}
       activeStyle={{ color: '#0A4D63', background: 'white' }}
       className={styles.buttonStyle}
