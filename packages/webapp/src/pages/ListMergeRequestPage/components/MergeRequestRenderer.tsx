@@ -1,4 +1,5 @@
 import { MergeRequest } from '@ceres/types';
+import { useTheme } from '@material-ui/core';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -32,9 +33,14 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
   children,
   shrink,
 }) => {
+  const theme = useTheme();
   return (
     <Accordion expanded={active} TransitionProps={{ timeout: 0 }}>
-      <AccordionSummary expandIcon={<ExpandMore />} onClick={onClickSummary}>
+      <AccordionSummary
+        expandIcon={<ExpandMore />}
+        onClick={onClickSummary}
+        style={{ background: active ? theme.palette.primary.light : '' }}
+      >
         <Grid container>
           <Grid item xs={shrink ? 8 : 6}>
             <Typography>{shortenTitle(mergeRequest.title, shrink)}</Typography>
