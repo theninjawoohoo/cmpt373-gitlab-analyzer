@@ -36,32 +36,34 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
     <Accordion expanded={active} TransitionProps={{ timeout: 0 }}>
       <AccordionSummary expandIcon={<ExpandMore />} onClick={onClickSummary}>
         <Grid container>
-          <Grid item xs={shrink ? 9 : 6}>
+          <Grid item xs={shrink ? 8 : 6}>
             <Typography>{shortenTitle(mergeRequest.title, shrink)}</Typography>
             {shrink && (
-              <Grid container spacing={2}>
-                <Grid item>
-                  <Typography>
-                    <strong>Score:</strong>{' '}
-                    {mergeRequest.extensions?.diffScore?.toFixed(1)}
+              <Grid container justify='space-between'>
+                <Typography variant='body2' color='textSecondary'>
+                  {mergeRequest.author.name}
+                </Typography>
+                <Box pr={4}>
+                  <Typography variant='body2' color='textSecondary'>
+                    <SmartDate>{mergeRequest.merged_at}</SmartDate>
                   </Typography>
-                </Grid>
-                <Grid item>
-                  <Typography>
-                    <strong>Commit scores sum:</strong>{' '}
-                    {mergeRequest.extensions?.commitScoreSum?.toFixed(1)}
-                  </Typography>
-                </Grid>
+                </Box>
               </Grid>
             )}
           </Grid>
           {shrink ? (
-            <Grid item>
-              <Typography>{mergeRequest.author.name}</Typography>
-              <Typography>
-                <SmartDate>{mergeRequest.merged_at}</SmartDate>
-              </Typography>
-            </Grid>
+            <>
+              <Grid item xs={2}>
+                <Typography align='right'>
+                  {mergeRequest.extensions?.diffScore?.toFixed(1)}
+                </Typography>
+              </Grid>
+              <Grid item xs={2}>
+                <Typography align='right'>
+                  {mergeRequest.extensions?.commitScoreSum?.toFixed(1)}
+                </Typography>
+              </Grid>
+            </>
           ) : (
             <>
               <Grid item xs={2}>
