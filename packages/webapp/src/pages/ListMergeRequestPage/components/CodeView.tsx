@@ -53,6 +53,7 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
                   setExpandedDiffs([...expandedDiffs, diff]);
                 }
               }}
+              allowEdit
             />
           );
         })}

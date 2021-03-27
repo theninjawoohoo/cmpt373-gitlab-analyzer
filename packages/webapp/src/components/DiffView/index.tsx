@@ -8,12 +8,15 @@ import {
 } from '@material-ui/core';
 import Chip from '@material-ui/core/Chip';
 import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip/Tooltip';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Root from './components/root';
 import ScorePopover from './components/ScorePopper';
+import CancelIcon from '@material-ui/icons/Cancel';
+import ScoreOverrideForm from '../../pages/ListMergeRequestPage/components/ScoreOverrideForm';
 
 interface DiffViewProps {
   fileName: string;
@@ -22,6 +25,7 @@ interface DiffViewProps {
   extensions?: Diff['extensions'];
   summary?: Diff['summary'];
   onSummaryClick?: () => void;
+  allowEdit?: boolean;
 }
 
 const LINE_COLOR_MAP = {
@@ -112,14 +116,42 @@ const DiffView: React.FC<DiffViewProps> = ({
   extensions,
   summary,
   onSummaryClick,
+  allowEdit,
 }) => {
+  const [anchor, setAnchor] = useState(null);
+  const [open, setOpen] = useState(false);
+  const onScoreEdit = (e: MouseEvent) => {
+    // prevent the accordion from toggling
+    e.stopPropagation();
+    setOpen(!open);
+    setAnchor(anchor ? null : e.currentTarget);
+  };
+
+  const onPopperClickAway = () => {
+    setOpen(false);
+    setAnchor(null);
+  };
+
   return (
     <Accordion expanded={expanded || false} TransitionProps={{ timeout: 0 }}>
       <AccordionSummary expandIcon={<ExpandMore />} onClick={onSummaryClick}>
-        <div>
-          <Typography style={{ fontFamily: 'monospace' }}>
-            {fileName}
-          </Typography>
+        <Box width='100%'>
+          <Grid container alignItems='center' justify='space-between'>
+            <Grid item>
+              <Typography style={{ fontFamily: 'monospace' }}>
+                {fileName}
+              </Typography>
+            </Grid>
+            {allowEdit && (
+              <>
+                <Grid item>
+                  <IconButton onClick={onScoreEdit as any}>
+                    <CancelIcon fontSize='small' />
+                  </IconButton>
+                </Grid>
+              </>
+            )}
+          </Grid>
           <Grid container alignItems='center' spacing={1}>
             <Grid item>
               <Typography variant='body2'>
@@ -149,8 +181,15 @@ const DiffView: React.FC<DiffViewProps> = ({
               <Chip size='small' label={extensions?.glob} />
             </Grid>
           </Grid>
-        </div>
+        </Box>
       </AccordionSummary>
+      {open && (
+        <ScoreOverrideForm
+          open={open}
+          anchor={anchor}
+          onClickAway={onPopperClickAway}
+        />
+      )}
       <AccordionDetails>
         <Root>
           {lines?.map((line) => {
