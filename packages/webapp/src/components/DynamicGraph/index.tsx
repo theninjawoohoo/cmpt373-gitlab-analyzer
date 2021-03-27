@@ -22,9 +22,8 @@ const getCodeData = (date: DateTime, commits: any[], merges: any[]) => {
     }
   }
   for (const merge of merges) {
-    if (DateTime.fromISO(merge.date).hasSame(date, 'day')) {
+    if (DateTime.fromISO(merge.merged_at).hasSame(date, 'day')) {
       mergeCount += merge.count;
-      console.log(mergeCount);
     }
   }
   return {
@@ -77,6 +76,8 @@ const DynamicGraph: React.FC = () => {
     {
       repository: repositoryId,
       author_email: emails,
+      merged_start_date: startDate,
+      merged_end_date: endDate,
     },
     0,
     9000,
@@ -120,7 +121,7 @@ const DynamicGraph: React.FC = () => {
         <DefaultPageTitleFormat>Contribution Graph</DefaultPageTitleFormat>
         <Container maxWidth='md'>
           <Grid container alignItems='flex-end' spacing={1}>
-            <Grid item xs={8}>
+            <Grid item xs={12}>
               <RepoFilter />
             </Grid>
           </Grid>
