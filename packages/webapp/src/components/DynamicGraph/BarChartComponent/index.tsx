@@ -6,6 +6,9 @@ interface BarChartProps {
   graphType: number;
 }
 
+const formatYAxis = (tickItem) => {
+  return tickItem.toFixed(2);
+};
 const DynamicBarChart: React.FC<BarChartProps> = (BarChartProps) => {
   if (BarChartProps.graphType == 0) {
     return (
@@ -36,7 +39,7 @@ const DynamicBarChart: React.FC<BarChartProps> = (BarChartProps) => {
     return (
       <BarChart width={1000} height={500} data={BarChartProps.graphData}>
         <XAxis dataKey='date' />
-        <YAxis />
+        <YAxis tickFormatter={formatYAxis} />
         <Tooltip />
         <Bar dataKey='wordCount' name='Word Counts' fill='#0A4D63' />
       </BarChart>
