@@ -18,6 +18,7 @@ interface CommitListProps {
 const Root = styled(Box)<{ disabled?: boolean }>`
   cursor: ${(p) => (p.disabled ? 'default' : 'pointer')};
   opacity: ${(o) => (o.disabled ? '50%' : '100%')};
+  border-top: 1px solid #e0e0e0;
 `;
 
 const CommitList: React.FC<CommitListProps> = ({
@@ -31,6 +32,9 @@ const CommitList: React.FC<CommitListProps> = ({
   });
   return (
     <>
+      <Box pr={3}>
+        <Typography align='right'>Commit Score</Typography>
+      </Box>
       {(commits?.results || []).map((commit) => {
         const isActive =
           authorEmails.length === 0 ||
@@ -38,7 +42,8 @@ const CommitList: React.FC<CommitListProps> = ({
         return (
           <Root
             key={commit.meta.id}
-            pl={5}
+            ml={5}
+            pr={3}
             py={1}
             onClick={
               !isActive
@@ -52,15 +57,21 @@ const CommitList: React.FC<CommitListProps> = ({
           >
             <Grid container>
               <Grid item xs={9}>
-                <Typography variant='body2'>{commit.title}</Typography>
-                <Typography>
-                  <strong>Score:</strong> {commit.extensions?.score?.toFixed(1)}
-                </Typography>
+                <Typography>{commit.title}</Typography>
+                <Grid container justify='space-between'>
+                  <Typography variant='body2' color='textSecondary'>
+                    {commit.author_name}
+                  </Typography>
+                  <Box pr={5}>
+                    <Typography variant='body2' color='textSecondary'>
+                      <SmartDate>{commit.authored_date}</SmartDate>
+                    </Typography>
+                  </Box>
+                </Grid>
               </Grid>
               <Grid item xs={3}>
-                <Typography variant='body2'>{commit.author_name}</Typography>
-                <Typography variant='body2'>
-                  <SmartDate>{commit.authored_date}</SmartDate>
+                <Typography align='right'>
+                  {commit.extensions?.score?.toFixed(1)}
                 </Typography>
               </Grid>
             </Grid>
