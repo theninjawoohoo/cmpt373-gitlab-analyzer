@@ -9,30 +9,39 @@ import Paper from '@material-ui/core/Paper';
 import Popper, { PopperProps } from '@material-ui/core/Popper';
 import TextField from '@material-ui/core/TextField';
 import React from 'react';
+import { useForm } from 'react-hook-form';
 
 interface ScoreOverrideFormProps {
-  defaultValues?: ScoreOverride;
+  defaultValues?: Partial<ScoreOverride>;
   open?: boolean;
   anchor?: PopperProps['anchorEl'];
   onClickAway?: () => void;
+  onSubmit?: (value: ScoreOverride) => void;
 }
 
 const ScoreOverrideForm: React.FC<ScoreOverrideFormProps> = ({
   anchor,
   open,
   onClickAway,
+  onSubmit,
 }) => {
+  const { handleSubmit, register } = useForm<ScoreOverride>();
   return (
     <ClickAwayListener onClickAway={onClickAway}>
       <Popper anchorEl={anchor} open={open}>
         <Paper elevation={3}>
           <Box minWidth='15rem' p={2}>
-            <form>
+            <form
+              autoComplete='off'
+              spellCheck={false}
+              onSubmit={handleSubmit(onSubmit)}
+            >
               <Grid container direction='column' spacing={1}>
                 <Grid item>
                   <FormControlLabel
-                    control={<Checkbox color='primary' />}
+                    control={<Checkbox color='primary' inputRef={register} />}
                     label='Exclude'
+                    name='exclude'
                   />
                 </Grid>
                 <Grid item>
@@ -40,6 +49,8 @@ const ScoreOverrideForm: React.FC<ScoreOverrideFormProps> = ({
                     fullWidth
                     label='Custom Score'
                     variant='outlined'
+                    inputRef={register}
+                    name='score'
                   />
                 </Grid>
                 <Grid item>
@@ -48,6 +59,8 @@ const ScoreOverrideForm: React.FC<ScoreOverrideFormProps> = ({
                     variant='outlined'
                     multiline
                     rows={4}
+                    inputRef={register}
+                    name='comment'
                   />
                 </Grid>
                 <Grid item>

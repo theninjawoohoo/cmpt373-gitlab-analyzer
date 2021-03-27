@@ -188,6 +188,9 @@ const DiffView: React.FC<DiffViewProps> = ({
           open={open}
           anchor={anchor}
           onClickAway={onPopperClickAway}
+          onSubmit={(values) => {
+            console.log(values);
+          }}
         />
       )}
       <AccordionDetails>
