@@ -42,10 +42,10 @@ export function Router() {
         <Route path='/settings' exact>
           <SettingsPage />
         </Route>
-        <Route path='/api' exact>
+        <Route path='/settings/api' exact>
           <ApiSettingPage />
         </Route>
-        <Route path='/scoring' exact>
+        <Route path='/settings/scoring' exact>
           <BrowseScoringConfigsPage />
         </Route>
         <Route path='/commits' exact>
@@ -60,7 +60,7 @@ export function Router() {
         <Route path='/diff' exact>
           <Diff />
         </Route>
-        <Route path='/scoring/edit' exact>
+        <Route path='/settings/scoring/edit' exact>
           <EditScoringConfigPage />
         </Route>
         <Route path='/logout' exact>

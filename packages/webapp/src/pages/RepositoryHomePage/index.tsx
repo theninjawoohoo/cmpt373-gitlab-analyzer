@@ -26,6 +26,7 @@ import ScoringConfigSelector from './components/ScoringConfigSelector';
 import { useUpdateScoring } from '../../api/scoring';
 import { ApiResource } from '../../api/base';
 import { ScoringConfig } from '@ceres/types';
+import RepoFilter from '../../components/RepositoryFilter';
 import styled from 'styled-components';
 
 const MainContainer = styled.div`
@@ -137,6 +138,9 @@ const RepositoryPage: React.FC = () => {
               repository={data}
             />
           )}
+          <Grid item xs={12}>
+            <RepoFilter />
+          </Grid>
           <LinkGrid repositoryId={id} />
         </MainContainer>
       </Container>

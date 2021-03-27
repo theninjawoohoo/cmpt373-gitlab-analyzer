@@ -19,7 +19,7 @@ const CommitList: React.FC = () => {
   const location = useLocation();
   const query = parse(location.search.replace(/^\?/, ''));
   const [page, setPage] = useState(0);
-  const [emails, setEmails] = useState<string[]>([]);
+  const { emails } = useFilterContext();
   const { repositoryId } = useRepositoryContext();
   const { data: commits } = useGetCommits(
     {
@@ -29,8 +29,6 @@ const CommitList: React.FC = () => {
     },
     page,
   );
-  const { elements } = useFilterContext();
-  console.log(elements);
   return (
     <Container>
       <Grid container justify='space-between' alignItems='center'>
@@ -38,12 +36,7 @@ const CommitList: React.FC = () => {
           <DefaultPageTitleFormat>Commit List</DefaultPageTitleFormat>
         </Grid>
         <Grid item>
-          <MemberDropdown
-            repositoryId={repositoryId}
-            onChange={(newEmails) => {
-              setEmails(newEmails);
-            }}
-          />
+          <MemberDropdown repositoryId={repositoryId} />
         </Grid>
       </Grid>
       {commits?.results.map((commit) => {
