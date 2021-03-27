@@ -1,5 +1,13 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ReferenceLine,
+} from 'recharts';
 
 interface BarChartProps {
   graphData: any[];
@@ -9,11 +17,17 @@ interface BarChartProps {
 const DynamicBarChart: React.FC<BarChartProps> = (BarChartProps) => {
   if (BarChartProps.graphType == 0) {
     return (
-      <BarChart width={1000} height={500} data={BarChartProps.graphData}>
+      <BarChart
+        width={1000}
+        height={500}
+        stackOffset='sign'
+        data={BarChartProps.graphData}
+      >
         <XAxis dataKey='date' />
-        <YAxis />
-        <Tooltip />
-        <Legend layout='vertical' align='right' verticalAlign='top' />
+        <YAxis tickFormatter={(value) => Math.abs(value).toString()} />
+        <Tooltip formatter={(value) => Math.abs(value).toString()} />
+        <Legend layout='horizontal' align='center' verticalAlign='top' />
+        <ReferenceLine y={0} stroke='#000' />
         <Bar dataKey='commitCount' name='Commits' stackId='a' fill='#0A4D63' />
         <Bar
           dataKey='mergeCount'

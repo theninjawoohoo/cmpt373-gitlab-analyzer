@@ -38,3 +38,7 @@ export function useInfiniteMergeRequest(
 ) {
   return useApiInfiniteQuery<MergeRequest>('/merge_request', params, pageSize);
 }
+
+export function useGetCountMergeRequests(params: MergeRequestSearchParams) {
+  return useApiQuery<MergeRequest.DailyCount>('/merge_request/count', params);
+}
