@@ -68,7 +68,7 @@ const ScoreOverrideForm: React.FC<ScoreOverrideFormProps> = ({
                     <Button variant='contained' color='secondary'>
                       Reset
                     </Button>
-                    <Button variant='contained' color='primary'>
+                    <Button variant='contained' color='primary' type='submit'>
                       Submit
                     </Button>
                   </Grid>

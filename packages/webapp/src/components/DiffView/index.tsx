@@ -1,4 +1,4 @@
-import { Diff, Line, LINE_SCORING } from '@ceres/types';
+import { Diff, Line, LINE_SCORING, ScoreOverride } from '@ceres/types';
 import {
   Accordion,
   AccordionSummary,
@@ -17,8 +17,10 @@ import Root from './components/root';
 import ScorePopover from './components/ScorePopper';
 import CancelIcon from '@material-ui/icons/Cancel';
 import ScoreOverrideForm from '../../pages/ListMergeRequestPage/components/ScoreOverrideForm';
+import { useScoreOverrideQueue } from '../../pages/ListMergeRequestPage/contexts/ScoreOverrideQueue';
 
 interface DiffViewProps {
+  diffId?: string;
   fileName: string;
   lines: Line[];
   expanded?: boolean;
@@ -117,9 +119,11 @@ const DiffView: React.FC<DiffViewProps> = ({
   summary,
   onSummaryClick,
   allowEdit,
+  diffId,
 }) => {
   const [anchor, setAnchor] = useState(null);
   const [open, setOpen] = useState(false);
+  const { add } = useScoreOverrideQueue();
   const onScoreEdit = (e: MouseEvent) => {
     // prevent the accordion from toggling
     e.stopPropagation();
@@ -131,6 +135,25 @@ const DiffView: React.FC<DiffViewProps> = ({
     setOpen(false);
     setAnchor(null);
   };
+
+  const onSubmitPopper = (values: ScoreOverride) => {
+    add({
+      id: `Diff/${diffId}`,
+      display: fileName,
+      previousScore: +extensions?.score?.toFixed(1) || 0,
+      override: {
+        ...values,
+        score: values.score ? +values.score : undefined,
+      },
+    });
+    onPopperClickAway();
+  };
+
+  const score = ScoreOverride.computeScore(
+    extensions?.override,
+    extensions?.score,
+  );
+  console.log({ score });
 
   return (
     <Accordion expanded={expanded || false} TransitionProps={{ timeout: 0 }}>
@@ -160,7 +183,7 @@ const DiffView: React.FC<DiffViewProps> = ({
             </Grid>
             <Grid item>
               <ScorePopover
-                scoreCount={extensions?.score?.toFixed(1)}
+                scoreCount={score.toFixed(1)}
                 scoreSummary={summary}
               />
             </Grid>
@@ -188,9 +211,7 @@ const DiffView: React.FC<DiffViewProps> = ({
           open={open}
           anchor={anchor}
           onClickAway={onPopperClickAway}
-          onSubmit={(values) => {
-            console.log(values);
-          }}
+          onSubmit={onSubmitPopper}
         />
       )}
       <AccordionDetails>

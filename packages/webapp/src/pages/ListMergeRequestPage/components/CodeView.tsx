@@ -39,6 +39,7 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
           return (
             <DiffView
               key={diff.meta.id}
+              diffId={diff.meta.id}
               fileName={diff.new_path}
               lines={diff.lines}
               summary={diff.summary}
