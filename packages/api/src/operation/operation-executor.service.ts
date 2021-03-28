@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { MergeRequestService } from '../gitlab/merge-request/merge-request.service';
 import { CommitAuthorService } from '../gitlab/repository/commit/author/commit-author.service';
 import { CommitService } from '../gitlab/repository/commit/commit.service';
-import { CommitDailyCountService } from '../gitlab/repository/commit/daily-count/daily-count.service';
 import { RepositoryMemberService } from '../gitlab/repository/repository-member/repository-member.service';
 import { RepositoryService } from '../gitlab/repository/repository.service';
 import { GitlabTokenService } from '../gitlab/services/gitlab-token.service';
@@ -24,14 +23,15 @@ export class OperationExecutorService {
     private readonly mergeRequestService: MergeRequestService,
     private readonly issueService: IssueService,
     private readonly repositoryService: RepositoryService,
-    private readonly commitDailyCountService: CommitDailyCountService,
     private readonly commitAuthorService: CommitAuthorService,
     private readonly repositoryMemberService: RepositoryMemberService,
   ) {}
 
   async execute(operation: OperationEntity) {
     console.log(`Starting execution for operation: ${operation.id}`);
-    operation.resource = this.startOperation(operation.resource);
+    operation.resource = OperationExecutorService.startOperation(
+      operation.resource,
+    );
     await this.operationRepository.save(operation);
     switch (operation.resource.type) {
       case Operation.Type.SYNC_REPOSITORY:
@@ -41,17 +41,19 @@ export class OperationExecutorService {
         await this.executeFetchRepositoriesOperation(operation);
         break;
     }
-    operation.resource = this.completeOperation(operation.resource);
+    operation.resource = OperationExecutorService.completeOperation(
+      operation.resource,
+    );
     return this.operationRepository.save(operation);
   }
 
-  private startOperation(operation: Operation) {
+  private static startOperation(operation: Operation) {
     operation.start_time = new Date().toISOString();
     operation.status = Operation.Status.PROCESSING;
     return operation;
   }
 
-  private completeOperation(operation: Operation) {
+  private static completeOperation(operation: Operation) {
     operation.end_time = new Date().toISOString();
     operation.status = Operation.Status.COMPLETED;
     return operation;
@@ -66,7 +68,6 @@ export class OperationExecutorService {
       this.mergeRequestService,
       this.issueService,
       this.repositoryService,
-      this.commitDailyCountService,
       this.commitAuthorService,
       this.repositoryMemberService,
     );
