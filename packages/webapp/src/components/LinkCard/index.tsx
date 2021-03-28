@@ -2,8 +2,8 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
 import styled from 'styled-components';
-import Icon from '../../../components/NavBar/iconHelper';
-import UndecoratedLink from '../../../components/UndecoratedLink';
+import Icon from '../NavBar/iconHelper';
+import UndecoratedLink from '../UndecoratedLink';
 
 interface LinkCardProps {
   color?: string;

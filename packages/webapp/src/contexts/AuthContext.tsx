@@ -2,6 +2,8 @@ import React, { useEffect, useContext, useState, useMemo } from 'react';
 import { useProfile } from '../api/user';
 import { User } from '@ceres/types';
 import axios from '../util/axios';
+import { resetFilterStorage } from './FilterContext';
+import { resetContextStorage } from './RepositoryContext';
 
 export function useAuthContext() {
   return useContext(AuthContext);
@@ -63,7 +65,9 @@ function login(token: string) {
 
 function logout() {
   axios.defaults.headers['Authorization'] = undefined;
-  localStorage.removeItem(LOCAL_STORAGE_KEY);
+  localStorage.clear();
+  resetFilterStorage();
+  resetContextStorage();
 }
 
 export const AuthContextProvider: React.FC = ({ children }) => {
