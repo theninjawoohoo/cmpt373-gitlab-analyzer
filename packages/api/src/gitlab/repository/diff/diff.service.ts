@@ -13,6 +13,7 @@ import {
   GlobWeight,
   Line,
   LINE_SCORING,
+  ScoreOverride,
 } from '@ceres/types';
 import { parsePatch } from 'diff';
 import DiffInterpreter from './helpers/DiffInterpreter';
@@ -26,7 +27,7 @@ export class DiffService {
     private readonly httpService: HttpService,
     @InjectRepository(DiffEntity)
     private readonly diffRepository: TypeORMRepository<DiffEntity>,
-  ) {}
+  ) { }
 
   search(filters: DiffQueryDto) {
     filters = withDefaults(filters);
@@ -44,6 +45,14 @@ export class DiffService {
 
     paginate(query, filters);
     return query.getManyAndCount();
+  }
+
+  async updateOverride(id: string, override: ScoreOverride) {
+    const diff = await this.diffRepository.findOne({ id });
+    diff.resource = Extensions.updateExtensions(diff.resource, {
+      override: override,
+    });
+    return this.diffRepository.save(diff);
   }
 
   async syncForCommit(commit: Commit, token: string) {

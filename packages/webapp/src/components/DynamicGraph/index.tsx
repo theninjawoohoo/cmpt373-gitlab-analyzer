@@ -2,23 +2,32 @@ import React, { useState, useEffect } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import { useParams } from 'react-router-dom';
-import { useCommitDailyCounts } from '../../api/commit';
+import { useGetCommits } from '../../api/commit';
 import { DateTime } from 'luxon';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
-import MemberDropdown from '../MemberDropdown';
 import { useFilterContext } from '../../contexts/FilterContext';
-import CalendarFilter from '../CalendarFilter';
 import DynamicBarChart from './BarChartComponent';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
+import { useRepositoryContext } from '../../contexts/RepositoryContext';
+import RepoFilter from '../../components/RepositoryFilter';
 
-const getCodeData = (date: DateTime, commits: any[], merges: any[]) => {
+const getCodeData = (
+  date: DateTime,
+  commits: any[],
+  merges: any[],
+  commit_index: number,
+) => {
   let commitCount = 0;
   let mergeCount = 0;
-  for (const result of commits) {
-    if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
-      commitCount += result.count;
+  let c_index = commit_index;
+  for (let i = c_index; i < commits.length; i++) {
+    const result = commits[i];
+    if (DateTime.fromISO(result.authored_date).hasSame(date, 'day')) {
+      commitCount += 1;
+    } else {
+      c_index = i;
+      break;
     }
   }
   for (const result of merges) {
@@ -30,6 +39,7 @@ const getCodeData = (date: DateTime, commits: any[], merges: any[]) => {
     date: date.toLocaleString(DateTime.DATE_SHORT),
     commitCount,
     mergeCount,
+    c_index,
   };
 };
 
@@ -60,13 +70,15 @@ const getCommentData = (date: DateTime, wordCounts: any[]) => {
 };
 
 const DynamicGraph: React.FC = () => {
-  const { startDate, endDate } = useFilterContext();
-  const { id } = useParams<{ id: string }>();
-  const [emails, setEmails] = useState<string[]>([]);
-  const { data: commits } = useCommitDailyCounts(
+  const { startDate, endDate, emails } = useFilterContext();
+  const { repositoryId } = useRepositoryContext();
+  const { data: commits } = useGetCommits(
     {
-      repository: id,
+      repository: repositoryId,
       author_email: emails,
+      start_date: startDate,
+      end_date: endDate,
+      sort: '+authored_date',
     },
     0,
     9000,
@@ -84,10 +96,19 @@ const DynamicGraph: React.FC = () => {
   useEffect(() => {
     if (startDate && endDate) {
       let date = DateTime.fromISO(startDate);
+      let commit_index = 0;
       const countsByDay = [];
       if (graphType == 0) {
         do {
-          countsByDay.push(getCodeData(date, commits?.results || [], []));
+          const codeData = getCodeData(
+            date,
+            commits?.results || [],
+            [],
+            commit_index,
+          );
+          const { date: day, commitCount, mergeCount } = codeData;
+          commit_index = codeData.c_index;
+          countsByDay.push({ date: day, commitCount, mergeCount });
           date = date.plus({ days: 1 });
         } while (date <= DateTime.fromISO(endDate));
       } else if (graphType == 1) {
@@ -116,17 +137,7 @@ const DynamicGraph: React.FC = () => {
         <Container maxWidth='md'>
           <Grid container alignItems='flex-end' spacing={1}>
             <Grid item xs={8}>
-              <CalendarFilter />
-            </Grid>
-            <Grid item xs={4}>
-              <Box mb={1}>
-                <MemberDropdown
-                  repositoryId={id}
-                  onChange={(newEmails) => {
-                    setEmails(newEmails);
-                  }}
-                />
-              </Box>
+              <RepoFilter />
             </Grid>
           </Grid>
         </Container>

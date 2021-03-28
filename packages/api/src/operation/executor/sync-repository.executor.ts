@@ -3,7 +3,6 @@ import { Repository as TypeORMRepository } from 'typeorm';
 import { MergeRequestService } from '../../gitlab/merge-request/merge-request.service';
 import { CommitAuthorService } from '../../gitlab/repository/commit/author/commit-author.service';
 import { CommitService } from '../../gitlab/repository/commit/commit.service';
-import { CommitDailyCountService } from '../../gitlab/repository/commit/daily-count/daily-count.service';
 import { RepositoryMember } from '../../gitlab/repository/repository-member/repository-member.entity';
 import { RepositoryMemberService } from '../../gitlab/repository/repository-member/repository-member.service';
 import { Repository } from '../../gitlab/repository/repository.entity';
@@ -19,7 +18,6 @@ enum Stage {
   syncIssues = 'syncIssues',
   linkCommitsAndMergeRequests = 'linkCommitsAndMergeRequests',
   linkNotesAndMergeRequests = 'linkNotesAndMergeRequests',
-  createDailyCommitCaches = 'createDailyCommitCaches',
   linkAuthors = 'linkAuthors',
 }
 
@@ -32,7 +30,6 @@ export class SyncRepositoryExecutor extends BaseExecutor<Stage> {
     private readonly mergeRequestService: MergeRequestService,
     private readonly issueService: IssueService,
     private readonly repositoryService: RepositoryService,
-    private readonly commitDailyCountService: CommitDailyCountService,
     private readonly commitAuthorService: CommitAuthorService,
     private readonly repositoryMemberService: RepositoryMemberService,
   ) {
@@ -44,7 +41,6 @@ export class SyncRepositoryExecutor extends BaseExecutor<Stage> {
       Stage.linkCommitsAndMergeRequests,
       'Link Commits and Merge Requests',
     );
-    this.addStage(Stage.createDailyCommitCaches, 'Create Daily Commit Caches');
     this.addStage(Stage.linkAuthors, 'Link Authors');
   }
 
@@ -59,11 +55,7 @@ export class SyncRepositoryExecutor extends BaseExecutor<Stage> {
       this.syncResource(Stage.syncMergeRequests, this.mergeRequestService),
       this.syncResource(Stage.syncIssues, this.issueService),
     ]);
-    await Promise.all([
-      this.linkCommitsAndMergeRequests(),
-      this.createDailyCommitCaches(),
-      this.linkAuthors(),
-    ]);
+    await Promise.all([this.linkCommitsAndMergeRequests(), this.linkAuthors()]);
   }
 
   private async init() {
@@ -131,19 +123,6 @@ export class SyncRepositoryExecutor extends BaseExecutor<Stage> {
     } catch {}
 
     await this.completeStage(Stage.linkCommitsAndMergeRequests);
-  }
-
-  private async createDailyCommitCaches() {
-    await this.startStage(Stage.createDailyCommitCaches);
-    const dailyCounts = await this.commitService.createDailyCache(
-      this.repository,
-    );
-    await this.commitDailyCountService.clear(this.repository.id);
-    await this.commitDailyCountService.createAll(
-      dailyCounts,
-      this.repository.id,
-    );
-    await this.completeStage(Stage.createDailyCommitCaches);
   }
 
   private async linkAuthors() {

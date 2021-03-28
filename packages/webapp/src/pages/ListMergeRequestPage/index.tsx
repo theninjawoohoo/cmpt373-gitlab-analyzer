@@ -13,12 +13,11 @@ import CommitList from './components/CommitList';
 import MergeRequestRenderer from './components/MergeRequestRenderer';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import MemberDropdown from '../../components/MemberDropdown';
-import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 import styled from 'styled-components';
 import { useFilterContext } from '../../contexts/FilterContext';
-import CalendarFilter from '../../components/CalendarFilter';
+import { ScoreOverrideQueueProvider } from './contexts/ScoreOverrideQueue';
+import ScoreOverrideQueueInfo from './components/ScoreOverrideQueueInfo';
 
 const IndependentScrollGrid = styled(Grid)`
   height: 100vh;
@@ -40,11 +39,48 @@ const IndependentScrollGrid = styled(Grid)`
   }
 `;
 
+const CompactTableHeaders: React.FC = () => {
+  return (
+    <Box pr={6} pl={2} py={1}>
+      <Grid container>
+        <Grid item xs={8}>
+          <Typography>Title</Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Typography align='right'>Score</Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Typography align='right'>Σ Commits</Typography>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+};
+
+const RegularTableHeaders: React.FC = () => {
+  return (
+    <Box pr={6} pl={2} py={1}>
+      <Grid container>
+        <Grid item xs={6}>
+          <Typography>Title</Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Typography>Author</Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Typography>Date</Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Typography>Score</Typography>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+};
+
 const ListMergeRequestPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { startDate, endDate } = useFilterContext();
-  const { repositoryId } = useRepositoryContext();
-  const [emails, setEmails] = useState<string[]>([]);
+  const { startDate, endDate, emails } = useFilterContext();
   const [activeMergeRequest, setActiveMergeRequest] = useState<
     ApiResource<MergeRequest>
   >();
@@ -76,93 +112,68 @@ const ListMergeRequestPage = () => {
   return (
     <>
       <DefaultPageLayout>
-        <GridComponent container spacing={activeMergeRequest ? 3 : 0}>
-          <Grid item xs={activeMergeRequest ? 5 : 12}>
-            <Container>
-              <Box my={2}>
-                <DefaultPageTitleFormat>Merge Requests</DefaultPageTitleFormat>
-              </Box>
-              <Grid item>
-                <Container maxWidth='md'>
-                  <Grid container alignItems='flex-end' spacing={1}>
-                    <Grid item xs={8}>
-                      <CalendarFilter />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Box mb={1}>
-                        <MemberDropdown
-                          repositoryId={repositoryId}
-                          onChange={(newEmails) => {
-                            setEmails(newEmails);
-                          }}
-                        />
-                      </Box>
-                    </Grid>
-                  </Grid>
-                </Container>
-              </Grid>
-              {!activeMergeRequest && (
-                <Box pr={6} pl={2} py={1}>
-                  <Grid container>
-                    <Grid item xs={6}>
-                      <Typography>Title</Typography>
-                    </Grid>
-                    <Grid item xs={2}>
-                      <Typography>Author</Typography>
-                    </Grid>
-                    <Grid item xs={2}>
-                      <Typography>Date</Typography>
-                    </Grid>
-                    <Grid item xs={2}>
-                      <Typography>Score</Typography>
-                    </Grid>
-                  </Grid>
+        <ScoreOverrideQueueProvider>
+          <GridComponent container spacing={activeMergeRequest ? 3 : 0}>
+            <Grid item xs={activeMergeRequest ? 5 : 12}>
+              <Container>
+                <ScoreOverrideQueueInfo />
+                <Box my={2}>
+                  <DefaultPageTitleFormat>
+                    Merge Requests
+                  </DefaultPageTitleFormat>
                 </Box>
-              )}
-              {reducedMergeRequests.map((mergeRequest) => {
-                const active =
-                  mergeRequest.meta.id === activeMergeRequest?.meta.id;
-                return (
-                  <MergeRequestRenderer
-                    key={mergeRequest.meta.id}
-                    mergeRequest={mergeRequest}
-                    active={active}
-                    shrink={!!activeMergeRequest}
-                    onClickSummary={() => {
-                      setActiveCommit(undefined);
-                      setActiveMergeRequest(active ? undefined : mergeRequest);
+                {!activeMergeRequest ? (
+                  <RegularTableHeaders />
+                ) : (
+                  <CompactTableHeaders />
+                )}
+                {reducedMergeRequests.map((mergeRequest) => {
+                  const active =
+                    mergeRequest.meta.id === activeMergeRequest?.meta.id;
+                  return (
+                    <MergeRequestRenderer
+                      key={mergeRequest.meta.id}
+                      mergeRequest={mergeRequest}
+                      active={active}
+                      shrink={!!activeMergeRequest}
+                      onClickSummary={() => {
+                        setActiveCommit(undefined);
+                        setActiveMergeRequest(
+                          active ? undefined : mergeRequest,
+                        );
+                      }}
+                    >
+                      {active && (
+                        <CommitList
+                          mergeRequest={mergeRequest}
+                          activeCommit={activeCommit}
+                          setActiveCommit={setActiveCommit}
+                          authorEmails={emails}
+                        />
+                      )}
+                    </MergeRequestRenderer>
+                  );
+                })}
+                {hasNextPage && (
+                  <LoadMore
+                    onClick={() => {
+                      void fetchNextPage();
                     }}
-                  >
-                    {active && (
-                      <CommitList
-                        mergeRequest={mergeRequest}
-                        activeCommit={activeCommit}
-                        setActiveCommit={setActiveCommit}
-                        authorEmails={emails}
-                      />
-                    )}
-                  </MergeRequestRenderer>
-                );
-              })}
-              {hasNextPage && (
-                <LoadMore
-                  onClick={() => {
-                    void fetchNextPage();
-                  }}
-                  ref={loadMoreRef}
-                />
-              )}
-            </Container>
-          </Grid>
-          {activeMergeRequest && (
-            <Grid item xs={7}>
-              <CodeView
-                mergeRequest={activeMergeRequest}
-                commit={activeCommit}
-              />
+                    ref={loadMoreRef}
+                  />
+                )}
+              </Container>
             </Grid>
-          )}
-        </GridComponent>
+            {activeMergeRequest && (
+              <Grid item xs={7}>
+                <CodeView
+                  mergeRequest={activeMergeRequest}
+                  commit={activeCommit}
+                />
+              </Grid>
+            )}
+          </GridComponent>
+        </ScoreOverrideQueueProvider>
       </DefaultPageLayout>
     </>
   );

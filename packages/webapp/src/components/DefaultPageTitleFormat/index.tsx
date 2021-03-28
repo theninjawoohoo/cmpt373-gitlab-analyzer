@@ -5,7 +5,9 @@ import Typography from '@material-ui/core/Typography';
 const DefaultPageTitleFormat: React.FC = ({ children }) => {
   return (
     <Box my={4}>
-      <Typography variant='h1'>{children}</Typography>
+      <Typography variant='h1' color='primary'>
+        {children}
+      </Typography>
     </Box>
   );
 };

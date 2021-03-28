@@ -4,7 +4,7 @@ interface RepositoryContextState {
   repositoryId: string;
   setRepositoryId: React.Dispatch<React.SetStateAction<string>>;
 }
-const LOCAL_STORAGE_KEY = 'repository_context';
+export const REPOSITORY_LOCAL_STORAGE_KEY = 'repository_context';
 
 const repositoryContextDefault: RepositoryContextState = {
   repositoryId: '',
@@ -21,7 +21,7 @@ export function useRepositoryContext() {
 
 function useRepositoryState(): RepositoryContextState {
   const [repositoryId, setRepositoryId] = useState<string>(
-    localStorage.getItem(LOCAL_STORAGE_KEY),
+    localStorage.getItem(REPOSITORY_LOCAL_STORAGE_KEY),
   );
   return { repositoryId, setRepositoryId };
 }
@@ -29,7 +29,7 @@ function useRepositoryState(): RepositoryContextState {
 export const RepositoryContextProvider: React.FC = ({ children }) => {
   const { repositoryId, setRepositoryId } = useRepositoryState();
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, repositoryId);
+    localStorage.setItem(REPOSITORY_LOCAL_STORAGE_KEY, repositoryId);
   }, [repositoryId]);
   return (
     <RepositoryContext.Provider value={{ repositoryId, setRepositoryId }}>
@@ -37,3 +37,7 @@ export const RepositoryContextProvider: React.FC = ({ children }) => {
     </RepositoryContext.Provider>
   );
 };
+
+export function resetContextStorage() {
+  localStorage.setItem(REPOSITORY_LOCAL_STORAGE_KEY, '');
+}
