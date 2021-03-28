@@ -2,30 +2,35 @@ import { Commit, Extensions, GlobWeight } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
-import { Repository as TypeORMCommit } from 'typeorm';
+import { Repository as TypeORMCommit, SelectQueryBuilder } from 'typeorm';
 import alwaysArray from '../../../common/alwaysArray';
-import { paginate, withDefaults } from '../../../common/query-dto';
 import { DiffService } from '../diff/diff.service';
 import { Repository } from '../repository.entity';
 import { CommitQueryDto } from './commit-query.dto';
 import { Commit as CommitEntity } from './commit.entity';
+import { BaseService } from 'src/common/base.service';
 
 @Injectable()
-export class CommitService {
+export class CommitService extends BaseService<
+  Commit,
+  CommitEntity,
+  CommitQueryDto
+> {
   constructor(
     private readonly httpService: HttpService,
     @InjectRepository(CommitEntity)
-    private readonly commitRepository: TypeORMCommit<CommitEntity>,
+    serviceRepository: TypeORMCommit<CommitEntity>,
     private readonly diffService: DiffService,
-  ) {}
+  ) {
+    super(serviceRepository, 'commit');
+  }
 
-  async search(filters: CommitQueryDto) {
-    const query = this.commitRepository.createQueryBuilder('commit');
-    filters = withDefaults(filters);
-
-    // Only merge commits have more than one parent
+  buildFilters(
+    query: SelectQueryBuilder<CommitEntity>,
+    filters: CommitQueryDto,
+  ): SelectQueryBuilder<CommitEntity> {
     query.andWhere("jsonb_array_length(commit.resource #> '{parent_ids}') < 2");
-
+    // Only merge commits have more than one parent
     if (filters.repository) {
       query.andWhere('commit.repository_id = :repository', {
         repository: filters.repository,
@@ -62,27 +67,36 @@ export class CommitService {
         endDate: filters.end_date,
       });
     }
+    return query;
+  }
 
-    query.orderBy("commit.resource #>> '{authored_date}'", 'DESC');
-    paginate(query, filters);
-    return query.getManyAndCount();
+  buildSort(
+    query: SelectQueryBuilder<CommitEntity>,
+    sortKey = 'authored_date',
+    order: 'ASC' | 'DESC' = 'DESC',
+  ): SelectQueryBuilder<CommitEntity> {
+    switch (sortKey) {
+      case 'authored_date':
+        return query.orderBy("commit.resource #>> '{authored_date}'", order);
+    }
+    return query;
   }
 
   async updateLastSync(commit: CommitEntity, timestamp = new Date()) {
     commit.resource = Extensions.updateExtensions(commit.resource, {
       lastSync: timestamp.toISOString(),
     });
-    return this.commitRepository.save(commit);
+    return this.serviceRepository.save(commit);
   }
 
   async findAllForRepository(repository: Repository) {
-    return this.commitRepository.find({
+    return this.serviceRepository.find({
       where: { repository: repository },
     });
   }
 
   async createDailyCache(repository: Repository): Promise<Commit.DailyCount[]> {
-    const rows = await this.commitRepository
+    const rows = await this.serviceRepository
       .createQueryBuilder('commit')
       .select("commit.resource #>>'{author_email}'", 'author_email')
       .addSelect("DATE(commit.resource #>>'{created_at}')", 'date')
@@ -103,7 +117,7 @@ export class CommitService {
   }
 
   async getDistinctAuthors(repository: Repository) {
-    const rows = await this.commitRepository
+    const rows = await this.serviceRepository
       .createQueryBuilder('commit')
       .select("commit.resource #>>'{author_email}'", 'author_email')
       .addSelect("commit.resource #>>'{author_name}'", 'author_name')
@@ -154,7 +168,7 @@ export class CommitService {
   }
 
   async findByGitlabId(repository: Repository, id: string) {
-    return this.commitRepository
+    return this.serviceRepository
       .createQueryBuilder()
       .where('repository_id = :repositoryId', { repositoryId: repository.id })
       .andWhere('resource @> :resource', { resource: { id } })
@@ -184,7 +198,7 @@ export class CommitService {
   private async createIfNotExists(repository: Repository, commits: Commit[]) {
     const entities = await Promise.all(
       commits.map(async (commit) => {
-        const found = await this.commitRepository
+        const found = await this.serviceRepository
           .createQueryBuilder()
           .where('resource @> :resource', {
             resource: {
@@ -199,7 +213,7 @@ export class CommitService {
           return { commit: found, created: false };
         }
         return {
-          commit: this.commitRepository.create({
+          commit: this.serviceRepository.create({
             repository: repository,
             resource: commit,
           }),
@@ -211,7 +225,7 @@ export class CommitService {
       existing: entities
         .filter(({ created }) => !created)
         .map(({ commit }) => commit),
-      created: await this.commitRepository.save(
+      created: await this.serviceRepository.save(
         entities.filter(({ created }) => created).map(({ commit }) => commit),
       ),
     };
@@ -226,7 +240,7 @@ export class CommitService {
     );
     commit.resource = Extensions.updateExtensions(commit.resource, { score });
     commit.score = score;
-    await this.commitRepository.save(commit);
+    await this.serviceRepository.save(commit);
   }
 
   async updateCommitScoreByRepository(
@@ -237,7 +251,6 @@ export class CommitService {
       repository: repositoryId,
       pageSize: 500000,
     });
-
     await Promise.all(
       commits.map(async (commit) => {
         await this.storeScore(commit, weights);
