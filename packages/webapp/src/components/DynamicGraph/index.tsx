@@ -87,7 +87,7 @@ const DynamicGraph: React.FC = () => {
       author_email: emails,
       start_date: startDate,
       end_date: endDate,
-      sort_order: 'ASC',
+      sort: '+authored_date',
     },
     0,
     9000,

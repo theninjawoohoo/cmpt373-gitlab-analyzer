@@ -1,4 +1,5 @@
-import { IsOptional, IsUUID } from 'class-validator';
+import { StagedScoreOverride } from '@ceres/types';
+import { IsArray, IsOptional, IsUUID } from 'class-validator';
 
 export class UpdateScoringPayload {
   @IsUUID()
@@ -7,4 +8,12 @@ export class UpdateScoringPayload {
   @IsUUID()
   @IsOptional()
   scoringConfigId?: string;
+}
+
+export class UpdateScoreOverridesPayload {
+  @IsUUID()
+  repositoryId: string;
+
+  @IsArray()
+  overrides: StagedScoreOverride[];
 }

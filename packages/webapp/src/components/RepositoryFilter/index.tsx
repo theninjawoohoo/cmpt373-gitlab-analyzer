@@ -5,23 +5,23 @@ import Grid from '@material-ui/core/Grid';
 import LuxonUtils from '@date-io/luxon';
 import {
   MuiPickersUtilsProvider,
-  KeyboardDatePicker,
+  KeyboardDateTimePicker,
 } from '@material-ui/pickers';
 import Paper from '@material-ui/core/Paper';
-import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import MemberDropdown from '../../components/MemberDropdown';
+import { Box } from '@material-ui/core';
 
 const RepoFilter: React.FC = () => {
   const { repositoryId } = useRepositoryContext();
   const { startDate, endDate, setStartDate, setEndDate } = useFilterContext();
 
   const handleStartDateChange = (date) => {
-    setStartDate(date.startOf('day'));
+    setStartDate(date.startOf('second').toUTC());
   };
 
   const handleEndDateChange = (date) => {
-    setEndDate(date.startOf('day'));
+    setEndDate(date.startOf('second').toUTC());
   };
 
   return (
@@ -30,11 +30,11 @@ const RepoFilter: React.FC = () => {
         <Typography variant='h2'>Date Filter Config</Typography>
         <MuiPickersUtilsProvider utils={LuxonUtils}>
           <Grid container spacing={1}>
-            <Grid item xs={3}>
-              <KeyboardDatePicker
-                disableToolbar
+            <Grid item xs={5}>
+              <KeyboardDateTimePicker
                 variant='inline'
-                format='MM/dd/yyyy'
+                format='MM/dd/yyyy hh:mm a'
+                ampm={true}
                 margin='normal'
                 id='date-picker-inline'
                 label='Start Date'
@@ -45,11 +45,11 @@ const RepoFilter: React.FC = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={3}>
-              <KeyboardDatePicker
-                disableToolbar
+            <Grid item xs={5}>
+              <KeyboardDateTimePicker
                 variant='inline'
-                format='MM/dd/yyyy'
+                format='MM/dd/yyyy hh:mm a'
+                ampm={true}
                 margin='normal'
                 id='date-picker-inline'
                 label='End Date'

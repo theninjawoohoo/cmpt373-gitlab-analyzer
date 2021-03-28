@@ -13,7 +13,7 @@ interface CommitSearchParams {
   author_email?: string[];
   start_date?: string;
   end_date?: string;
-  sort_order?: 'ASC' | 'DESC';
+  sort?: string;
 }
 
 export function useGetCommits(
