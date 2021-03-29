@@ -55,16 +55,29 @@ const getCodeData = (
   };
 };
 
-const getScoreData = (date: DateTime, scores: any[]) => {
-  let score = 0;
-  for (const result of scores) {
-    if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
-      score += result.total_score;
+const getScoreData = (
+  date: DateTime,
+  merges: MergeRequest.DailyCount,
+  merge_index: number,
+) => {
+  let mergeScore = 0;
+  let m_index = merge_index;
+  if (merges) {
+    for (let j = m_index; j < Object.keys(merges).length; j++) {
+      const result = merges[j];
+      if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
+        mergeScore += result.score;
+      } else {
+        m_index = j;
+        break;
+      }
     }
   }
+
   return {
     date: date.toLocaleString(DateTime.DATE_MED),
-    score,
+    mergeScore,
+    m_index,
   };
 };
 
@@ -129,7 +142,10 @@ const DynamicGraph: React.FC = () => {
         } while (date <= DateTime.fromISO(endDate));
       } else if (graphType == 1) {
         do {
-          countsByDay.push(getScoreData(date, commits?.results || []));
+          const scoreData = getScoreData(date, merges, merge_index);
+          const { date: day, mergeScore } = scoreData;
+          merge_index = scoreData.m_index;
+          countsByDay.push({ date: day, score: mergeScore });
           date = date.plus({ days: 1 });
         } while (date <= DateTime.fromISO(endDate));
       } else {
