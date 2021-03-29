@@ -3,8 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { useGetCommits } from '../../api/commit';
-import { useGetMergeRequests } from '../../api/mergeRequests';
-// import { useGetCountMergeRequests } from '../../api/mergeRequests';
+import { useGetCountMergeRequests } from '../../api/mergeRequests';
 import { DateTime } from 'luxon';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 import { useFilterContext } from '../../contexts/FilterContext';
@@ -13,11 +12,12 @@ import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import RepoFilter from '../../components/RepositoryFilter';
+import { MergeRequest } from '@ceres/types';
 
 const getCodeData = (
   date: DateTime,
   commits: any[],
-  merges: any[],
+  merges: MergeRequest.DailyCount,
   commit_index: number,
   merge_index: number,
 ) => {
@@ -34,15 +34,18 @@ const getCodeData = (
       break;
     }
   }
-  for (let j = m_index; j < merges.length; j++) {
-    const result = merges[j];
-    if (DateTime.fromISO(result.merged_at).hasSame(date, 'day')) {
-      mergeCount -= 1;
-    } else {
-      m_index = j;
-      break;
+  if (merges) {
+    for (let j = m_index; j < Object.keys(merges).length; j++) {
+      const result = merges[j];
+      if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
+        mergeCount -= result.count;
+      } else {
+        m_index = j;
+        break;
+      }
     }
   }
+
   return {
     date: date.toLocaleString(DateTime.DATE_MED),
     commitCount,
@@ -92,22 +95,13 @@ const DynamicGraph: React.FC = () => {
     0,
     9000,
   );
-  const { data: merges } = useGetMergeRequests(
-    {
-      repository: repositoryId,
-      author_email: emails,
-      merged_start_date: startDate,
-      merged_end_date: endDate,
-    },
-    0,
-    9000,
-  );
-  // const { data: merges_test } = useGetCountMergeRequests({
-  //   repository: repositoryId,
-  //   author_email: emails,
-  //   merged_start_date: startDate,
-  //   merged_end_date: endDate,
-  // });
+  const { data: merges } = useGetCountMergeRequests({
+    repository: repositoryId,
+    author_email: emails,
+    merged_start_date: startDate,
+    merged_end_date: endDate,
+  });
+  console.log(merges);
 
   const [graphType, setGraphType] = useState(0); // 0 = code, 1 = score, 2 = comments
   const [graphData, setGraphData] = useState([]);
@@ -123,7 +117,7 @@ const DynamicGraph: React.FC = () => {
           const codeData = getCodeData(
             date,
             commits?.results || [],
-            merges?.results || [],
+            merges,
             commit_index,
             merge_index,
           );
@@ -146,7 +140,7 @@ const DynamicGraph: React.FC = () => {
       }
       setGraphData(countsByDay);
     }
-  }, [graphType, commits?.results, merges?.results, startDate, endDate]);
+  }, [graphType, commits?.results, merges, startDate, endDate]);
 
   const handleTabs = (event: React.ChangeEvent<unknown>, newType: number) => {
     setGraphType(newType);
