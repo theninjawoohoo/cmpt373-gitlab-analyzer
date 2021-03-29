@@ -18,6 +18,7 @@ import ScorePopover from './components/ScorePopper';
 import CancelIcon from '@material-ui/icons/Cancel';
 import ScoreOverrideForm from '../../pages/ListMergeRequestPage/components/ScoreOverrideForm';
 import { useScoreOverrideQueue } from '../../pages/ListMergeRequestPage/contexts/ScoreOverrideQueue';
+import WarningIcon from '@material-ui/icons/Warning';
 
 interface DiffViewProps {
   diffId?: string;
@@ -140,7 +141,7 @@ const DiffView: React.FC<DiffViewProps> = ({
     add({
       id: `Diff/${diffId}`,
       display: fileName,
-      previousScore: +extensions?.score?.toFixed(1) || 0,
+      previousScore: score,
       override: {
         ...values,
         score: values.score ? +values.score : undefined,
@@ -153,7 +154,10 @@ const DiffView: React.FC<DiffViewProps> = ({
     extensions?.override,
     extensions?.score,
   );
-  console.log({ score });
+  const isExcluded = extensions?.override?.exclude;
+  const hasOverride = isExcluded || extensions?.override?.score;
+  const fileNameTextDecoration = isExcluded ? 'line-through' : '';
+  console.log({ override: extensions?.override });
 
   return (
     <Accordion expanded={expanded || false} TransitionProps={{ timeout: 0 }}>
@@ -161,9 +165,23 @@ const DiffView: React.FC<DiffViewProps> = ({
         <Box width='100%'>
           <Grid container alignItems='center' justify='space-between'>
             <Grid item>
-              <Typography style={{ fontFamily: 'monospace' }}>
-                {fileName}
-              </Typography>
+              <Grid container alignItems='center' spacing={2}>
+                {hasOverride && (
+                  <Grid item>
+                    <WarningIcon />
+                  </Grid>
+                )}
+                <Grid item>
+                  <Typography
+                    style={{
+                      fontFamily: 'monospace',
+                      textDecoration: fileNameTextDecoration,
+                    }}
+                  >
+                    {fileName}
+                  </Typography>
+                </Grid>
+              </Grid>
             </Grid>
             {allowEdit && (
               <>
@@ -212,6 +230,7 @@ const DiffView: React.FC<DiffViewProps> = ({
           anchor={anchor}
           onClickAway={onPopperClickAway}
           onSubmit={onSubmitPopper}
+          defaultValues={extensions?.override}
         />
       )}
       <AccordionDetails>

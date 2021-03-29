@@ -24,8 +24,11 @@ const ScoreOverrideForm: React.FC<ScoreOverrideFormProps> = ({
   open,
   onClickAway,
   onSubmit,
+  defaultValues,
 }) => {
-  const { handleSubmit, register } = useForm<ScoreOverride>();
+  const { handleSubmit, register } = useForm<ScoreOverride>({
+    defaultValues,
+  });
   return (
     <ClickAwayListener onClickAway={onClickAway}>
       <Popper anchorEl={anchor} open={open}>

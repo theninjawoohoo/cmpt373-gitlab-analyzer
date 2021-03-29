@@ -1,5 +1,6 @@
 import { StagedScoreOverride } from '@ceres/types';
 import React, { useContext, useState } from 'react';
+import { useAuthContext } from '../../../contexts/AuthContext';
 
 interface ScoreOverrideQueueState {
   queue: StagedScoreOverride[];
@@ -21,8 +22,13 @@ const ScoreOverrideQueue = React.createContext<ScoreOverrideQueueState>(
 
 function useScoreOverrideQueueState(): ScoreOverrideQueueState {
   const [queue, setQueue] = useState<StagedScoreOverride[]>([]);
+  const { user } = useAuthContext();
 
   function add(value: StagedScoreOverride) {
+    value.override.user = {
+      id: user.id,
+      display: user.sfuId,
+    };
     setQueue([...queue.filter((override) => override.id !== value.id), value]);
   }
 
