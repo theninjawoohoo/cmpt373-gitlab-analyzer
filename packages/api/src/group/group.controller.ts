@@ -7,10 +7,8 @@ import { GroupService } from './group.service';
 
 @Controller('group')
 export class GroupController {
-  constructor(private readonly groupService: GroupService);
-
-  @Post()
-  create(@Auth() { user }: VerifiedUser, @Body() resource: GroupConfig) {
-    return this.groupService.create({ resource, user });
-  }
+  //   @Post()
+  //   create(@Auth() { user }: VerifiedUser, @Body() resource: GroupConfig) {
+  //     return this.groupService.create({ resource, user });
+  //   }
 }
