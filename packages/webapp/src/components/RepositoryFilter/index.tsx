@@ -11,17 +11,18 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import MemberDropdown from '../../components/MemberDropdown';
 import { Box } from '@material-ui/core';
+import { DateTime } from 'luxon';
 
 const RepoFilter: React.FC = () => {
   const { repositoryId } = useRepositoryContext();
   const { startDate, endDate, setStartDate, setEndDate } = useFilterContext();
 
-  const handleStartDateChange = (date) => {
-    setStartDate(date.startOf('second').toUTC());
+  const handleStartDateChange = (date: DateTime) => {
+    setStartDate(date.startOf('second').toISO());
   };
 
-  const handleEndDateChange = (date) => {
-    setEndDate(date.startOf('second').toUTC());
+  const handleEndDateChange = (date: DateTime) => {
+    setEndDate(date.startOf('second').toISO());
   };
 
   return (
