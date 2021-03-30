@@ -10,7 +10,6 @@ import DynamicBarChart from './BarChartComponent';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
-import RepoFilter from '../../components/RepositoryFilter';
 
 const getCodeData = (
   date: DateTime,
@@ -127,13 +126,6 @@ const DynamicGraph: React.FC = () => {
     <>
       <Container>
         <DefaultPageTitleFormat>Contribution Graph</DefaultPageTitleFormat>
-        <Container maxWidth='md'>
-          <Grid container alignItems='flex-end' spacing={1}>
-            <Grid item xs={8}>
-              <RepoFilter />
-            </Grid>
-          </Grid>
-        </Container>
         <Box my={2}>
           <Tabs
             value={graphType}

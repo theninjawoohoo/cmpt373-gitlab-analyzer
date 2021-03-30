@@ -11,6 +11,7 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PeopleIcon from '@material-ui/icons/People';
 import BuildIcon from '@material-ui/icons/Build';
 import ScoreIcon from '@material-ui/icons/Score';
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
 export default function Icon(props: any) {
   switch (props.icon) {
@@ -38,6 +39,8 @@ export default function Icon(props: any) {
       return <BuildIcon />;
     case 'scoring':
       return <ScoreIcon />;
+    case 'calendar':
+      return <CalendarTodayIcon />;
   }
   return <ErrorIcon />;
 }
