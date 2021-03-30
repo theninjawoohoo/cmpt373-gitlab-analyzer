@@ -17,7 +17,7 @@ export class GroupService extends BaseService<
     @InjectRepository(GroupConfigEntity)
     serviceRepository: Repository<GroupConfigEntity>,
   ) {
-    super(serviceRepository, 'scoring_config');
+    super(serviceRepository, 'group_config');
   }
 
   buildFilters(
