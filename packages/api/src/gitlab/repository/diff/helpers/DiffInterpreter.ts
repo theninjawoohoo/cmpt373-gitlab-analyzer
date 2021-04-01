@@ -30,7 +30,6 @@ export default class DiffInterpreter {
     let commentFlag = false;
     while (currentLine < hunk.lines.length) {
       const line = hunk.lines[currentLine];
-      // let newline= line.substring(1).trim();
       const lineType = this.determineLineType(line);
       if (lineType === Line.Type.add) {
         commentFlag = this.checkAddLineType(line, hunkLines,rightLineNumber,commentFlag);
@@ -62,26 +61,22 @@ export default class DiffInterpreter {
     commentFlag: boolean
     ) {
     let newline= line.substring(1).trim();
-    console.log(line);
     if(line.trim() === "+"){
       hunkLines.push(this.createBlank(line, LineNumber, true));
     }
     else if (newline.substring(0,2) === "//" || commentFlag){
-      console.log(commentFlag);
       hunkLines.push(this.createComment(line, LineNumber, true));
     }
     else if (newline.substring(0,2) === "/*"){
       hunkLines.push(this.createComment(line, LineNumber, true));
       commentFlag = true;
-      console.log(commentFlag);
     }
     else if(newline.substring(line.length - 2) === "*/" && commentFlag){
       hunkLines.push(this.createComment(line, LineNumber, true));
       commentFlag = false;
-      console.log(commentFlag);
     }
     else if (!line.match('[a-zA-Z1-9]')){
-      hunkLines.push(this.createSyntax(line, LineNumber, true));
+      hunkLines.push(this.createSyntaxLine(line, LineNumber, true));
     }
     else{
       hunkLines.push(this.createAdd(line, LineNumber));
@@ -100,10 +95,6 @@ export default class DiffInterpreter {
     commentFlag: boolean
     ) {
     let newline= line.substring(1).trim();
-    console.log(line);
-    console.log(newline);
-    console.log(leftLineNumber);
-    console.log(rightLineNumber);
     if(line.trim() === "-"){
       hunkLines.push(this.createBlank(line, leftLineNumber, false));
     }
@@ -119,7 +110,7 @@ export default class DiffInterpreter {
       commentFlag = false;
     }
     else if (!line.match('[a-zA-Z1-9]')){
-      hunkLines.push(this.createSyntax(line, leftLineNumber, false));
+      hunkLines.push(this.createSyntaxLine(line, leftLineNumber, false));
     }
     else{
       const { addedLine, deletedLine } = this.findGroupedChange(
@@ -204,7 +195,7 @@ export default class DiffInterpreter {
   // Get different between the added line and deleted line. Helper for `linkLine`
   private getLineChange(addedLine: LineContent, deletedLine: LineContent){
     let added = addedLine.content.substring(1).split("");
-    let deleted = addedLine.content.substring(1).split("");
+    let deleted = deletedLine.content.substring(1).split("");
     let long = added;
     let short = deleted;
     if (added.length < deleted.length){
@@ -219,7 +210,6 @@ export default class DiffInterpreter {
         }
       }
     }
-    console.log("diff"+ long.join('').trim());
     return long.join('').trim();
   }
 
@@ -317,7 +307,7 @@ export default class DiffInterpreter {
     }
   }
 
-  private createSyntax(line: string, lineNumber: number, add: boolean): Line {
+  private createSyntaxLine(line: string, lineNumber: number, add: boolean): Line {
     if(add){
       return {
         type: Line.Type.syntaxLine,
