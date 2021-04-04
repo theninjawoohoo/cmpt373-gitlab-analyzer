@@ -1,10 +1,11 @@
+import { ScoreOverride } from "./ScoreOverride";
 import { WithExtensions } from "./WithExtensions";
 
 interface CommitExtensions {
-  lastSync?: string;
   score?: number;
   // Indicates a diff in this commit has a score override
   diffHasOverride?: boolean;
+  override?: ScoreOverride;
 }
 
 export interface Commit extends WithExtensions<CommitExtensions> {

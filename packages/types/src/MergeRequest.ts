@@ -1,3 +1,4 @@
+import { ScoreOverride } from "./ScoreOverride";
 import { WithExtensions } from "./WithExtensions";
 
 interface MergedBy {
@@ -79,13 +80,13 @@ interface TaskCompletionStatus {
 }
 
 interface MergeRequestExtensions {
-  lastSync?: string;
   diffScore?: number;
   // indicates a diff in this merge request has an override
   diffHasOverride?: boolean;
   commitScoreSum?: number;
   // indicates a commit in this merge request has an override
   commitHasOverride?: boolean;
+  override?: ScoreOverride;
 }
 
 export interface MergeRequest extends WithExtensions<MergeRequestExtensions>{

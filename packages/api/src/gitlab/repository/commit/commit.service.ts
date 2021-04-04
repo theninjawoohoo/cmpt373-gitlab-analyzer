@@ -82,13 +82,6 @@ export class CommitService extends BaseService<
     return query;
   }
 
-  async updateLastSync(commit: CommitEntity, timestamp = new Date()) {
-    commit.resource = Extensions.updateExtensions(commit.resource, {
-      lastSync: timestamp.toISOString(),
-    });
-    return this.serviceRepository.save(commit);
-  }
-
   async findAllForRepository(repository: Repository) {
     return this.serviceRepository.find({
       where: { repository: repository },
