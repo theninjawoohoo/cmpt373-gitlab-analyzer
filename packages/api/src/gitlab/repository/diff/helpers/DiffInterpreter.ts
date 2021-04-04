@@ -37,7 +37,7 @@ export default class DiffInterpreter {
         currentLine++;
       }else if (lineType === Line.Type.noChange) {
         hunkLines.push(
-          this.createNoChange(line, leftLineNumber, rightLineNumber),
+          this.createChange(line, leftLineNumber, line, rightLineNumber, Line.Type.noChange),
         );
         leftLineNumber++;
         rightLineNumber++;
@@ -60,28 +60,10 @@ export default class DiffInterpreter {
     LineNumber: number, 
     commentFlag: boolean
     ) {
-    let newline= line.substring(1).trim();
-    if(line.trim() === "+"){
-      hunkLines.push(this.createBlank(line, LineNumber, true));
-    }
-    else if (newline.substring(0,2) === "//" || commentFlag){
-      hunkLines.push(this.createComment(line, LineNumber, true));
-    }
-    else if (newline.substring(0,2) === "/*"){
-      hunkLines.push(this.createComment(line, LineNumber, true));
-      commentFlag = true;
-    }
-    else if(newline.substring(line.length - 2) === "*/" && commentFlag){
-      hunkLines.push(this.createComment(line, LineNumber, true));
-      commentFlag = false;
-    }
-    else if (!line.match('[a-zA-Z1-9]')){
-      hunkLines.push(this.createSyntaxLine(line, LineNumber, true));
-    }
-    else{
+    let pushed = this.createCommentAndSyntax(line, hunkLines, LineNumber, commentFlag, true);
+    if(!pushed) {
       hunkLines.push(this.createAdd(line, LineNumber));
     }
-
     return commentFlag;
   };
 
@@ -94,25 +76,8 @@ export default class DiffInterpreter {
     currentLine: number, 
     commentFlag: boolean
     ) {
-    let newline= line.substring(1).trim();
-    if(line.trim() === "-"){
-      hunkLines.push(this.createBlank(line, leftLineNumber, false));
-    }
-    else if (newline.substring(0,2) === "//" || commentFlag){
-      hunkLines.push(this.createComment(line, leftLineNumber, false));
-    }
-    else if (newline.substring(0,2) === "/*"){
-      hunkLines.push(this.createComment(line, leftLineNumber, false));
-      commentFlag = true;
-    }
-    else if(newline.substring(line.length - 2) === "*/" && commentFlag){
-      hunkLines.push(this.createComment(line, leftLineNumber, false));
-      commentFlag = false;
-    }
-    else if (!line.match('[a-zA-Z1-9]')){
-      hunkLines.push(this.createSyntaxLine(line, leftLineNumber, false));
-    }
-    else{
+    let pushed = this.createCommentAndSyntax(line, hunkLines, leftLineNumber, commentFlag, true);
+    if(!pushed) {
       const { addedLine, deletedLine } = this.findGroupedChange(
         hunk.lines,
         currentLine,
@@ -125,6 +90,39 @@ export default class DiffInterpreter {
     }
 
     return [leftLineNumber, rightLineNumber, currentLine];
+  }
+
+  private createCommentAndSyntax(
+    line: string, 
+    hunkLines:Line[], 
+    LineNumber: number, 
+    commentFlag: boolean,
+    added: boolean){
+    let pushed = false;
+    let newline= line.substring(1).trim();
+    if(line.trim() === "+" || line.trim() === "-"){
+      hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.blank));
+      pushed = true;
+    }
+    else if (newline.substring(0,2) === "//" || commentFlag){
+      hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.comment));
+      pushed = true;
+    }
+    else if (newline.substring(0,2) === "/*"){
+      hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.comment));
+      commentFlag = true;
+      pushed = true;
+    }
+    else if(newline.substring(line.length - 2) === "*/" && commentFlag){
+      hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.comment));
+      commentFlag = false;
+      pushed = true;
+    }
+    else if (!line.match('[a-zA-Z1-9]')){
+      hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.syntaxLine));
+      pushed = true;
+    }
+    return pushed;
   }
 
   // First read a delte line and the matching add line
@@ -156,21 +154,23 @@ export default class DiffInterpreter {
       let lineChange = this.getLineChange(addedLine,deletedLine);
       if (lineChange == ""){
         changes.push(
-          this.createSpaceChange(
+          this.createChange(
             addedLine.content,
             addedLine.number,
             deletedLine.content,
             deletedLine.number,
+            Line.Type.spaceChange
           ),
         );
       }
       else if (!lineChange.match('[a-zA-Z1-9]')){
         changes.push(
-          this.createSyntaxChange(
+          this.createChange(
             addedLine.content,
             addedLine.number,
             deletedLine.content,
             deletedLine.number,
+            Line.Type.syntaxChange
           ),
         );
       }
@@ -265,10 +265,10 @@ export default class DiffInterpreter {
     return definition;
   }
 
-  private createComment(line: string, lineNumber: number, add: boolean): Line {
+  private createLine(line: string, lineNumber: number, add: boolean, type: Line.Type): Line {
     if(add){
       return {
-        type: Line.Type.comment,
+        type: type,
         right: {
           lineNumber,
           lineContent: line,
@@ -277,49 +277,7 @@ export default class DiffInterpreter {
     }
     else{
       return {
-        type: Line.Type.comment,
-        left: {
-          lineNumber,
-          lineContent: line,
-        },
-      };
-    }
-  }
-
-  private createBlank(line: string, lineNumber: number, add: boolean): Line {
-    if(add){
-      return {
-        type: Line.Type.blank,
-        right: {
-          lineNumber,
-          lineContent: line,
-        },
-      };
-    }
-    else{
-      return {
-        type: Line.Type.blank,
-        left: {
-          lineNumber,
-          lineContent: line,
-        },
-      };
-    }
-  }
-
-  private createSyntaxLine(line: string, lineNumber: number, add: boolean): Line {
-    if(add){
-      return {
-        type: Line.Type.syntaxLine,
-        right: {
-          lineNumber,
-          lineContent: line,
-        },
-      };
-    }
-    else{
-      return {
-        type: Line.Type.syntaxLine,
+        type: type,
         left: {
           lineNumber,
           lineContent: line,
@@ -338,51 +296,15 @@ export default class DiffInterpreter {
     };
   }
 
-  private createNoChange(
-    line: string,
-    leftLineNumber: number,
-    rightLineNumber: number,
-  ): Line {
-    return {
-      type: Line.Type.noChange,
-      left: {
-        lineContent: line,
-        lineNumber: leftLineNumber,
-      },
-      right: {
-        lineContent: line,
-        lineNumber: rightLineNumber,
-      },
-    };
-  }
-
-  private createSpaceChange(
+  private createChange(
     line: string,
     lineNumber: number,
     deletedLine: string,
     deletedLineNumber: number,
+    type: Line.Type
   ): Line {
     return {
-      type: Line.Type.spaceChange,
-      left: {
-        lineContent: deletedLine,
-        lineNumber: deletedLineNumber,
-      },
-      right: {
-        lineContent: line,
-        lineNumber: lineNumber,
-      },
-    };
-  }
-
-  private createSyntaxChange(
-    line: string,
-    lineNumber: number,
-    deletedLine: string,
-    deletedLineNumber: number,
-  ): Line {
-    return {
-      type: Line.Type.syntaxChange,
+      type: type,
       left: {
         lineContent: deletedLine,
         lineNumber: deletedLineNumber,
