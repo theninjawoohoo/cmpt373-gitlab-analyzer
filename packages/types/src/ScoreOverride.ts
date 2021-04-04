@@ -12,6 +12,7 @@ export interface StagedScoreOverride {
   id: string;
   display: string;
   previousScore: number;
+  defaultScore: number;
   override: ScoreOverride;
 }
 
