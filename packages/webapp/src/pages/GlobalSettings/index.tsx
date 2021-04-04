@@ -12,7 +12,7 @@ const SettingsPage: React.FC = () => {
         <Container>
           <Grid container direction='column' spacing={2}>
             <Grid item>
-              <DefaultPageTitleFormat>Settings</DefaultPageTitleFormat>
+              <DefaultPageTitleFormat>Global Settings</DefaultPageTitleFormat>
             </Grid>
             <Grid item xs={12}>
               <LinkCard color='#edd4ff' icon='api' to='/settings/api'>
