@@ -5,23 +5,23 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import LinkCard from '../../components/LinkCard';
 
-const RepoConfigPage: React.FC = () => {
+const RepoSetupPage: React.FC = () => {
   return (
     <div>
       <DefaultPageLayout>
         <Container>
           <Grid container direction='column' spacing={2}>
             <Grid item>
-              <DefaultPageTitleFormat>Settings</DefaultPageTitleFormat>
+              <DefaultPageTitleFormat>Repository Config</DefaultPageTitleFormat>
             </Grid>
             <Grid item xs={12}>
-              <LinkCard color='#edd4ff' icon='api' to='/settings/api'>
-                Change API Key
+              <LinkCard color='#FFEDC0' icon='members' to='/settings/api'>
+                Members
               </LinkCard>
             </Grid>
             <Grid item xs={12}>
-              <LinkCard color='#ccdfff' icon='scoring' to='/settings/scoring'>
-                Score Config
+              <LinkCard color='#d7ffd1' icon='rubric' to='/settings/scoring'>
+                Score Rubric
               </LinkCard>
             </Grid>
           </Grid>
@@ -31,4 +31,4 @@ const RepoConfigPage: React.FC = () => {
   );
 };
 
-export default RepoConfigPage;
+export default RepoSetupPage;

@@ -39,6 +39,12 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
             url={repositoryId ? `/repository/${repositoryId}` : '/repository'}
           />
           <ItemBox
+            icon='setup'
+            primary={'Repository Setup'}
+            url={`/setup/${repositoryId}`}
+            repositoryDependent
+          />
+          <ItemBox
             icon='merge'
             primary={'Merge Requests'}
             url={`/merge/${repositoryId}`}
@@ -56,12 +62,12 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
             url={`/graph/${repositoryId}`}
             repositoryDependent
           />
-          <ItemBox
+          {/* <ItemBox
             icon='members'
             primary={'Members'}
             url={`/repository/${repositoryId}/members`}
             repositoryDependent
-          />
+          /> */}
           <ItemBox icon='setting' primary={'Global Settings'} url='/settings' />
           <ItemBox icon='operation' primary={'Operations'} url='/operations' />
           <ItemBox icon='logout' primary={'Logout'} url='/logout' />

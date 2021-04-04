@@ -42,7 +42,7 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
   return (
     <Paper>
       <Box p={2}>
-        <Typography variant='h2'>Scoring Config</Typography>
+        <Typography variant='h2'>Score Rubric</Typography>
         <Grid container spacing={3} alignItems='center' direction='column'>
           {repository?.extensions?.scoringConfig?.lastRan ? (
             <Grid item>

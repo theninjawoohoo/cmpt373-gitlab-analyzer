@@ -10,12 +10,8 @@ const LinkGrid: React.FC<LinkGridProps> = ({ repositoryId }) => {
   return (
     <Grid container spacing={2}>
       <Grid item xs={6}>
-        <LinkCard
-          color='#FFEDC0'
-          icon='members'
-          to={`/repository/${repositoryId}/members`}
-        >
-          Members
+        <LinkCard color='#FFEDC0' icon='setup' to={`/setup/${repositoryId}`}>
+          Repository Setup
         </LinkCard>
       </Grid>
       <Grid item xs={6}>
@@ -24,7 +20,7 @@ const LinkGrid: React.FC<LinkGridProps> = ({ repositoryId }) => {
         </LinkCard>
       </Grid>
       <Grid item xs={6}>
-        <LinkCard color='#FFECFB' icon='graph' to={`/graph/${repositoryId}`}>
+        <LinkCard color='#ffdeec' icon='graph' to={`/graph/${repositoryId}`}>
           Graphs
         </LinkCard>
       </Grid>
