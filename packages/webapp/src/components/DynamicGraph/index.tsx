@@ -129,7 +129,7 @@ const DynamicGraph: React.FC = () => {
         <DefaultPageTitleFormat>Contribution Graph</DefaultPageTitleFormat>
         <Container maxWidth='md'>
           <Grid container alignItems='flex-end' spacing={1}>
-            <Grid item xs={8}>
+            <Grid item xs={12}>
               <RepoFilter />
             </Grid>
           </Grid>

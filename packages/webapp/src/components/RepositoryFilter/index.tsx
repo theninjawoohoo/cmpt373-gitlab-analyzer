@@ -30,8 +30,8 @@ const RepoFilter: React.FC = () => {
       <Box p={2}>
         <Typography variant='h2'>Date Filter Config</Typography>
         <MuiPickersUtilsProvider utils={LuxonUtils}>
-          <Grid container spacing={1}>
-            <Grid item xs={5}>
+          <Grid container spacing={1} justify='space-around'>
+            <Grid item xs={3}>
               <KeyboardDateTimePicker
                 variant='inline'
                 format='MM/dd/yyyy hh:mm a'
@@ -46,7 +46,7 @@ const RepoFilter: React.FC = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={3}>
               <KeyboardDateTimePicker
                 variant='inline'
                 format='MM/dd/yyyy hh:mm a'
@@ -62,10 +62,8 @@ const RepoFilter: React.FC = () => {
               />
             </Grid>
             <Grid>
-              <Grid container alignItems='flex-end' justify='flex-end'>
-                <Grid item xs={3}>
-                  <MemberDropdown repositoryId={repositoryId} />
-                </Grid>
+              <Grid item xs={6}>
+                <MemberDropdown repositoryId={repositoryId} />
               </Grid>
             </Grid>
           </Grid>

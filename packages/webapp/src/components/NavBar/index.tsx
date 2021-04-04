@@ -62,7 +62,7 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
             url={`/repository/${repositoryId}/members`}
             repositoryDependent
           />
-          <ItemBox icon='setting' primary={'Settings'} url='/settings' />
+          <ItemBox icon='setting' primary={'Global Settings'} url='/settings' />
           <ItemBox icon='operation' primary={'Operations'} url='/operations' />
           <ItemBox icon='logout' primary={'Logout'} url='/logout' />
         </List>

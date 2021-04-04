@@ -10,7 +10,7 @@ import SfuVerify from '../../pages/SfuVerify';
 import Graph from '../../pages/Graph';
 import ListMergeRequestPage from '../../pages/ListMergeRequestPage';
 import ApiSettingPage from '../../pages/ApiSetting';
-import SettingsPage from '../../pages/Settings';
+import SettingsPage from '../../pages/GlobalSettings';
 import { useAuthContext } from '../../contexts/AuthContext';
 import CommitsPage from '../../pages/Commits';
 import Members from '../../pages/Members';
