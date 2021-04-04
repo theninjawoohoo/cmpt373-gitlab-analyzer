@@ -17,6 +17,16 @@ interface OverrideRowProps {
   stagedOverride: StagedScoreOverride;
 }
 
+function newScoreDisplay(stagedOverride: StagedScoreOverride): React.ReactNode {
+  if (stagedOverride.override?.exclude) {
+    return 0;
+  }
+  if (stagedOverride.override?.score) {
+    return stagedOverride.override.score;
+  }
+  return stagedOverride.defaultScore;
+}
+
 const OverrideRow: React.FC<OverrideRowProps> = ({ stagedOverride }) => {
   return (
     <>
@@ -24,9 +34,7 @@ const OverrideRow: React.FC<OverrideRowProps> = ({ stagedOverride }) => {
         <DialogContentText>{stagedOverride.previousScore}</DialogContentText>
       </Grid>
       <Grid item xs={2}>
-        <DialogContentText>
-          {stagedOverride.override.score || 0}
-        </DialogContentText>
+        <DialogContentText>{newScoreDisplay(stagedOverride)}</DialogContentText>
       </Grid>
       <Grid item xs={8}>
         <Box>

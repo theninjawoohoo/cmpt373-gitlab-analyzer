@@ -142,6 +142,7 @@ const DiffView: React.FC<DiffViewProps> = ({
       id: `Diff/${diffId}`,
       display: fileName,
       previousScore: score,
+      defaultScore: extensions?.score,
       override: {
         ...values,
         score: values.score ? +values.score : undefined,
@@ -157,7 +158,6 @@ const DiffView: React.FC<DiffViewProps> = ({
   const isExcluded = extensions?.override?.exclude;
   const hasOverride = isExcluded || extensions?.override?.score;
   const fileNameTextDecoration = isExcluded ? 'line-through' : '';
-  console.log({ override: extensions?.override });
 
   return (
     <Accordion expanded={expanded || false} TransitionProps={{ timeout: 0 }}>
