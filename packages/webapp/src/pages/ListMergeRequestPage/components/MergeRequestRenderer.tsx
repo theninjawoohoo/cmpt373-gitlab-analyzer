@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import React from 'react';
 import { ApiResource } from '../../../api/base';
+import ScoringChip from '../../../components/ScoringChip';
 import SmartDate from '../../../components/SmartDate';
 
 interface MergeRequestRendererProps {
@@ -61,12 +62,20 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
             <>
               <Grid item xs={2}>
                 <Typography align='right'>
-                  {mergeRequest.extensions?.diffScore?.toFixed(1)}
+                  <ScoringChip
+                    hasOverride={mergeRequest?.extensions?.diffHasOverride}
+                  >
+                    {mergeRequest.extensions?.diffScore?.toFixed(1)}
+                  </ScoringChip>
                 </Typography>
               </Grid>
               <Grid item xs={2}>
                 <Typography align='right'>
-                  {mergeRequest.extensions?.commitScoreSum?.toFixed(1)}
+                  <ScoringChip
+                    hasOverride={mergeRequest?.extensions?.commitHasOverride}
+                  >
+                    {mergeRequest.extensions?.commitScoreSum?.toFixed(1)}
+                  </ScoringChip>
                 </Typography>
               </Grid>
             </>
@@ -80,19 +89,23 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
                   <SmartDate>{mergeRequest.merged_at}</SmartDate>
                 </Typography>
               </Grid>
-              <Grid item xs={2}>
-                <Grid container>
-                  <Grid item xs={6}>
-                    <Typography>
-                      {mergeRequest.extensions?.diffScore?.toFixed(1)}
-                    </Typography>
-                  </Grid>
-                  <Grid item>
-                    <Typography>
-                      {mergeRequest.extensions?.commitScoreSum?.toFixed(1)}
-                    </Typography>
-                  </Grid>
-                </Grid>
+              <Grid item xs={1}>
+                <Typography align='right'>
+                  <ScoringChip
+                    hasOverride={mergeRequest?.extensions?.diffHasOverride}
+                  >
+                    {mergeRequest.extensions?.diffScore?.toFixed(1)}
+                  </ScoringChip>
+                </Typography>
+              </Grid>
+              <Grid item xs={1}>
+                <Typography align='right'>
+                  <ScoringChip
+                    hasOverride={mergeRequest?.extensions?.commitHasOverride}
+                  >
+                    {mergeRequest.extensions?.commitScoreSum?.toFixed(1)}
+                  </ScoringChip>
+                </Typography>
               </Grid>
             </>
           )}

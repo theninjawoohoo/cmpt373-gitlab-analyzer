@@ -70,8 +70,11 @@ const RegularTableHeaders: React.FC = () => {
         <Grid item xs={2}>
           <Typography>Date</Typography>
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={1}>
           <Typography>Score</Typography>
+        </Grid>
+        <Grid item xs={1}>
+          <Typography>Σ Commits</Typography>
         </Grid>
       </Grid>
     </Box>
