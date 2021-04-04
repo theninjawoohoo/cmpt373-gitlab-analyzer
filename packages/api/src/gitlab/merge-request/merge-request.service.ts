@@ -297,11 +297,13 @@ export class MergeRequestService extends BaseService<
     mergeRequest: MergeRequestEntity,
     weights?: GlobWeight[],
   ) {
-    const [commits] = await this.commitService.search({
-      merge_request: mergeRequest.id,
-      pageSize: 50000,
-    });
-    const scores = await Promise.all(
+    const [commits] = await this.commitService.search(
+      {
+        merge_request: mergeRequest.id,
+      },
+      false,
+    );
+    const commitScores = await Promise.all(
       commits.map(async (commit) => {
         return this.diffService.calculateDiffScore(
           {
@@ -311,27 +313,38 @@ export class MergeRequestService extends BaseService<
         );
       }),
     );
-
-    return scores.reduce((a, b) => a + b, 0);
+    const score = commitScores
+      .map(({ score }) => score)
+      .reduce((a, b) => a + b, 0);
+    const hasOverride = commitScores.some(({ hasOverride }) => hasOverride);
+    return {
+      score,
+      hasOverride,
+    };
   }
 
   async storeScore(mergeRequest: MergeRequestEntity, weights?: GlobWeight[]) {
-    const score = await this.diffService.calculateDiffScore(
+    const {
+      score: diffScore,
+      hasOverride: diffHasOverride,
+    } = await this.diffService.calculateDiffScore(
       {
         merge_request: mergeRequest.id,
       },
       weights,
     );
-    const sumScore = await this.getSumScoreForMergeRequest(
-      mergeRequest,
-      weights,
-    );
+    const {
+      score: commitScoreSum,
+      hasOverride: commitHasOverride,
+    } = await this.getSumScoreForMergeRequest(mergeRequest, weights);
     mergeRequest.resource = Extensions.updateExtensions(mergeRequest.resource, {
-      diffScore: score,
-      commitScoreSum: sumScore,
+      diffScore,
+      diffHasOverride,
+      commitScoreSum,
+      commitHasOverride,
     });
-    mergeRequest.diffScore = score;
-    mergeRequest.commitScoreSum = sumScore;
+    mergeRequest.diffScore = diffScore;
+    mergeRequest.commitScoreSum = commitScoreSum;
     await this.serviceRepository.save(mergeRequest);
   }
 

@@ -23,6 +23,9 @@ export namespace ScoreOverride {
     }
     return +(override?.score || computed || 0);
   }
+  export function hasOverride(override?: ScoreOverride) {
+    return override?.exclude || override?.score;
+  }
 }
 
 export namespace StagedScoreOverride {

@@ -232,13 +232,19 @@ export class CommitService extends BaseService<
   }
 
   async storeScore(commit: CommitEntity, weights?: GlobWeight[]) {
-    const score = await this.diffService.calculateDiffScore(
+    const {
+      score,
+      hasOverride: diffHasOverride,
+    } = await this.diffService.calculateDiffScore(
       {
         commit: commit.id,
       },
       weights,
     );
-    commit.resource = Extensions.updateExtensions(commit.resource, { score });
+    commit.resource = Extensions.updateExtensions(commit.resource, {
+      score,
+      diffHasOverride,
+    });
     commit.score = score;
     await this.serviceRepository.save(commit);
   }

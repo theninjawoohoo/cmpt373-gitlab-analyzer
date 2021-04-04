@@ -81,7 +81,11 @@ interface TaskCompletionStatus {
 interface MergeRequestExtensions {
   lastSync?: string;
   diffScore?: number;
+  // indicates a diff in this merge request has an override
+  diffHasOverride?: boolean;
   commitScoreSum?: number;
+  // indicates a commit in this merge request has an override
+  commitHasOverride?: boolean;
 }
 
 export interface MergeRequest extends WithExtensions<MergeRequestExtensions>{
