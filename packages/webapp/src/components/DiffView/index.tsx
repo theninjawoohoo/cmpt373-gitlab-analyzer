@@ -20,6 +20,12 @@ import ScoreOverrideForm from '../../pages/ListMergeRequestPage/components/Score
 import { useScoreOverrideQueue } from '../../pages/ListMergeRequestPage/contexts/ScoreOverrideQueue';
 import WarningIcon from '@material-ui/icons/Warning';
 
+const StyledAccordionSummary = styled(AccordionSummary)`
+  &.MuiAccordionSummary-root.Mui-focused {
+    background: none;
+  }
+`;
+
 interface DiffViewProps {
   diffId?: string;
   fileName: string;
@@ -161,7 +167,10 @@ const DiffView: React.FC<DiffViewProps> = ({
 
   return (
     <Accordion expanded={expanded || false} TransitionProps={{ timeout: 0 }}>
-      <AccordionSummary expandIcon={<ExpandMore />} onClick={onSummaryClick}>
+      <StyledAccordionSummary
+        expandIcon={<ExpandMore />}
+        onClick={onSummaryClick}
+      >
         <Box width='100%'>
           <Grid container alignItems='center' justify='space-between'>
             <Grid item>
@@ -223,7 +232,7 @@ const DiffView: React.FC<DiffViewProps> = ({
             </Grid>
           </Grid>
         </Box>
-      </AccordionSummary>
+      </StyledAccordionSummary>
       {open && (
         <ScoreOverrideForm
           open={open}
