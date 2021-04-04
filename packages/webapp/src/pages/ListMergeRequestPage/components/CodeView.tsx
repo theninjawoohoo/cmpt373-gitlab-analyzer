@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { ApiResource } from '../../../api/base';
 import { useGetDiffs } from '../../../api/diff';
 import DiffView from '../../../components/DiffView';
+import CallMadeIcon from '@material-ui/icons/CallMade';
 
 interface CodeViewProps {
   mergeRequest?: ApiResource<MergeRequest>;
@@ -19,6 +20,7 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
       ? { commit: commit.meta.id }
       : { merge_request: mergeRequest.meta.id },
   );
+  const gitlabButtonStyle = { marginLeft: 5, bold: true };
   const [expandedDiffs, setExpandedDiffs] = useState<ApiResource<Diff>[]>([]);
   return (
     <Container>
@@ -32,6 +34,15 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
           Expand All
         </Button>
         <Button onClick={() => setExpandedDiffs([])}>Collapse All</Button>
+        <Button
+          style={gitlabButtonStyle}
+          variant='text'
+          color={'primary'}
+          endIcon={<CallMadeIcon />}
+          onClick={() => window.open(mergeRequest.web_url)}
+        >
+          View on GitLab
+        </Button>
       </Box>
       <Box>
         {diffs?.results.map((diff) => {

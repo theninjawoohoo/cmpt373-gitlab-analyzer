@@ -5,6 +5,7 @@ import { parse } from 'querystring';
 import React, { useState } from 'react';
 import { AccordionSummary, AccordionDetails } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import CallMadeIcon from '@material-ui/icons/CallMade';
 import { useGetCommits } from '../../api/commit';
 import { Link, useLocation } from 'react-router-dom';
 import Pagination from '@material-ui/lab/Pagination';
@@ -21,6 +22,7 @@ const CommitList: React.FC = () => {
   const [page, setPage] = useState(0);
   const { emails } = useFilterContext();
   const { repositoryId } = useRepositoryContext();
+  const gitlabButtonStyle = { marginLeft: 5 };
   const { data: commits } = useGetCommits(
     {
       repository: query.repository as string,
@@ -73,6 +75,14 @@ const CommitList: React.FC = () => {
                     to={`/diff?commit=${commit.meta.id}`}
                   >
                     View Diff
+                  </Button>
+                  <Button
+                    style={gitlabButtonStyle}
+                    variant='outlined'
+                    endIcon={<CallMadeIcon />}
+                    onClick={() => window.open(commit.web_url)}
+                  >
+                    View on GitLab
                   </Button>
                 </Grid>
               </Grid>
