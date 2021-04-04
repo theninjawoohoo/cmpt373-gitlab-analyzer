@@ -42,7 +42,13 @@ const ScoreOverrideForm: React.FC<ScoreOverrideFormProps> = ({
               <Grid container direction='column' spacing={1}>
                 <Grid item>
                   <FormControlLabel
-                    control={<Checkbox color='primary' inputRef={register} />}
+                    control={
+                      <Checkbox
+                        color='primary'
+                        inputRef={register}
+                        defaultChecked={defaultValues?.exclude}
+                      />
+                    }
                     label='Exclude'
                     name='exclude'
                   />
