@@ -67,7 +67,7 @@ const ScoreOverrideQueueInfo: React.FC = () => {
       },
       {
         onSuccess: () => {
-          setShowDialog(false);
+          window.location.reload();
         },
       },
     );
