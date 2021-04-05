@@ -6,7 +6,6 @@ import {
   Box,
   Typography,
 } from '@material-ui/core';
-import Chip from '@material-ui/core/Chip';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import ExpandMore from '@material-ui/icons/ExpandMore';
@@ -25,6 +24,24 @@ const StyledAccordionSummary = styled(AccordionSummary)`
     background: none;
   }
 `;
+
+const DiffFactWrapper: React.FC<{
+  name: React.ReactNode;
+  value: React.ReactNode;
+}> = ({ name, value }) => {
+  return (
+    <Grid container justify='space-between' alignItems='center' spacing={2}>
+      <Grid item>
+        <Typography variant='body2'>
+          <strong>{name}:</strong>
+        </Typography>
+      </Grid>
+      <Grid item>
+        <Typography variant='body2'>{value}</Typography>
+      </Grid>
+    </Grid>
+  );
+};
 
 interface DiffViewProps {
   diffId?: string;
@@ -121,34 +138,24 @@ const DiffView: React.FC<DiffViewProps> = ({
               </>
             )}
           </Grid>
-          <Grid container alignItems='center' spacing={1}>
-            <Grid item>
-              <Typography variant='body2'>
-                <strong>Score:</strong>
-              </Typography>
-            </Grid>
-            <Grid item>
-              <ScorePopover
-                hasOverride={hasOverride}
-                scoreCount={score.toFixed(1)}
-                scoreSummary={summary}
+          <Grid container alignItems='center' spacing={2}>
+            <Grid item xs={2}>
+              <DiffFactWrapper
+                name='Score'
+                value={
+                  <ScorePopover
+                    hasOverride={hasOverride}
+                    scoreCount={score.toFixed(1)}
+                    scoreSummary={summary}
+                  />
+                }
               />
             </Grid>
-            <Grid item>
-              <Typography variant='body2'>
-                <strong>Weight:</strong>
-              </Typography>
+            <Grid item xs={2}>
+              <DiffFactWrapper name='Weight' value={extensions?.weight || 0} />
             </Grid>
             <Grid item>
-              <Chip size='small' label={extensions?.weight || 0} />
-            </Grid>
-            <Grid item>
-              <Typography variant='body2'>
-                <strong>Glob:</strong>
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Chip size='small' label={extensions?.glob} />
+              <DiffFactWrapper name='Filetype' value={extensions?.glob} />
             </Grid>
           </Grid>
         </Box>
