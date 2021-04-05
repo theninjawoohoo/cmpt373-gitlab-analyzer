@@ -27,66 +27,193 @@ export default class DiffInterpreter {
     let rightLineNumber = hunk.newStart;
 
     const hunkLines: Line[] = [];
+    let commentFlag = false;
     while (currentLine < hunk.lines.length) {
       const line = hunk.lines[currentLine];
       const lineType = this.determineLineType(line);
       if (lineType === Line.Type.add) {
-        hunkLines.push(this.createAdd(line, rightLineNumber));
+        commentFlag = this.checkAddLineType(line, hunkLines,rightLineNumber,commentFlag);
         rightLineNumber++;
         currentLine++;
-      } else if (lineType === Line.Type.noChange) {
+      }else if (lineType === Line.Type.noChange) {
         hunkLines.push(
-          this.createNoChange(line, leftLineNumber, rightLineNumber),
+          this.createChange(line, leftLineNumber, line, rightLineNumber, Line.Type.noChange),
         );
         leftLineNumber++;
         rightLineNumber++;
         currentLine++;
-      } else if (lineType == Line.Type.delete) {
-        const { addedLines, deletedLines } = this.findGroupedChange(
-          hunk.lines,
-          currentLine,
-          leftLineNumber,
-          rightLineNumber,
-        );
-        hunkLines.push(...this.linkLines(deletedLines, addedLines));
-        leftLineNumber += deletedLines.length;
-        rightLineNumber += addedLines.length;
-        currentLine += deletedLines.length + addedLines.length;
+      }else if (lineType == Line.Type.delete) {
+        let returnValue = this.checkDeleteLineType(line, hunkLines, hunk, leftLineNumber, rightLineNumber, currentLine, commentFlag);
+        leftLineNumber = returnValue[0];
+        rightLineNumber = returnValue[1];
+        currentLine = returnValue[2];
+        leftLineNumber++;
+        currentLine++;
       }
     }
     return hunkLines;
   }
 
-  // First read all consecutively deleted lines, and then read all the consecutively added lines
+  private checkAddLineType(
+    line: string, 
+    hunkLines:Line[], 
+    LineNumber: number, 
+    commentFlag: boolean
+    ) {
+    let result = this.createBlankCommentAndSyntax(line, hunkLines, LineNumber, commentFlag, true);
+    let pushed = result[0];
+    commentFlag = result[1];
+    if(!pushed) {
+      hunkLines.push(this.createAdd(line, LineNumber));
+    }
+    return commentFlag;
+  };
+
+  private checkDeleteLineType(
+    line: string, 
+    hunkLines:Line[], 
+    hunk: Hunk, 
+    leftLineNumber: number, 
+    rightLineNumber: number, 
+    currentLine: number, 
+    commentFlag: boolean
+    ) {
+    let result = this.createBlankCommentAndSyntax(line, hunkLines, leftLineNumber, commentFlag, true);
+    let pushed = result[0];
+    commentFlag = result[1];
+    if(!pushed) {
+      const { addedLine, deletedLine } = this.findGroupedChange(
+        hunk.lines,
+        currentLine,
+        leftLineNumber,
+        rightLineNumber,
+      );
+      hunkLines.push(...this.linkLine(deletedLine, addedLine));
+      rightLineNumber += 1;
+      currentLine += 1;
+    }
+
+    return [leftLineNumber, rightLineNumber, currentLine];
+  }
+
+  private createBlankCommentAndSyntax(
+    line: string, 
+    hunkLines:Line[], 
+    LineNumber: number, 
+    commentFlag: boolean,
+    added: boolean){
+    let pushed = false;
+    if(line.trim() === "+" || line.trim() === "-"){
+      hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.blank));
+      pushed = true;
+    }
+    if(!pushed){
+      let result = this.createComment(line, hunkLines, LineNumber, commentFlag, added);
+      pushed = result[0];
+      commentFlag = result[1];
+    }
+    if (!pushed && !line.match('[a-zA-Z1-9]')){
+      hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.syntaxLine));
+      pushed = true;
+    }
+    return [pushed, commentFlag];
+  }
+
+  private createComment(
+    line: string, 
+    hunkLines:Line[], 
+    LineNumber: number, 
+    commentFlag: boolean,
+    added: boolean){
+    let pushed = false;
+    let newline= line.substring(1).trim();
+    let commentSign = "";
+    let commentSectionStart = "";
+    let commentSectionEnd = "";
+    if(this.fileType == FileType.sql || this.fileType == FileType.haskell){
+      commentSign = "--";
+    }
+    if(this.fileType == FileType.haskell){
+      commentSectionStart = "{--";
+      commentSectionEnd = "--}";
+    }
+    else if(this.fileType == FileType.html){
+      commentSectionStart = "<!--";
+      commentSectionEnd = "-->";
+    }
+    else{
+      commentSign = "//";
+      commentSectionStart = "/*";
+      commentSectionEnd = "*/";
+    }
+
+    if (commentSign.length>0 && newline.substring(0,commentSign.length) === commentSign){
+      hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.comment));
+      pushed = true;
+    }
+    else{
+      if (commentFlag || (commentSectionStart.length > 0 && newline.substring(0,commentSectionStart.length) === commentSectionStart) ){
+        hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.comment));
+        pushed = true;
+        commentFlag = true;
+      }
+      if(commentSectionEnd.length > 0  && newline.substring(line.length - commentSectionEnd.length) === commentSectionEnd){
+        commentFlag = false;
+      }
+    }
+    return [pushed, commentFlag];
+  }
+
+  // First read a delte line and the matching add line
   private findGroupedChange(
     lines: string[],
     currentLine: number,
     leftLineNumber: number,
     rightLineNumber: number,
   ) {
-    const deletedLines = this.getDeletedLines(
+    const deletedLine = this.getDeletedLine(
       leftLineNumber,
       lines,
       currentLine,
     );
-    const addedLines = this.getAddedLines(
+    const addedLine = this.getAddedLine(
       rightLineNumber,
       lines,
-      currentLine + deletedLines.length,
+      currentLine + 1,
     );
-    return { deletedLines, addedLines };
+    return { deletedLine, addedLine };
   }
 
   // In the case when deletions are followed directly by an addition, we want to render
   // the deletion on the left side and the addition on the right side on the same line.
   // This helpers function creates the left and right side on the same line.
-  private linkLines(deletedLines: LineContent[], addedLines: LineContent[]) {
-    const max = Math.max(deletedLines.length, addedLines.length);
+  private linkLine(deletedLine: LineContent, addedLine: LineContent) {
     const changes: Line[] = [];
-    for (let i = 0; i < max; i++) {
-      const addedLine = addedLines[i];
-      const deletedLine = deletedLines[i];
-      if (addedLine) {
+    if (addedLine) {
+      let lineChange = this.getLineChange(addedLine,deletedLine);
+      if (lineChange == ""){
+        changes.push(
+          this.createChange(
+            addedLine.content,
+            addedLine.number,
+            deletedLine.content,
+            deletedLine.number,
+            Line.Type.spaceChange
+          ),
+        );
+      }
+      else if (!lineChange.match('[a-zA-Z1-9]')){
+        changes.push(
+          this.createChange(
+            addedLine.content,
+            addedLine.number,
+            deletedLine.content,
+            deletedLine.number,
+            Line.Type.syntaxChange
+          ),
+        );
+      }
+      else{
         changes.push(
           this.createAdd(
             addedLine.content,
@@ -95,50 +222,61 @@ export default class DiffInterpreter {
             deletedLine?.number,
           ),
         );
-      } else {
-        changes.push(
-          this.createDelete(deletedLine.content, deletedLine.number),
-        );
       }
+    } else {
+      changes.push(
+        this.createDelete(deletedLine.content, deletedLine.number),
+      );
     }
     return changes;
   }
 
-  // Read all consecutive deletes so we can group them. Helper for `findGroupedChange`
-  private getDeletedLines(
+  // Get different between the added line and deleted line. Helper for `linkLine`
+  private getLineChange(addedLine: LineContent, deletedLine: LineContent){
+    let added = addedLine.content.substring(1).split("");
+    let deleted = deletedLine.content.substring(1).split("");
+    let long = added;
+    let short = deleted;
+    if (added.length < deleted.length){
+      long = deleted;
+      short = added;
+    }
+    for(let i =0; i<short.length; i++){
+      for(let j =0; j<long.length;j++){
+        if (short[i] === long[j]){
+          long[j]="";
+          break;
+        }
+      }
+    }
+    return long.join('').trim();
+  }
+
+  // Read the deleted line. Helper for `findGroupedChange`
+  private getDeletedLine(
     leftLineNumber: number,
     lines: string[],
     currentLine: number,
   ) {
-    const deletedLines: LineContent[] = [];
     let line = lines[currentLine];
-    while (line && this.determineLineType(line) === Line.Type.delete) {
-      deletedLines.push({
-        number: leftLineNumber,
-        content: line,
-      });
-      leftLineNumber++;
-      line = lines[++currentLine];
-    }
+    const deletedLines: LineContent = {
+      number: leftLineNumber,
+      content: line,
+    };
     return deletedLines;
   }
 
-  // Read all consecutive adds so we can group them. Helper for `findGroupedChange`
-  private getAddedLines(
+  // Read the added line. Helper for `findGroupedChange`
+  private getAddedLine(
     rightLineNumber: number,
     lines: string[],
     currentLine: number,
   ) {
-    const addedLines: LineContent[] = [];
     let line = lines[currentLine];
-    while (line && this.determineLineType(line) === Line.Type.add) {
-      addedLines.push({
-        number: rightLineNumber,
-        content: line,
-      });
-      rightLineNumber++;
-      line = lines[++currentLine];
-    }
+    const addedLines: LineContent = {
+      number: rightLineNumber,
+      content: line,
+    };
     return addedLines;
   }
 
@@ -166,6 +304,27 @@ export default class DiffInterpreter {
     return definition;
   }
 
+  private createLine(line: string, lineNumber: number, add: boolean, type: Line.Type): Line {
+    if(add){
+      return {
+        type: type,
+        right: {
+          lineNumber,
+          lineContent: line,
+        },
+      };
+    }
+    else{
+      return {
+        type: type,
+        left: {
+          lineNumber,
+          lineContent: line,
+        },
+      };
+    }
+  }
+
   private createDelete(line: string, lineNumber: number): Line {
     return {
       type: Line.Type.delete,
@@ -176,20 +335,22 @@ export default class DiffInterpreter {
     };
   }
 
-  private createNoChange(
+  private createChange(
     line: string,
-    leftLineNumber: number,
-    rightLineNumber: number,
+    lineNumber: number,
+    deletedLine: string,
+    deletedLineNumber: number,
+    type: Line.Type
   ): Line {
     return {
-      type: Line.Type.noChange,
+      type: type,
       left: {
-        lineContent: line,
-        lineNumber: leftLineNumber,
+        lineContent: deletedLine,
+        lineNumber: deletedLineNumber,
       },
       right: {
         lineContent: line,
-        lineNumber: rightLineNumber,
+        lineNumber: lineNumber,
       },
     };
   }
