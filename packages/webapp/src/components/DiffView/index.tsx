@@ -162,7 +162,7 @@ const DiffView: React.FC<DiffViewProps> = ({
     extensions?.score,
   );
   const isExcluded = extensions?.override?.exclude;
-  const hasOverride = isExcluded || extensions?.override?.score;
+  const hasOverride = ScoreOverride.hasOverride(extensions?.override);
   const fileNameTextDecoration = isExcluded ? 'line-through' : '';
 
   return (
@@ -210,6 +210,7 @@ const DiffView: React.FC<DiffViewProps> = ({
             </Grid>
             <Grid item>
               <ScorePopover
+                hasOverride={hasOverride}
                 scoreCount={score.toFixed(1)}
                 scoreSummary={summary}
               />
