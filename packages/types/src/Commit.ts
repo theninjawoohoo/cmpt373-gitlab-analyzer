@@ -1,5 +1,5 @@
-import { ScoreOverride } from "./ScoreOverride";
-import { WithExtensions } from "./WithExtensions";
+import { ScoreOverride } from './ScoreOverride';
+import { WithExtensions } from './WithExtensions';
 
 interface CommitExtensions {
   score?: number;
