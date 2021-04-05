@@ -60,7 +60,9 @@ export default class DiffInterpreter {
     LineNumber: number, 
     commentFlag: boolean
     ) {
-    let pushed = this.createCommentAndSyntax(line, hunkLines, LineNumber, commentFlag, true);
+    let result = this.createBlankCommentAndSyntax(line, hunkLines, LineNumber, commentFlag, true);
+    let pushed = result[0];
+    commentFlag = result[1];
     if(!pushed) {
       hunkLines.push(this.createAdd(line, LineNumber));
     }
@@ -76,7 +78,9 @@ export default class DiffInterpreter {
     currentLine: number, 
     commentFlag: boolean
     ) {
-    let pushed = this.createCommentAndSyntax(line, hunkLines, leftLineNumber, commentFlag, true);
+    let result = this.createBlankCommentAndSyntax(line, hunkLines, leftLineNumber, commentFlag, true);
+    let pushed = result[0];
+    commentFlag = result[1];
     if(!pushed) {
       const { addedLine, deletedLine } = this.findGroupedChange(
         hunk.lines,
@@ -92,7 +96,30 @@ export default class DiffInterpreter {
     return [leftLineNumber, rightLineNumber, currentLine];
   }
 
-  private createCommentAndSyntax(
+  private createBlankCommentAndSyntax(
+    line: string, 
+    hunkLines:Line[], 
+    LineNumber: number, 
+    commentFlag: boolean,
+    added: boolean){
+    let pushed = false;
+    if(line.trim() === "+" || line.trim() === "-"){
+      hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.blank));
+      pushed = true;
+    }
+    if(!pushed){
+      let result = this.createComment(line, hunkLines, LineNumber, commentFlag, added);
+      pushed = result[0];
+      commentFlag = result[1];
+    }
+    if (!pushed && !line.match('[a-zA-Z1-9]')){
+      hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.syntaxLine));
+      pushed = true;
+    }
+    return [pushed, commentFlag];
+  }
+
+  private createComment(
     line: string, 
     hunkLines:Line[], 
     LineNumber: number, 
@@ -100,29 +127,41 @@ export default class DiffInterpreter {
     added: boolean){
     let pushed = false;
     let newline= line.substring(1).trim();
-    if(line.trim() === "+" || line.trim() === "-"){
-      hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.blank));
-      pushed = true;
+    let commentSign = "";
+    let commentSectionStart = "";
+    let commentSectionEnd = "";
+    if(this.fileType == FileType.sql || this.fileType == FileType.haskell){
+      commentSign = "--";
     }
-    else if (newline.substring(0,2) === "//" || commentFlag){
+    if(this.fileType == FileType.haskell){
+      commentSectionStart = "{--";
+      commentSectionEnd = "--}";
+    }
+    else if(this.fileType == FileType.html){
+      commentSectionStart = "<!--";
+      commentSectionEnd = "-->";
+    }
+    else{
+      commentSign = "//";
+      commentSectionStart = "/*";
+      commentSectionEnd = "*/";
+    }
+
+    if (commentSign.length>0 && newline.substring(0,commentSign.length) === commentSign){
       hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.comment));
       pushed = true;
     }
-    else if (newline.substring(0,2) === "/*"){
-      hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.comment));
-      commentFlag = true;
-      pushed = true;
+    else{
+      if (commentFlag || (commentSectionStart.length > 0 && newline.substring(0,commentSectionStart.length) === commentSectionStart) ){
+        hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.comment));
+        pushed = true;
+        commentFlag = true;
+      }
+      if(commentSectionEnd.length > 0  && newline.substring(line.length - commentSectionEnd.length) === commentSectionEnd){
+        commentFlag = false;
+      }
     }
-    else if(newline.substring(line.length - 2) === "*/" && commentFlag){
-      hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.comment));
-      commentFlag = false;
-      pushed = true;
-    }
-    else if (!line.match('[a-zA-Z1-9]')){
-      hunkLines.push(this.createLine(line, LineNumber, added, Line.Type.syntaxLine));
-      pushed = true;
-    }
-    return pushed;
+    return [pushed, commentFlag];
   }
 
   // First read a delte line and the matching add line
