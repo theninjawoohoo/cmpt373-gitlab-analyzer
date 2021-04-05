@@ -1,20 +1,29 @@
+import { SnackbarProvider } from 'notistack';
 import React from 'react';
 import './App.css';
 import { Router } from './components/Router';
 import ThemeProvider from './components/ThemeProvider';
 import { AuthContextProvider } from './contexts/AuthContext';
 import { RepositoryContextProvider } from './contexts/RepositoryContext';
-import { DateFilterContextProvider } from './contexts/DateFilterContext';
+import { FilterContextProvider } from './contexts/FilterContext';
 
 const App = () => {
   return (
     <AuthContextProvider>
       <RepositoryContextProvider>
-        <DateFilterContextProvider>
+        <FilterContextProvider>
           <ThemeProvider>
-            <Router />
+            <SnackbarProvider
+              maxSnack={3}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+            >
+              <Router />
+            </SnackbarProvider>
           </ThemeProvider>
-        </DateFilterContextProvider>
+        </FilterContextProvider>
       </RepositoryContextProvider>
     </AuthContextProvider>
   );

@@ -41,7 +41,9 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
               key={diff.meta.id}
               fileName={diff.new_path}
               lines={diff.lines}
+              summary={diff.summary}
               expanded={expanded}
+              extensions={diff.extensions}
               onSummaryClick={() => {
                 if (expanded) {
                   setExpandedDiffs(

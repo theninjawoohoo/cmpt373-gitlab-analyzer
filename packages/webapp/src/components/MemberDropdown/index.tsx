@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { useRepositoryAuthors } from '../../api/author';
 import { ApiResource } from '../../api/base';
 import { useRepositoryMembers } from '../../api/repo_members';
+import { useFilterContext } from '../../contexts/FilterContext';
 
 function findEmailsForMember(
   memberId: string,
@@ -20,23 +21,32 @@ function findEmailsForMember(
 
 interface MemberDropdownProps {
   repositoryId: string;
-  onChange?: (emails: string[]) => void;
 }
 
-const MemberDropdown: React.FC<MemberDropdownProps> = ({
-  repositoryId,
-  onChange,
-}) => {
-  const [value, setValue] = useState('all');
+const MemberDropdown: React.FC<MemberDropdownProps> = ({ repositoryId }) => {
+  const { author, setAuthor, setEmail } = useFilterContext();
+  const [value, setValue] = useState(author);
+
   const { data: members } = useRepositoryMembers(repositoryId);
   const { data: authors } = useRepositoryAuthors(repositoryId);
+
+  const handleChangeAuthor = (author) => {
+    setAuthor(author);
+  };
+
+  const handleEmailChange = (emails) => {
+    setEmail(emails);
+  };
+
   useEffect(() => {
     if (value !== 'all') {
-      const emails = findEmailsForMember(value, authors);
-
-      onChange(emails.length > 0 ? emails : ['']);
+      const newEmails = findEmailsForMember(value, authors);
+      console.log(newEmails);
+      handleChangeAuthor(value);
+      handleEmailChange(newEmails);
     } else {
-      onChange([]);
+      handleChangeAuthor(value);
+      handleEmailChange([]);
     }
   }, [value]);
 

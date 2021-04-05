@@ -1,10 +1,9 @@
-import { Commit, Extensions, MergeRequest } from '@ceres/types';
+import { Commit, Extensions, GlobWeight, MergeRequest } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
 import alwaysArray from 'src/common/alwaysArray';
-import { Repository as TypeORMRepository } from 'typeorm';
-import { paginate, withDefaults } from '../../common/query-dto';
+import { Repository as TypeORMRepository, SelectQueryBuilder } from 'typeorm';
 import { CommitService } from '../repository/commit/commit.service';
 import { DiffService } from '../repository/diff/diff.service';
 import { Repository } from '../repository/repository.entity';
@@ -12,26 +11,32 @@ import { MergeRequestParticipantService } from './merge-request-participant/merg
 import { MergeRequestQueryDto } from './merge-request-query.dto';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
 import { NoteService } from '../repository/note/note.service';
+import { BaseService } from 'src/common/base.service';
 
 @Injectable()
-export class MergeRequestService {
+export class MergeRequestService extends BaseService<
+  MergeRequest,
+  MergeRequestEntity,
+  MergeRequestQueryDto
+> {
   constructor(
     private readonly httpService: HttpService,
     @InjectRepository(MergeRequestEntity)
-    private readonly repository: TypeORMRepository<MergeRequestEntity>,
+    serviceRepository: TypeORMRepository<MergeRequestEntity>,
     private readonly diffService: DiffService,
     private readonly commitService: CommitService,
     private readonly participantService: MergeRequestParticipantService,
     private readonly noteService: NoteService,
-  ) {}
+  ) {
+    super(serviceRepository, 'merge_request');
+  }
 
-  async search(filters: MergeRequestQueryDto) {
-    filters = withDefaults(filters);
+  buildFilters(
+    query: SelectQueryBuilder<MergeRequestEntity>,
+    filters: MergeRequestQueryDto,
+  ): SelectQueryBuilder<MergeRequestEntity> {
     const { repository } = filters;
-    const query = this.repository
-      .createQueryBuilder('merge_request')
-      .where('merge_request.repository_id = :repository', { repository })
-      .orderBy("merge_request.resource #>> '{merged_at}'", 'DESC');
+    query.andWhere('merge_request.repository_id = :repository', { repository });
 
     if (filters.author_email) {
       query.andWhere(
@@ -48,18 +53,47 @@ export class MergeRequestService {
         { authorEmail: alwaysArray(filters.author_email) },
       );
     }
-    paginate(query, filters);
-    return query.getManyAndCount();
+
+    if (filters.merged_start_date) {
+      query.andWhere(
+        "(merge_request.resource #>> '{merged_at}') >= (:startDate)",
+        {
+          startDate: filters.merged_start_date,
+        },
+      );
+    }
+
+    if (filters.merged_end_date) {
+      query.andWhere(
+        "(merge_request.resource #>> '{merged_at}') <= (:endDate)",
+        {
+          endDate: filters.merged_end_date,
+        },
+      );
+    }
+    return query;
   }
 
-  async updateLastSync(
-    mergeRequest: MergeRequestEntity,
-    timestamp = new Date(),
-  ) {
-    mergeRequest.resource = Extensions.updateExtensions(mergeRequest.resource, {
-      lastSync: timestamp.toISOString(),
-    });
-    return this.repository.save(mergeRequest);
+  buildSort(
+    query: SelectQueryBuilder<MergeRequestEntity>,
+  ): SelectQueryBuilder<MergeRequestEntity> {
+    return query.orderBy("merge_request.resource #>> '{merged_at}'", 'DESC');
+  }
+
+  async buildDailyCounts(
+    filters: MergeRequestQueryDto,
+  ): Promise<MergeRequest.DailyCount[]> {
+    let query = this.serviceRepository.createQueryBuilder('merge_request');
+    query = this.buildFilters(query, filters);
+    query.select("DATE(merge_request.resource #>>'{merged_at}')", 'date');
+    query.addSelect('count(*)::integer', 'count');
+    query.addSelect(
+      "sum((merge_request.resource #>> '{extensions,diffScore}')::float)",
+      'score',
+    );
+    query.groupBy('date');
+    query.orderBy('date', 'ASC');
+    return query.getRawMany<MergeRequest.DailyCount>();
   }
 
   async fetchAllParticipantsForRepository(
@@ -89,11 +123,11 @@ export class MergeRequestService {
   }
 
   async findAllForRepository(repository: Repository) {
-    return this.repository.find({ where: { repository } });
+    return this.serviceRepository.find({ where: { repository } });
   }
 
   async findOne(id: string) {
-    return this.repository.findOne({
+    return this.serviceRepository.findOne({
       where: { id },
     });
   }
@@ -112,7 +146,7 @@ export class MergeRequestService {
     let page = 0;
     let mergeRequests = [];
     do {
-      mergeRequests = await this.repository.find({
+      mergeRequests = await this.serviceRepository.find({
         where: { repository },
         take: 10,
         skip: page,
@@ -142,7 +176,7 @@ export class MergeRequestService {
         this.commitService.findByGitlabId(repository, commit.id),
       ),
     );
-    await this.repository.save(mergeRequest);
+    await this.serviceRepository.save(mergeRequest);
   }
 
   async syncForRepositoryPage(
@@ -171,7 +205,7 @@ export class MergeRequestService {
   ) {
     const entities = await Promise.all(
       mergeRequests.map(async (mergeRequest) => {
-        const found = await this.repository
+        const found = await this.serviceRepository
           .createQueryBuilder()
           .where('resource @> :resource', {
             resource: {
@@ -186,7 +220,7 @@ export class MergeRequestService {
           return { mergeRequest: found, created: false };
         }
         return {
-          mergeRequest: this.repository.create({
+          mergeRequest: this.serviceRepository.create({
             repository: repository,
             resource: mergeRequest,
           }),
@@ -198,7 +232,7 @@ export class MergeRequestService {
       existing: entities
         .filter(({ created }) => !created)
         .map(({ mergeRequest }) => mergeRequest),
-      created: await this.repository.save(
+      created: await this.serviceRepository.save(
         entities
           .filter(({ created }) => created)
           .map(({ mergeRequest }) => mergeRequest),
@@ -259,53 +293,59 @@ export class MergeRequestService {
       .toPromise();
   }
 
-  public async getSumScoreForMergeRequest(mergeRequest: MergeRequestEntity) {
-    let score = 0;
-    const commits = await this.repository
-      .createQueryBuilder('merge_request')
-      .addSelect('mrcc.commitId', 'commits_id')
-      .andWhere('merge_request.id = :mr_id', { mr_id: mergeRequest.id })
-      .innerJoin(
-        'merge_request_commits_commit',
-        'mrcc',
-        'merge_request.id = mrcc.mergeRequestId',
-      )
-      .getRawMany();
-
-    await Promise.all(
+  public async getSumScoreForMergeRequest(
+    mergeRequest: MergeRequestEntity,
+    weights?: GlobWeight[],
+  ) {
+    const [commits] = await this.commitService.search({
+      merge_request: mergeRequest.id,
+      pageSize: 50000,
+    });
+    const scores = await Promise.all(
       commits.map(async (commit) => {
-        const commitScore = this.diffService.calculateDiffScore({
-          commit: commit.commits_id,
-        });
-        score += await commitScore;
+        return this.diffService.calculateDiffScore(
+          {
+            commit: commit.id,
+          },
+          weights,
+        );
       }),
     );
 
-    return score;
+    return scores.reduce((a, b) => a + b, 0);
   }
 
-  async storeScore(mergeRequest: MergeRequestEntity) {
-    const score = await this.diffService.calculateDiffScore({
-      merge_request: mergeRequest.id,
-    });
-    const sumScore = await this.getSumScoreForMergeRequest(mergeRequest);
+  async storeScore(mergeRequest: MergeRequestEntity, weights?: GlobWeight[]) {
+    const score = await this.diffService.calculateDiffScore(
+      {
+        merge_request: mergeRequest.id,
+      },
+      weights,
+    );
+    const sumScore = await this.getSumScoreForMergeRequest(
+      mergeRequest,
+      weights,
+    );
     mergeRequest.resource = Extensions.updateExtensions(mergeRequest.resource, {
       diffScore: score,
       commitScoreSum: sumScore,
     });
     mergeRequest.diffScore = score;
     mergeRequest.commitScoreSum = sumScore;
-    await this.repository.save(mergeRequest);
+    await this.serviceRepository.save(mergeRequest);
   }
 
-  async updateMergeRequestScoreByRepository(repositoryId: string) {
+  async updateMergeRequestScoreByRepository(
+    repositoryId: string,
+    weights?: GlobWeight[],
+  ) {
     const [mergeRequests] = await this.search({
       repository: repositoryId,
       pageSize: 500000,
     });
     await Promise.all(
       mergeRequests.map(async (mergeRequest) => {
-        await this.storeScore(mergeRequest);
+        await this.storeScore(mergeRequest, weights);
       }),
     );
   }

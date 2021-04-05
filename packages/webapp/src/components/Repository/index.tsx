@@ -1,19 +1,28 @@
-import { Operation } from '@ceres/types';
-import React from 'react';
+import { Operation, Repository } from '@ceres/types';
+import Tabs from '@material-ui/core/Tabs';
+import React, { useState } from 'react';
 import {
   useFetchRepositories,
   useGetOperations,
   useSyncRepository,
 } from '../../api/operation';
 import { useRepository } from '../../api/repository';
-import { ProgressCircle } from '../Common/CircularProgress';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
+import { useAuthContext } from '../../contexts/AuthContext';
 import RepositoryCard from './RepositoryCard';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
-import Box from '@material-ui/core/Box';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+} from '@material-ui/core';
+import { TextField } from '@material-ui/core';
+import Tab from '@material-ui/core/Tab/Tab';
 
 function hasPendingSync(operations: Operation[], id: string) {
   return (
@@ -22,8 +31,28 @@ function hasPendingSync(operations: Operation[], id: string) {
   );
 }
 
-const Repository: React.FC = () => {
-  const { data: repos } = useRepository();
+enum TabOption {
+  all = 'all',
+  owned = 'owned',
+  shared = 'shared',
+}
+
+const tabToRoleMappings = {
+  [TabOption.all]: [Repository.Role.owner, Repository.Role.collaborator],
+  [TabOption.owned]: [Repository.Role.owner],
+  [TabOption.shared]: [Repository.Role.collaborator],
+};
+
+const RepositoryList: React.FC = () => {
+  const [sort, setSort] = useState('-project_created');
+  const [search, setSearch] = useState('');
+  const [tab, setTab] = useState(TabOption.all);
+  const { data } = useRepository({
+    sort,
+    name: search,
+    role: tabToRoleMappings[tab],
+  });
+  const { user } = useAuthContext();
   const {
     data: operationsData,
     invalidate: invalidateOperations,
@@ -40,8 +69,6 @@ const Repository: React.FC = () => {
   });
   const { sync } = useSyncRepository();
   const { fetch } = useFetchRepositories();
-  const openCircularProgress = false;
-  const progress = 0;
   const isFetchingRepositories = pendingFetches?.total > 0;
 
   const syncRepository = (id: string) => {
@@ -60,7 +87,7 @@ const Repository: React.FC = () => {
   };
 
   const message =
-    repos?.results.length == 0 ? (
+    data?.results.length == 0 ? (
       <h3>You have no repositories on your profile</h3>
     ) : null;
 
@@ -89,24 +116,70 @@ const Repository: React.FC = () => {
           </Box>
         </Grid>
       </Grid>
-      {message}
-      {openCircularProgress && <ProgressCircle progress={progress} />}
-      {repos?.results.map((repo) => {
-        const isSyncing = hasPendingSync(
-          operationsData?.results || [],
-          repo.meta.id,
-        );
-        return (
-          <RepositoryCard
-            repository={repo}
-            isSyncing={isSyncing}
-            syncRepository={syncRepository}
-            key={repo.meta.id}
+      <Grid container spacing={2}>
+        <Grid item xs={8}>
+          <TextField
+            label='Search'
+            variant='outlined'
+            fullWidth
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
-        );
-      })}
+        </Grid>
+        <Grid item xs={4}>
+          <FormControl variant='filled' fullWidth>
+            <InputLabel shrink id='sort-order-label'>
+              Sort
+            </InputLabel>
+            <Select
+              labelId='sort-order-label'
+              id='sort-order-label-options'
+              value={sort}
+              onChange={(e) => setSort(e.target.value as string)}
+              style={{ minWidth: '15rem' }}
+              fullWidth
+            >
+              <MenuItem value='-project_synced'>Recently Synced</MenuItem>
+              <MenuItem value='+project_synced'>Oldest Synced</MenuItem>
+              <MenuItem value='-project_created'>Recently Created</MenuItem>
+              <MenuItem value='+project_created'>Oldest Created</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
+      <Tabs
+        value={tab}
+        onChange={(_e, newTab) => {
+          setTab(newTab);
+        }}
+        indicatorColor='primary'
+        textColor='primary'
+        centered
+      >
+        <Tab value={TabOption.all} label='All' />
+        <Tab value={TabOption.owned} label='Owned by me' />
+        <Tab value={TabOption.shared} label='Shared with me' />
+      </Tabs>
+      {message}
+      <React.Fragment>
+        {data?.results.map((repo) => {
+          const isSyncing = hasPendingSync(
+            operationsData?.results || [],
+            repo.meta.id,
+          );
+          return (
+            <RepositoryCard
+              repository={repo}
+              isShared={user?.id !== repo?.extensions?.owner?.id}
+              isSyncing={isSyncing}
+              syncRepository={syncRepository}
+              key={repo.meta.id}
+            />
+          );
+        })}
+      </React.Fragment>
     </Container>
   );
 };
 
-export default Repository;
+export default RepositoryList;

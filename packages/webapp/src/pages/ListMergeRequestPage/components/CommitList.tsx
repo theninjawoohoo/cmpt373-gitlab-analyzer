@@ -16,8 +16,9 @@ interface CommitListProps {
 }
 
 const Root = styled(Box)<{ disabled?: boolean }>`
-  cursor: ${(p) => (p.disabled ? 'pointer' : 'default')};
-  opacity: ${(o) => (o.disabled ? '100%' : '50%')};
+  cursor: ${(p) => (p.disabled ? 'default' : 'pointer')};
+  opacity: ${(o) => (o.disabled ? '50%' : '100%')};
+  border-top: 1px solid #e0e0e0;
 `;
 
 const CommitList: React.FC<CommitListProps> = ({
@@ -31,36 +32,52 @@ const CommitList: React.FC<CommitListProps> = ({
   });
   return (
     <>
-      {(commits?.results || []).map((commit) => (
-        <Root
-          key={commit.meta.id}
-          pl={5}
-          py={1}
-          onClick={
-            authorEmails.indexOf(commit.author_email)
-              ? () => {
-                  console.log('Invalid selection');
-                }
-              : () => setActiveCommit(commit)
-          }
-          bgcolor={activeCommit?.meta.id === commit.meta.id ? '#D3D3D3' : ''}
-          disabled={authorEmails.indexOf(commit.author_email) != -1}
-        >
-          <Grid container>
-            <Grid item xs={8}>
-              <Typography variant='body2'>{commit.title}</Typography>
+      <Box pr={3}>
+        <Typography align='right'>Commit Score</Typography>
+      </Box>
+      {(commits?.results || []).map((commit) => {
+        const isActive =
+          authorEmails.length === 0 ||
+          authorEmails.includes(commit.author_email);
+        return (
+          <Root
+            key={commit.meta.id}
+            ml={5}
+            pr={3}
+            py={1}
+            onClick={
+              !isActive
+                ? () => {
+                    console.log('Invalid selection');
+                  }
+                : () => setActiveCommit(commit)
+            }
+            bgcolor={activeCommit?.meta.id === commit.meta.id ? '#D3D3D3' : ''}
+            disabled={!isActive}
+          >
+            <Grid container>
+              <Grid item xs={9}>
+                <Typography>{commit.title}</Typography>
+                <Grid container justify='space-between'>
+                  <Typography variant='body2' color='textSecondary'>
+                    {commit.author_name}
+                  </Typography>
+                  <Box pr={5}>
+                    <Typography variant='body2' color='textSecondary'>
+                      <SmartDate>{commit.authored_date}</SmartDate>
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+              <Grid item xs={3}>
+                <Typography align='right'>
+                  {commit.extensions?.score?.toFixed(1)}
+                </Typography>
+              </Grid>
             </Grid>
-            <Grid item xs={2}>
-              <Typography variant='body2'>{commit.author_name}</Typography>
-            </Grid>
-            <Grid item xs={2}>
-              <Typography variant='body2'>
-                <SmartDate>{commit.authored_date}</SmartDate>
-              </Typography>
-            </Grid>
-          </Grid>
-        </Root>
-      ))}
+          </Root>
+        );
+      })}
     </>
   );
 };

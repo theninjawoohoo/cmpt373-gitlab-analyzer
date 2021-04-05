@@ -1,4 +1,4 @@
-import { Commit, Extensions } from '@ceres/types';
+import { Commit, Extensions, GlobWeight } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
@@ -50,7 +50,7 @@ export class CommitService {
 
     if (filters.start_date) {
       query.andWhere(
-        "DATE(commit.resource #>> '{authored_date}') >= DATE(:startDate)",
+        "(commit.resource #>> '{authored_date}') >= (:startDate)",
         {
           startDate: filters.start_date,
         },
@@ -58,12 +58,9 @@ export class CommitService {
     }
 
     if (filters.end_date) {
-      query.andWhere(
-        "DATE(commit.resource #>> '{authored_date}') <= DATE(:endDate)",
-        {
-          endDate: filters.end_date,
-        },
-      );
+      query.andWhere("(commit.resource #>> '{authored_date}') <= (:endDate)", {
+        endDate: filters.end_date,
+      });
     }
 
     query.orderBy("commit.resource #>> '{authored_date}'", 'DESC');
@@ -116,20 +113,6 @@ export class CommitService {
       })
       .getRawMany();
     return rows as Commit.Author[];
-  }
-
-  async getByAuthors(repository: Repository, author: [string]) {
-    const rows = await this.commitRepository
-      .createQueryBuilder('commit')
-      .select('commit.id', 'commit_id')
-      .where('commit.repository_id = :repositoryId', {
-        repositoryId: repository.id,
-      })
-      .andWhere('commit.resource.author_email = :author_email', {
-        author_email: author,
-      })
-      .getRawMany();
-    return rows as Commit[];
   }
 
   async fetchForRepository(repository: Repository, token: string) {
@@ -234,16 +217,22 @@ export class CommitService {
     };
   }
 
-  async storeScore(commit: CommitEntity) {
-    const score = await this.diffService.calculateDiffScore({
-      commit: commit.id,
-    });
+  async storeScore(commit: CommitEntity, weights?: GlobWeight[]) {
+    const score = await this.diffService.calculateDiffScore(
+      {
+        commit: commit.id,
+      },
+      weights,
+    );
     commit.resource = Extensions.updateExtensions(commit.resource, { score });
     commit.score = score;
     await this.commitRepository.save(commit);
   }
 
-  async updateCommitScoreByRepository(repositoryId: string) {
+  async updateCommitScoreByRepository(
+    repositoryId: string,
+    weights?: GlobWeight[],
+  ) {
     const [commits] = await this.search({
       repository: repositoryId,
       pageSize: 500000,
@@ -251,7 +240,7 @@ export class CommitService {
 
     await Promise.all(
       commits.map(async (commit) => {
-        await this.storeScore(commit);
+        await this.storeScore(commit, weights);
       }),
     );
   }

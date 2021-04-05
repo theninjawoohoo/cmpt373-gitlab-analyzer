@@ -1,10 +1,15 @@
 import { Extensions, Repository } from '@ceres/types';
+import alwaysArray from '../../common/alwaysArray';
 import { WithUser } from '../../common/query-dto';
 import { RepositoryMemberService } from './repository-member/repository-member.service';
 import { Repository as RepositoryEntity } from './repository.entity';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository as TypeORMRepository, SelectQueryBuilder } from 'typeorm';
+import {
+  Brackets,
+  Repository as TypeORMRepository,
+  SelectQueryBuilder,
+} from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { RepositoryQueryDto } from './repository-query.dto';
 import { BaseService } from 'src/common/base.service';
@@ -28,7 +33,28 @@ export class RepositoryService extends BaseService<
     query: SelectQueryBuilder<RepositoryEntity>,
     filters: WithUser<RepositoryQueryDto>,
   ): SelectQueryBuilder<RepositoryEntity> {
-    query.andWhere('repository.user_id = :userId', { userId: filters.user.id });
+    // nests an OR inside and AND
+    // i.e. AND ( ... OR ... ) so we can query for repositories the user owns
+    // and is a collaborator in at the same time
+    query.andWhere(
+      new Brackets((q) => {
+        alwaysArray(filters.role || [Repository.Role.owner]).forEach((role) => {
+          if (role === Repository.Role.owner) {
+            q.orWhere('repository.user_id = :userId', {
+              userId: filters.user.id,
+            });
+          } else if (role === Repository.Role.collaborator) {
+            // check if user is one of the collaborators
+            q.orWhere(
+              "repository.resource #> '{extensions}' @> :collaborators",
+              {
+                collaborators: { collaborators: [{ id: filters.user.id }] },
+              },
+            );
+          }
+        });
+      }),
+    );
 
     if (filters.name) {
       query.andWhere(
@@ -38,7 +64,6 @@ export class RepositoryService extends BaseService<
         },
       );
     }
-
     return query;
   }
   buildSort(
@@ -55,6 +80,8 @@ export class RepositoryService extends BaseService<
         );
       case 'project_created':
         return query.orderBy("repository.resource #>> '{created_at}'", order);
+      case 'project_name':
+        return query.orderBy("repository.resource #> '{name}'", order);
     }
     return query;
   }
@@ -62,6 +89,42 @@ export class RepositoryService extends BaseService<
   async updateLastSync(repository: RepositoryEntity, timestamp = new Date()) {
     repository.resource = Extensions.updateExtensions(repository.resource, {
       lastSync: timestamp.toISOString(),
+    });
+    return this.update(repository);
+  }
+
+  updateScoringConfig(
+    repository: RepositoryEntity,
+    scoringConfig: Repository['extensions']['scoringConfig'],
+  ) {
+    repository.resource = Extensions.updateExtensions(repository.resource, {
+      scoringConfig,
+    });
+    return this.update(repository);
+  }
+
+  addCollaborator(
+    repository: RepositoryEntity,
+    user: User,
+    accessLevel: Repository.AccessLevel,
+  ) {
+    const collaborators = repository.resource.extensions?.collaborators || [];
+    if (!collaborators.find((c) => c.id === user.id)) {
+      repository.resource = Extensions.updateExtensions(repository.resource, {
+        collaborators: [
+          ...collaborators,
+          { id: user.id, display: user.auth.userId, accessLevel },
+        ],
+      });
+    }
+    return this.update(repository);
+  }
+
+  removeCollaborator(repository: RepositoryEntity, user: User) {
+    const collaborators = repository.resource.extensions?.collaborators || [];
+    const filtered = collaborators.filter((c) => c.id !== user.id);
+    repository.resource = Extensions.updateExtensions(repository.resource, {
+      collaborators: filtered,
     });
     return this.update(repository);
   }
@@ -82,7 +145,7 @@ export class RepositoryService extends BaseService<
   }
 
   private async createOrUpdate(user: User, repositories: Repository[]) {
-    const entities = await Promise.all(
+    let entities = await Promise.all(
       repositories.map(async (repo) => {
         let found = await this.serviceRepository
           .createQueryBuilder()
@@ -104,6 +167,12 @@ export class RepositoryService extends BaseService<
         return found;
       }),
     );
+    entities = entities.map((entity) => ({
+      ...entity,
+      resource: Extensions.updateExtensions(entity.resource, {
+        owner: { id: user.id, display: user.auth.userId },
+      }),
+    }));
     return this.serviceRepository.save(entities);
   }
 

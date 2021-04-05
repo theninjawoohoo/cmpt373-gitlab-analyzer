@@ -5,21 +5,38 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import DefaultPageLayout from '../../../components/DefaultPageLayout';
 import DefaultPageTitleFormat from '../../../components/DefaultPageTitleFormat';
+import IconButton from '@material-ui/core/IconButton';
+import CancelIcon from '@material-ui/icons/Cancel';
+import { useHistory } from 'react-router-dom';
 
 interface ScoringLayoutProps {
   showCreateButton?: boolean;
+  showBackButton?: boolean;
 }
 
 const ScoringLayout: React.FC<ScoringLayoutProps> = ({
   children,
   showCreateButton,
+  showBackButton,
 }) => {
+  const { push } = useHistory();
   return (
     <DefaultPageLayout>
       <Container>
         <Grid container alignItems='center' justify='space-between'>
           <Grid item>
-            <DefaultPageTitleFormat>Scoring Config</DefaultPageTitleFormat>
+            <Grid container alignItems='center'>
+              {showBackButton && (
+                <Grid item>
+                  <IconButton onClick={() => push('/settings')}>
+                    <CancelIcon fontSize='large' />
+                  </IconButton>
+                </Grid>
+              )}
+              <Grid item>
+                <DefaultPageTitleFormat>Scoring Config</DefaultPageTitleFormat>
+              </Grid>
+            </Grid>
           </Grid>
           <Grid item>
             {showCreateButton ? (
@@ -28,7 +45,7 @@ const ScoringLayout: React.FC<ScoringLayoutProps> = ({
                 color='primary'
                 size='large'
                 component={Link}
-                to='/scoring/edit'
+                to='/settings/scoring/edit'
               >
                 Create
               </Button>
@@ -37,7 +54,7 @@ const ScoringLayout: React.FC<ScoringLayoutProps> = ({
                 variant='contained'
                 color='secondary'
                 component={Link}
-                to='/scoring'
+                to='/settings/scoring'
               >
                 Cancel
               </Button>

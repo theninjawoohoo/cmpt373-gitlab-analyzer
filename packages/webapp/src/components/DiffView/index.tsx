@@ -1,4 +1,4 @@
-import { Line } from '@ceres/types';
+import { Diff, Line, LINE_SCORING } from '@ceres/types';
 import {
   Accordion,
   AccordionSummary,
@@ -6,14 +6,21 @@ import {
   Box,
   Typography,
 } from '@material-ui/core';
+import Chip from '@material-ui/core/Chip';
+import Grid from '@material-ui/core/Grid';
+import Tooltip from '@material-ui/core/Tooltip/Tooltip';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import React from 'react';
+import styled from 'styled-components';
 import Root from './components/root';
+import ScorePopover from './components/ScorePopper';
 
 interface DiffViewProps {
   fileName: string;
   lines: Line[];
   expanded?: boolean;
+  extensions?: Diff['extensions'];
+  summary?: Diff['summary'];
   onSummaryClick?: () => void;
 }
 
@@ -22,6 +29,12 @@ const LINE_COLOR_MAP = {
   [Line.Type.delete]: 'red',
   [Line.Type.noChange]: 'black',
 };
+
+const TwoColumnGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 0;
+`;
 
 const LineRenderer: React.FC<{
   color?: string;
@@ -50,10 +63,19 @@ const LineRenderer: React.FC<{
   );
 };
 
-function renderLine(line: Line) {
+const LineWrapper: React.FC<{ tooltip: string }> = ({ children, tooltip }) => {
+  return (
+    <Tooltip title={tooltip}>
+      <TwoColumnGrid>{children}</TwoColumnGrid>
+    </Tooltip>
+  );
+};
+
+function renderLine(line: Line, weight: number) {
+  const tooltip = `${line.type}: ${LINE_SCORING[line.type]} × ${weight}`;
   if (line.type === Line.Type.add && line.left) {
     return (
-      <>
+      <LineWrapper tooltip={tooltip}>
         <LineRenderer
           color={LINE_COLOR_MAP[Line.Type.delete]}
           lineNumber={line.left.lineNumber}
@@ -64,11 +86,11 @@ function renderLine(line: Line) {
           lineNumber={line.right.lineNumber}
           content={line.right.lineContent}
         />
-      </>
+      </LineWrapper>
     );
   }
   return (
-    <>
+    <LineWrapper tooltip={tooltip}>
       <LineRenderer
         color={LINE_COLOR_MAP[line.type]}
         lineNumber={line.left?.lineNumber}
@@ -79,7 +101,7 @@ function renderLine(line: Line) {
         lineNumber={line.right?.lineNumber}
         content={line.right?.lineContent}
       />
-    </>
+    </LineWrapper>
   );
 }
 
@@ -87,17 +109,52 @@ const DiffView: React.FC<DiffViewProps> = ({
   fileName,
   lines,
   expanded,
+  extensions,
+  summary,
   onSummaryClick,
 }) => {
   return (
     <Accordion expanded={expanded || false} TransitionProps={{ timeout: 0 }}>
       <AccordionSummary expandIcon={<ExpandMore />} onClick={onSummaryClick}>
-        <Typography style={{ fontFamily: 'monospace' }}>{fileName}</Typography>
+        <div>
+          <Typography style={{ fontFamily: 'monospace' }}>
+            {fileName}
+          </Typography>
+          <Grid container alignItems='center' spacing={1}>
+            <Grid item>
+              <Typography variant='body2'>
+                <strong>Score:</strong>
+              </Typography>
+            </Grid>
+            <Grid item>
+              <ScorePopover
+                scoreCount={extensions?.score?.toFixed(1)}
+                scoreSummary={summary}
+              />
+            </Grid>
+            <Grid item>
+              <Typography variant='body2'>
+                <strong>Weight:</strong>
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Chip size='small' label={extensions?.weight || 0} />
+            </Grid>
+            <Grid item>
+              <Typography variant='body2'>
+                <strong>Glob:</strong>
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Chip size='small' label={extensions?.glob} />
+            </Grid>
+          </Grid>
+        </div>
       </AccordionSummary>
       <AccordionDetails>
         <Root>
           {lines?.map((line) => {
-            return renderLine(line);
+            return renderLine(line, extensions?.weight || 0);
           })}
         </Root>
       </AccordionDetails>

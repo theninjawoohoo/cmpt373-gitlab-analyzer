@@ -13,10 +13,9 @@ import CommitList from './components/CommitList';
 import MergeRequestRenderer from './components/MergeRequestRenderer';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import MemberDropdown from '../../components/MemberDropdown';
-import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 import styled from 'styled-components';
+import { useFilterContext } from '../../contexts/FilterContext';
 
 const IndependentScrollGrid = styled(Grid)`
   height: 100vh;
@@ -38,10 +37,48 @@ const IndependentScrollGrid = styled(Grid)`
   }
 `;
 
+const CompactTableHeaders: React.FC = () => {
+  return (
+    <Box pr={6} pl={2} py={1}>
+      <Grid container>
+        <Grid item xs={8}>
+          <Typography>Title</Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Typography align='right'>Score</Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Typography align='right'>Σ Commits</Typography>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+};
+
+const RegularTableHeaders: React.FC = () => {
+  return (
+    <Box pr={6} pl={2} py={1}>
+      <Grid container>
+        <Grid item xs={6}>
+          <Typography>Title</Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Typography>Author</Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Typography>Date</Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Typography>Score</Typography>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+};
+
 const ListMergeRequestPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { repositoryId } = useRepositoryContext();
-  const [emails, setEmails] = useState<string[]>([]);
+  const { startDate, endDate, emails } = useFilterContext();
   const [activeMergeRequest, setActiveMergeRequest] = useState<
     ApiResource<MergeRequest>
   >();
@@ -54,10 +91,11 @@ const ListMergeRequestPage = () => {
   } = useInfiniteMergeRequest({
     repository: id,
     author_email: emails,
+    merged_start_date: startDate.toString(),
+    merged_end_date: endDate.toString(),
   });
 
   useEffect(() => {
-    console.log(emails);
     if (loadMoreInView) {
       void fetchNextPage();
     }
@@ -78,27 +116,11 @@ const ListMergeRequestPage = () => {
               <Box my={2}>
                 <DefaultPageTitleFormat>Merge Requests</DefaultPageTitleFormat>
               </Box>
-              <Grid item>
-                <MemberDropdown
-                  repositoryId={repositoryId}
-                  onChange={(newEmails) => {
-                    setEmails(newEmails);
-                  }}
-                />
-              </Grid>
-              <Box pr={6} pl={2} py={1}>
-                <Grid container>
-                  <Grid item xs={6}>
-                    <Typography>Title</Typography>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Typography>Author</Typography>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Typography>Date</Typography>
-                  </Grid>
-                </Grid>
-              </Box>
+              {!activeMergeRequest ? (
+                <RegularTableHeaders />
+              ) : (
+                <CompactTableHeaders />
+              )}
               {reducedMergeRequests.map((mergeRequest) => {
                 const active =
                   mergeRequest.meta.id === activeMergeRequest?.meta.id;
@@ -107,6 +129,7 @@ const ListMergeRequestPage = () => {
                     key={mergeRequest.meta.id}
                     mergeRequest={mergeRequest}
                     active={active}
+                    shrink={!!activeMergeRequest}
                     onClickSummary={() => {
                       setActiveCommit(undefined);
                       setActiveMergeRequest(active ? undefined : mergeRequest);

@@ -20,9 +20,9 @@ import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
-import MemberDropdown from '../MemberDropdown';
 import { useParams } from 'react-router-dom';
 import { useCommitsForMergeRequest } from '../../api/commit';
+import { useFilterContext } from '../../contexts/FilterContext';
 
 const useBigTableStyles = makeStyles({
   table: {
@@ -140,7 +140,7 @@ const MergeRequestCommitList: React.FC = () => {
   const classes = useBigTableStyles();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [emails, setEmails] = React.useState<string[]>([]);
+  const { emails } = useFilterContext();
   const { id } = useParams<{ id: string }>();
   const { data: searchInterface } = useCommitsForMergeRequest(id);
   const rows = searchInterface?.results || [];
@@ -173,14 +173,6 @@ const MergeRequestCommitList: React.FC = () => {
 
   return (
     <>
-      <div style={{ float: 'right' }}>
-        <MemberDropdown
-          repositoryId={id}
-          onChange={(newEmails) => {
-            setEmails(newEmails);
-          }}
-        />
-      </div>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label='merge requests table'>
           <TableHead>

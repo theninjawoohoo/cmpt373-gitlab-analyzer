@@ -39,7 +39,19 @@ export class NoteService {
       });
     }
 
-    query.orderBy("note.resource #>> '{authored_date}'", 'DESC');
+    if (filters.start_date) {
+      query.andWhere("(note.resource #>> '{created_at}') >= (:startDate)", {
+        startDate: filters.start_date,
+      });
+    }
+
+    if (filters.end_date) {
+      query.andWhere("(note.resource #>> '{created_at}') <= (:endDate)", {
+        endDate: filters.end_date,
+      });
+    }
+
+    query.orderBy("note.resource #>> '{created_at}'", 'DESC');
     paginate(query, filters);
     return query.getManyAndCount();
   }

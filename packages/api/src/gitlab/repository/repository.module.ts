@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModule } from '../../user/user.module';
 import { ApiModule } from '../api/api.module';
 import { CommitAuthor } from './commit/author/commit-author.entity';
 import { CommitAuthorService } from './commit/author/commit-author.service';
@@ -42,6 +43,7 @@ import { IssueController } from './issue/issue.controller';
       Issue,
     ]),
     ApiModule,
+    UserModule,
   ],
   providers: [
     RepositoryService,
