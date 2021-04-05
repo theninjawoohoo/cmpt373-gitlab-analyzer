@@ -9,15 +9,7 @@ interface NoteSearchParams {
   end_date?: string;
 }
 
-export function useGetMergeRequestNotes(
-  params: NoteSearchParams,
-  page?: number,
-  pageSize?: number,
-) {
-  return usePaginatedQuery<Note>(`/note`, params, page, pageSize);
-}
-
-export function useGetIssueNotes(
+export function useGetNotes(
   params: NoteSearchParams,
   page?: number,
   pageSize?: number,

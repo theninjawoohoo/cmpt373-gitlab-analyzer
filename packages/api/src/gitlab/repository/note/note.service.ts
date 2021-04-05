@@ -22,13 +22,13 @@ export class NoteService {
     const query = this.noteRepository.createQueryBuilder('note');
 
     if (filters.merge_request) {
-      query.where('merge_request.id = :merge_request', {
+      query.where('note.merge_request_id = :merge_request', {
         merge_request: filters.merge_request,
       });
     }
 
     if (filters.issue) {
-      query.andWhere('issue.id = :issue', {
+      query.andWhere('note.issue_id = :issue', {
         issue: filters.issue,
       });
     }
