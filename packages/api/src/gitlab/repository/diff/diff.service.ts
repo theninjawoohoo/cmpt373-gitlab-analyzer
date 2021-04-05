@@ -78,7 +78,7 @@ export class DiffService {
       if (summary) {
         score = Object.keys(summary)
           .map((lineType) => LINE_SCORING[lineType] * (summary[lineType] || 0))
-          .reduce((a, b) => a + b, 0);
+          .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
       }
       const weight = this.getWeight(diff.resource.new_path, weights);
       diff.resource = Extensions.updateExtensions(diff.resource, {
@@ -95,7 +95,7 @@ export class DiffService {
           diff.resource?.extensions?.score,
         ),
       )
-      .reduce((a, b) => a + b, 0);
+      .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
     const hasOverride = updatedDiffs.some((diff) =>
       ScoreOverride.hasOverride(diff?.resource?.extensions?.override),
     );

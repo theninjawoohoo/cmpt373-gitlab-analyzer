@@ -315,7 +315,7 @@ export class MergeRequestService extends BaseService<
     );
     const score = commitScores
       .map(({ score }) => score)
-      .reduce((a, b) => a + b, 0);
+      .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
     const hasOverride = commitScores.some(({ hasOverride }) => hasOverride);
     return {
       score,
