@@ -6,6 +6,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { ApiResource } from '../../../api/base';
 import { useGetCommits } from '../../../api/commit';
+import ScoringChip from '../../../components/ScoringChip';
 import SmartDate from '../../../components/SmartDate';
 
 interface CommitListProps {
@@ -71,7 +72,9 @@ const CommitList: React.FC<CommitListProps> = ({
               </Grid>
               <Grid item xs={3}>
                 <Typography align='right'>
-                  {commit.extensions?.score?.toFixed(1)}
+                  <ScoringChip hasOverride={commit.extensions?.diffHasOverride}>
+                    {commit.extensions?.score?.toFixed(1)}
+                  </ScoringChip>
                 </Typography>
               </Grid>
             </Grid>
