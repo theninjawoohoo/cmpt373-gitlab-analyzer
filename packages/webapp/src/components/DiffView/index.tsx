@@ -43,6 +43,8 @@ const LINE_COLOR_MAP = {
   [Line.Type.noChange]: 'black',
 };
 
+const accordionStyle = { backgroundColor: '#f8f8f8', marginRight: '50px' };
+
 const TwoColumnGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -166,7 +168,11 @@ const DiffView: React.FC<DiffViewProps> = ({
   const fileNameTextDecoration = isExcluded ? 'line-through' : '';
 
   return (
-    <Accordion expanded={expanded || false} TransitionProps={{ timeout: 0 }}>
+    <Accordion
+      expanded={expanded || false}
+      TransitionProps={{ timeout: 0 }}
+      style={accordionStyle}
+    >
       <StyledAccordionSummary
         expandIcon={<ExpandMore />}
         onClick={onSummaryClick}
