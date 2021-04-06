@@ -15,7 +15,7 @@ const RepoSetupPage: React.FC = () => {
         <Container>
           <Grid container direction='column' spacing={2}>
             <Grid item>
-              <DefaultPageTitleFormat>Repository Config</DefaultPageTitleFormat>
+              <DefaultPageTitleFormat>Repository Setup</DefaultPageTitleFormat>
             </Grid>
             <Grid item xs={12}>
               <LinkCard
