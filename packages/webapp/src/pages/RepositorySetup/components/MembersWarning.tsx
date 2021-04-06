@@ -1,6 +1,5 @@
 import { Commit } from '@ceres/types';
 import Alert from '@material-ui/lab/Alert';
-import AlertTitle from '@material-ui/lab/AlertTitle';
 import React from 'react';
 import { useRepositoryAuthors } from '../../../api/author';
 import { Button } from '@material-ui/core';
@@ -34,7 +33,6 @@ const MembersWarning: React.FC<MembersWarningProps> = ({ repositoryId }) => {
         </Button>
       }
     >
-      <AlertTitle>Warning</AlertTitle>
       There are <strong>{orphanCount}</strong> commit authors that are not
       linked to a repository member.
     </Alert>

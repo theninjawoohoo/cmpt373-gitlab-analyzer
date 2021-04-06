@@ -14,8 +14,7 @@ import SettingsPage from '../../pages/GlobalSettings';
 import { useAuthContext } from '../../contexts/AuthContext';
 import CommitsPage from '../../pages/Commits';
 import Members from '../../pages/Members';
-import RepositoryHomePage from '../../pages/RepositoryHomePage';
-import RepositorySetupPage from '../../pages/RepositorySetup';
+import RepoSetupPage from '../../pages/RepositorySetup';
 import ScoreRubricPage from '../../pages/ScoreRubric';
 
 export function Router() {
@@ -32,11 +31,8 @@ export function Router() {
         <Route path='/repository' exact>
           <RepositoryPage />
         </Route>
-        <Route path='/repository/:id' exact>
-          <RepositoryHomePage />
-        </Route>
         <Route path='/setup/:id' exact>
-          <RepositorySetupPage />
+          <RepoSetupPage />
         </Route>
         <Route path='/setup/:id/members' exact>
           <Members />

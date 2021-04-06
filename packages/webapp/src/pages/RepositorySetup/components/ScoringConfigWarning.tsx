@@ -1,7 +1,6 @@
 import { Repository } from '@ceres/types';
 import { Button } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
-import AlertTitle from '@material-ui/lab/AlertTitle';
 import React from 'react';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 
@@ -31,7 +30,6 @@ const ScoringConfigWarning: React.FC<ScoringConfigWarningProps> = ({
         </Button>
       }
     >
-      <AlertTitle>Warning</AlertTitle>
       This repository has no scoring rubric. Without a rubric, all files will
       have a weight of 1 when calculating scores.
     </Alert>

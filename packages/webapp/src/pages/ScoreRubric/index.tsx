@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import { useHistory, useParams } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useGetRepository } from '../../api/repository';
-import ScoringConfigSelector from '../RepositoryHomePage/components/ScoringConfigSelector';
+import ScoringConfigSelector from '../RepositorySetup/components/ScoringConfigSelector';
 import { ApiResource } from '../../api/base';
 import { useUpdateScoring } from '../../api/scoring';
 import { ScoringConfig } from '@ceres/types';
