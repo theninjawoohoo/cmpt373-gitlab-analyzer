@@ -8,10 +8,11 @@ import Tab from '@material-ui/core/Tab';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 // import { DateTime } from 'luxon';
 // import { useFilterContext } from '../../contexts/FilterContext';
-import { useGetMergeRequestNotes } from '../../api/note';
+import { useGetIssueNotes, useGetMergeRequestNotes } from '../../api/note';
 // import { useParams } from 'react-router-dom';
 import NotePaper from './NotePaper';
 import { useGetMergeRequestById } from '../../api/mergeRequests';
+import { useGetIssueById } from '../../api/issue';
 // import { ApiResource } from '../../api/base';
 // import { Note } from '@ceres/types';
 
@@ -33,82 +34,31 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-// const getMergeRequestNoteData = (date: DateTime, mergeRequestNotes: any[]) => {
-//   let filteredMergeRequestNotes: any[];
-//
-//   for (const result of mergeRequestNotes) {
-//     if (DateTime.fromISO(result.created_at).hasSame(date, 'day')) {
-//       filteredMergeRequestNotes.push(result);
-//     }
-//   }
-//
-//   return {
-//     date: date.toLocaleString(DateTime.DATE_SHORT),
-//     filteredMergeRequestNotes,
-//   };
-// };
-//
-// const getIssueNoteData = (date: DateTime, issueNotes: any[]) => {
-//   let filteredIssueNotes: any[];
-//
-//   for (const result of issueNotes) {
-//     if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
-//       filteredIssueNotes.push(result);
-//     }
-//   }
-//   return {
-//     date: date.toLocaleString(DateTime.DATE_SHORT),
-//     filteredIssueNotes,
-//   };
-// };
+enum TabOption {
+  codeReview = 'code reviews',
+  issueNotes = 'issue notes',
+}
 
 const Comment: React.FC = () => {
   const classes = useStyles();
 
   const merge_request_id = '6cc45a67-e562-4014-982c-8973a36d5743';
   const mergeRequest = useGetMergeRequestById(merge_request_id);
-  console.log(mergeRequest.data);
-  const issue_id = '3d9719cf-c951-4e26-a4ad-9126659a1331';
-  console.log(merge_request_id);
-  console.log(issue_id);
+  const issue_id = '61d75c79-8afc-4e59-9b3b-fa994727ea66';
   // const { startDate, endDate, emails } = useFilterContext();
-  const { data: notes } = useGetMergeRequestNotes(merge_request_id);
-  console.log(notes?.results || []);
+  const { data: mergeRequestNotes } = useGetMergeRequestNotes(merge_request_id);
+  const { data: issueNotes } = useGetIssueNotes(issue_id);
+  const issue = useGetIssueById(issue_id);
 
-  const [noteType, setNoteType] = useState(0);
-  // const [noteData /*setNoteData*/] = useState<ApiResource<Note>[]>(
-  //   notes?.results || [],
-  // );
+  const [tab, setTab] = useState(TabOption.codeReview);
+  const isMergeRequestNote = tab === TabOption.codeReview;
+  const notes =
+    tab === TabOption.codeReview
+      ? mergeRequestNotes?.results || []
+      : issueNotes?.results || [];
 
-  // useEffect(() => {
-  //   if (startDate && endDate) {
-  //     let date = DateTime.fromISO(startDate);
-  //     const filteredData = [];
-  //     if (noteType == 0) {
-  //       do {
-  //         filteredData.push(
-  //           getMergeRequestNoteData(date, mergeRequestNotes?.results || []),
-  //         );
-  //         date = date.plus({ days: 1 });
-  //       } while (date <= DateTime.fromISO(endDate));
-  //     } else {
-  //       do {
-  //         filteredData.push(getIssueNoteData(date, issueNotes?.results || []));
-  //         date = date.plus({ days: 1 });
-  //       } while (date <= DateTime.fromISO(endDate));
-  //     }
-  //     setNoteData(filteredData);
-  //   }
-  // }, [
-  //   noteType,
-  //   mergeRequestNotes?.results,
-  //   issueNotes?.results,
-  //   startDate,
-  //   endDate,
-  // ]);
-
-  const handleTabs = (event: React.ChangeEvent<unknown>, newType: number) => {
-    setNoteType(newType);
+  const handleTabs = (event: React.ChangeEvent<unknown>, newTab: any) => {
+    setTab(newTab);
   };
 
   return (
@@ -117,14 +67,14 @@ const Comment: React.FC = () => {
         <DefaultPageTitleFormat>Comments</DefaultPageTitleFormat>
         <Box my={2} className={classes.root}>
           <Tabs
-            value={noteType}
+            value={tab}
             onChange={handleTabs}
             indicatorColor='primary'
             textColor='primary'
             centered
           >
-            <Tab label='Code Reviews' />
-            <Tab label='Issue Notes' />
+            <Tab value={TabOption.codeReview} label='Code Reviews' />
+            <Tab value={TabOption.issueNotes} label='Issue Notes' />
           </Tabs>
         </Box>
         <Grid
@@ -134,13 +84,14 @@ const Comment: React.FC = () => {
           alignItems={'stretch'}
           spacing={1}
         >
-          {notes?.results?.map((note) => {
+          {notes.map((note) => {
             return (
               <NotePaper
                 key={note.meta.id}
-                noteType={noteType}
                 noteData={note}
                 mergeRequest={mergeRequest.data}
+                issue={issue.data}
+                isMergeRequestNote={isMergeRequestNote}
               />
             );
           })}

@@ -9,10 +9,10 @@ import { Issue, MergeRequest, Note } from '@ceres/types';
 import SmartDate from '../../../components/SmartDate';
 
 interface NoteProps {
-  noteType: number;
   noteData: ApiResource<Note>;
   mergeRequest?: MergeRequest;
   issue?: Issue;
+  isMergeRequestNote?: boolean;
 }
 
 const useStyles = makeStyles(() =>
@@ -34,46 +34,7 @@ const extractNoteContent = (noteBody: string) => {
 const NotePaper: React.FC<NoteProps> = (NoteProps) => {
   const classes = useStyles();
 
-  // const { startDate, endDate, emails } = useFilterContext();
-  // const { data: mergeRequestNotes } = useGetNotes(
-  //   {
-  //     author_email: emails,
-  //     start_date: startDate,
-  //     end_date: endDate,
-  //   },
-  //   0,
-  //   9000,
-  // );
-  //
-  //
-  // useEffect(() => {
-  //   if (startDate && endDate) {
-  //     let date = DateTime.fromISO(startDate);
-  //     const countsByDay = [];
-  //     if (NoteProps.noteType == 0) {
-  //       do {
-  //         countsByDay.push(
-  //           getMergeRequestNoteData(date, mergeRequestNotes?.results || []),
-  //         );
-  //         date = date.plus({ days: 1 });
-  //       } while (date <= DateTime.fromISO(endDate));
-  //     } else {
-  //       do {
-  //         countsByDay.push(getIssueNoteData(date, issueNotes?.results || []));
-  //         date = date.plus({ days: 1 });
-  //       } while (date <= DateTime.fromISO(endDate));
-  //     }
-  //     setNoteData(countsByDay);
-  //   }
-  // }, [
-  //   NoteProps.noteType,
-  //   mergeRequestNotes?.results,
-  //   issueNotes?.results,
-  //   startDate,
-  //   endDate,
-  // ]);
-
-  if (NoteProps.noteType == 0) {
+  if (NoteProps.isMergeRequestNote) {
     return (
       <Paper
         elevation={3}
@@ -141,7 +102,7 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
             <Box fontSize={18} paddingBottom={1.5}>
               On issue{' '}
               <Box fontWeight='fontWeightBold' display='inline'>
-                Link-to-issue
+                {NoteProps.issue.title}
               </Box>
             </Box>
           </Typography>
@@ -163,25 +124,25 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
           >
             <Typography>
               <Box fontWeight='fontWeightBold' display='inline'>
-                Author X
+                {NoteProps.noteData.author.name}
               </Box>{' '}
               wrote:
             </Typography>
           </Grid>
           <Grid item xs={8}>
             <Typography>
-              This should display the content body of a note left on an issue.
+              {extractNoteContent(NoteProps.noteData.body)}
             </Typography>
             <Typography variant={'body2'} align={'right'}>
               <Box fontSize={16} fontStyle={'italic'} marginTop={2}>
-                Date and time of the note issue
+                <SmartDate>{NoteProps.noteData.created_at}</SmartDate>
               </Box>
             </Typography>
           </Grid>
           <Grid item xs={2}>
             <Typography align={'right'}>
               <Box fontWeight={'fontWeightBold'} fontSize={20} marginRight={2}>
-                Word Count
+                {NoteProps.noteData.extensions?.wordCount}
               </Box>
             </Typography>
           </Grid>
