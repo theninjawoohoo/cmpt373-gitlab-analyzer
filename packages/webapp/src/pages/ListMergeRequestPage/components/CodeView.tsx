@@ -39,7 +39,11 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
           variant='text'
           color={'primary'}
           endIcon={<CallMadeIcon />}
-          onClick={() => window.open(mergeRequest.web_url)}
+          onClick={
+            commit?.web_url
+              ? () => window.open(commit.web_url)
+              : () => window.open(mergeRequest.web_url)
+          }
         >
           View on GitLab
         </Button>
