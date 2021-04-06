@@ -20,7 +20,6 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
       ? { commit: commit.meta.id }
       : { merge_request: mergeRequest.meta.id },
   );
-  const gitlabButtonStyle = { marginLeft: 5, bold: true };
   const [expandedDiffs, setExpandedDiffs] = useState<ApiResource<Diff>[]>([]);
   return (
     <Container>
@@ -35,7 +34,6 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
         </Button>
         <Button onClick={() => setExpandedDiffs([])}>Collapse All</Button>
         <Button
-          style={gitlabButtonStyle}
           variant='text'
           color={'primary'}
           endIcon={<CallMadeIcon />}
