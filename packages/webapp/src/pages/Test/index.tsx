@@ -7,12 +7,12 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 // import { DateTime } from 'luxon';
-import { useFilterContext } from '../../contexts/FilterContext';
-import { useGetNotes } from '../../api/note';
+// import { useFilterContext } from '../../contexts/FilterContext';
+import { useGetMergeRequestNotes } from '../../api/note';
 // import { useParams } from 'react-router-dom';
 import NotePaper from './NotePaper';
-import { ApiResource } from '../../api/base';
-import { Note } from '@ceres/types';
+// import { ApiResource } from '../../api/base';
+// import { Note } from '@ceres/types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -65,27 +65,19 @@ const Comment: React.FC = () => {
   const classes = useStyles();
 
   // const { merge_request_id } = useParams<{ merge_request_id: string }>();
-  const merge_request_id = '025cdf01-08e4-4b86-b2cb-e436186b47b9';
+  const merge_request_id = '576c9f9b-240f-441f-a5fe-e472e196c741';
   const issue_id = '3d9719cf-c951-4e26-a4ad-9126659a1331';
   // const { issue_id } = useParams<{ issue_id: string }>();
   console.log(merge_request_id);
   console.log(issue_id);
-  const { startDate, endDate, emails } = useFilterContext();
-  const { data: notes } = useGetNotes(
-    {
-      merge_request: merge_request_id,
-      issue: issue_id,
-      author_email: emails,
-      start_date: startDate,
-      end_date: endDate,
-    },
-    0,
-    9000,
-  );
-  console.log(notes);
+  // const { startDate, endDate, emails } = useFilterContext();
+  const { data: notes } = useGetMergeRequestNotes(merge_request_id);
+  console.log(notes?.results || []);
 
   const [noteType, setNoteType] = useState(0);
-  const [noteData /*setNoteData*/] = useState<ApiResource<Note>[]>([]);
+  // const [noteData /*setNoteData*/] = useState<ApiResource<Note>[]>(
+  //   notes?.results || [],
+  // );
 
   // useEffect(() => {
   //   if (startDate && endDate) {
@@ -141,7 +133,7 @@ const Comment: React.FC = () => {
           alignItems={'stretch'}
           spacing={1}
         >
-          {noteData.map((note) => {
+          {notes?.results?.map((note) => {
             return (
               <NotePaper
                 key={note.meta.id}

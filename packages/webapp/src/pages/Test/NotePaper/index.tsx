@@ -6,6 +6,7 @@ import { Paper } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { ApiResource } from '../../../api/base';
 import { Note } from '@ceres/types';
+import SmartDate from '../../../components/SmartDate';
 
 interface NoteProps {
   noteType: number;
@@ -129,7 +130,7 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
           >
             <Typography>
               <Box fontWeight='fontWeightBold' display='inline'>
-                {NoteProps.noteData.author}
+                {NoteProps.noteData.author.name}
               </Box>{' '}
               wrote:
             </Typography>
@@ -138,7 +139,7 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
             <Typography>{NoteProps.noteData.body}</Typography>
             <Typography variant={'body2'} align={'right'}>
               <Box fontSize={16} fontStyle={'italic'} marginTop={2}>
-                {NoteProps.noteData.created_at}
+                <SmartDate>{NoteProps.noteData.updated_at}</SmartDate>
               </Box>
             </Typography>
           </Grid>
@@ -146,6 +147,7 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
             <Typography align={'right'}>
               <Box fontWeight={'fontWeightBold'} fontSize={20} marginRight={2}>
                 Word Count
+                {NoteProps.noteData.extensions?.wordCount}
               </Box>
             </Typography>
           </Grid>

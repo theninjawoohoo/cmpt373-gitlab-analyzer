@@ -33,6 +33,8 @@ export class NoteService {
       });
     }
 
+    query.andWhere("note.resource #>> '{system}' <> 'true'");
+
     if (filters.author_email) {
       query.andWhere("note.resource #>> '{author_email}' IN (:...author)", {
         author_email: alwaysArray(filters.author_email),
