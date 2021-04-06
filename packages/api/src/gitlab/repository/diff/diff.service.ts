@@ -27,7 +27,7 @@ export class DiffService {
     private readonly httpService: HttpService,
     @InjectRepository(DiffEntity)
     private readonly diffRepository: TypeORMRepository<DiffEntity>,
-  ) { }
+  ) {}
 
   search(filters: DiffQueryDto) {
     filters = withDefaults(filters);
@@ -78,7 +78,7 @@ export class DiffService {
       if (summary) {
         score = Object.keys(summary)
           .map((lineType) => LINE_SCORING[lineType] * (summary[lineType] || 0))
-          .reduce((a, b) => a + b, 0);
+          .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
       }
       const weight = this.getWeight(diff.resource.new_path, weights);
       diff.resource = Extensions.updateExtensions(diff.resource, {
@@ -88,9 +88,21 @@ export class DiffService {
       return diff;
     });
     await this.diffRepository.save(updatedDiffs);
-    return updatedDiffs
-      .map((diff) => diff.resource?.extensions?.score || 0)
-      .reduce((a, b) => a + b, 0);
+    const score = updatedDiffs
+      .map((diff) =>
+        ScoreOverride.computeScore(
+          diff.resource?.extensions.override,
+          diff.resource?.extensions?.score,
+        ),
+      )
+      .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+    const hasOverride = updatedDiffs.some((diff) =>
+      ScoreOverride.hasOverride(diff?.resource?.extensions?.override),
+    );
+    return {
+      score,
+      hasOverride,
+    };
   }
 
   async syncForMergeRequest(mergeRequest: MergeRequest, token: string) {
