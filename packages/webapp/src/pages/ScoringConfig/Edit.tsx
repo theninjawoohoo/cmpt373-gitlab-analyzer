@@ -23,7 +23,7 @@ const PreloadedForm: React.FC<PreloadedFormProps> = ({ id }) => {
     updateScoringConfig(values, {
       onSuccess: () => {
         void invalidate();
-        push('/scoring');
+        push('/settings/scoring');
       },
     });
   };

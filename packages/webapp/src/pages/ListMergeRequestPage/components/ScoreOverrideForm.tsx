@@ -24,8 +24,11 @@ const ScoreOverrideForm: React.FC<ScoreOverrideFormProps> = ({
   open,
   onClickAway,
   onSubmit,
+  defaultValues,
 }) => {
-  const { handleSubmit, register } = useForm<ScoreOverride>();
+  const { handleSubmit, register } = useForm<ScoreOverride>({
+    defaultValues,
+  });
   return (
     <ClickAwayListener onClickAway={onClickAway}>
       <Popper anchorEl={anchor} open={open}>
@@ -39,7 +42,13 @@ const ScoreOverrideForm: React.FC<ScoreOverrideFormProps> = ({
               <Grid container direction='column' spacing={1}>
                 <Grid item>
                   <FormControlLabel
-                    control={<Checkbox color='primary' inputRef={register} />}
+                    control={
+                      <Checkbox
+                        color='primary'
+                        inputRef={register}
+                        defaultChecked={defaultValues?.exclude}
+                      />
+                    }
                     label='Exclude'
                     name='exclude'
                   />

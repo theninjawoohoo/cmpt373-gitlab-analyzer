@@ -12,6 +12,7 @@ export interface StagedScoreOverride {
   id: string;
   display: string;
   previousScore: number;
+  defaultScore: number;
   override: ScoreOverride;
 }
 
@@ -21,6 +22,9 @@ export namespace ScoreOverride {
       return 0;
     }
     return +(override?.score || computed || 0);
+  }
+  export function hasOverride(override?: ScoreOverride) {
+    return override?.exclude || !!override?.score;
   }
 }
 
