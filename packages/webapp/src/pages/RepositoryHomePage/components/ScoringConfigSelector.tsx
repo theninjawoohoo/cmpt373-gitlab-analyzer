@@ -5,7 +5,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import Paper from '@material-ui/core/Paper';
+// import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography';
 import React, { useState } from 'react';
@@ -40,74 +40,72 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
   };
 
   return (
-    <Paper>
-      <Box p={2}>
-        <Typography variant='h2'>Score Rubric</Typography>
-        <Grid container spacing={3} alignItems='center' direction='column'>
-          {repository?.extensions?.scoringConfig?.lastRan ? (
-            <Grid item>
-              <Typography>
-                Last evaluated at{' '}
-                <strong>
-                  <SmartDate>
-                    {repository.extensions.scoringConfig.lastRan}
-                  </SmartDate>
-                </strong>{' '}
-                with config:{' '}
-                <strong>
-                  {repository.extensions.scoringConfig?.config?.name || 'None'}
-                </strong>
-              </Typography>
-            </Grid>
-          ) : (
-            <Grid item>
-              <Typography>This repository has never been evaluated.</Typography>
-            </Grid>
-          )}
-          <Grid item>
-            <FormControl variant='filled'>
-              <InputLabel id='selected-scoring-config'>
-                Scoring Config
-              </InputLabel>
-              <Select
-                style={{ minWidth: '15rem' }}
-                labelId='selected-scoring-config'
-                value={selectedScoringConfig}
-                onChange={(e) =>
-                  setSelectedScoringConfig(e.target.value as string)
-                }
-              >
-                <MenuItem value='None'>None</MenuItem>
-                {(data?.results || []).map((scoringConfig) => (
-                  <MenuItem
-                    key={scoringConfig.meta.id}
-                    value={scoringConfig.meta.id}
-                  >
-                    {scoringConfig.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item>
-            <Button
-              color='primary'
-              variant='contained'
-              onClick={handleSubmit}
-              disabled={isLoading}
-            >
-              Evaluate
-            </Button>
-          </Grid>
+    // <Paper>
+    <Box p={2}>
+      {/* <Typography variant='h2'>Score Rubric</Typography> */}
+      <Grid container spacing={3} alignItems='center' direction='column'>
+        {repository?.extensions?.scoringConfig?.lastRan ? (
           <Grid item>
             <Typography>
-              You can create and edit scoring configs{' '}
-              <Link to='/settings/scoring'>here</Link>.
+              Last evaluated at{' '}
+              <strong>
+                <SmartDate>
+                  {repository.extensions.scoringConfig.lastRan}
+                </SmartDate>
+              </strong>{' '}
+              with config:{' '}
+              <strong>
+                {repository.extensions.scoringConfig?.config?.name || 'None'}
+              </strong>
             </Typography>
           </Grid>
+        ) : (
+          <Grid item>
+            <Typography>This repository has never been evaluated.</Typography>
+          </Grid>
+        )}
+        <Grid item>
+          <FormControl variant='filled'>
+            <InputLabel id='selected-scoring-config'>Scoring Config</InputLabel>
+            <Select
+              style={{ minWidth: '15rem' }}
+              labelId='selected-scoring-config'
+              value={selectedScoringConfig}
+              onChange={(e) =>
+                setSelectedScoringConfig(e.target.value as string)
+              }
+            >
+              <MenuItem value='None'>None</MenuItem>
+              {(data?.results || []).map((scoringConfig) => (
+                <MenuItem
+                  key={scoringConfig.meta.id}
+                  value={scoringConfig.meta.id}
+                >
+                  {scoringConfig.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
-      </Box>
-    </Paper>
+        <Grid item>
+          <Button
+            color='primary'
+            variant='contained'
+            onClick={handleSubmit}
+            disabled={isLoading}
+          >
+            Evaluate
+          </Button>
+        </Grid>
+        <Grid item>
+          <Typography>
+            You can create and edit scoring configs{' '}
+            <Link to='/settings/scoring'>here</Link>.
+          </Typography>
+        </Grid>
+      </Grid>
+    </Box>
+    // </Paper>
   );
 };
 

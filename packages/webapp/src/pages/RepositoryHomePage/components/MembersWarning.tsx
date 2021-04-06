@@ -3,7 +3,8 @@ import Alert from '@material-ui/lab/Alert';
 import AlertTitle from '@material-ui/lab/AlertTitle';
 import React from 'react';
 import { useRepositoryAuthors } from '../../../api/author';
-import ShortcutButton from './ShortcutButton';
+import { Button } from '@material-ui/core';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 
 interface MembersWarningProps {
   repositoryId: string;
@@ -23,9 +24,14 @@ const MembersWarning: React.FC<MembersWarningProps> = ({ repositoryId }) => {
     <Alert
       severity='warning'
       action={
-        <ShortcutButton link={`/setup/${repositoryId}/members`}>
+        <Button
+          variant='text'
+          color='inherit'
+          endIcon={<ArrowForwardIosIcon />}
+          href={`/setup/${repositoryId}/members`}
+        >
           Link members
-        </ShortcutButton>
+        </Button>
       }
     >
       <AlertTitle>Warning</AlertTitle>

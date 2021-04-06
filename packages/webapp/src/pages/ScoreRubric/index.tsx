@@ -3,13 +3,15 @@ import DefaultPageLayout from '../../components/DefaultPageLayout';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useGetRepository } from '../../api/repository';
 import ScoringConfigSelector from '../RepositoryHomePage/components/ScoringConfigSelector';
 import { ApiResource } from '../../api/base';
 import { useUpdateScoring } from '../../api/scoring';
 import { ScoringConfig } from '@ceres/types';
+import { IconButton } from '@material-ui/core';
+import CancelIcon from '@material-ui/icons/Cancel';
 
 const ScoreRubricPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +22,7 @@ const ScoreRubricPage: React.FC = () => {
     mutate: updateScoring,
     isLoading: updateScoreLoading,
   } = useUpdateScoring();
+  const { push } = useHistory();
 
   const handleUpdateScore = (scoringConfig: ApiResource<ScoringConfig>) => {
     updateScoring(
@@ -39,19 +42,24 @@ const ScoreRubricPage: React.FC = () => {
     <div>
       <DefaultPageLayout>
         <Container>
-          <Grid container direction='column' spacing={2}>
+          <Grid container alignItems='center' justify='space-between'>
             <Grid item>
-              <DefaultPageTitleFormat>Score Rubric</DefaultPageTitleFormat>
+              <DefaultPageTitleFormat>Scoring Rubric</DefaultPageTitleFormat>
             </Grid>
-            <Grid item xs={12}>
-              {data && isOwner && (
-                <ScoringConfigSelector
-                  isLoading={updateScoreLoading}
-                  onSubmit={handleUpdateScore}
-                  repository={data}
-                />
-              )}
+            <Grid item>
+              <IconButton onClick={() => push(`/setup/${id}`)}>
+                <CancelIcon fontSize='large' />
+              </IconButton>
             </Grid>
+          </Grid>
+          <Grid container alignItems='center' justify='center'>
+            {data && isOwner && (
+              <ScoringConfigSelector
+                isLoading={updateScoreLoading}
+                onSubmit={handleUpdateScore}
+                repository={data}
+              />
+            )}
           </Grid>
         </Container>
       </DefaultPageLayout>

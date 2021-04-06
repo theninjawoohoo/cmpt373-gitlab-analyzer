@@ -1,8 +1,9 @@
 import { Repository } from '@ceres/types';
+import { Button } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import AlertTitle from '@material-ui/lab/AlertTitle';
 import React from 'react';
-import ShortcutButton from './ShortcutButton';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 
 interface ScoringConfigWarningProps {
   repository?: Repository;
@@ -20,9 +21,14 @@ const ScoringConfigWarning: React.FC<ScoringConfigWarningProps> = ({
     <Alert
       severity='warning'
       action={
-        <ShortcutButton link={`/setup/${repositoryId}/rubric`}>
+        <Button
+          variant='text'
+          color='inherit'
+          endIcon={<ArrowForwardIosIcon />}
+          href={`/setup/${repositoryId}/rubric`}
+        >
           Set rubric
-        </ShortcutButton>
+        </Button>
       }
     >
       <AlertTitle>Warning</AlertTitle>

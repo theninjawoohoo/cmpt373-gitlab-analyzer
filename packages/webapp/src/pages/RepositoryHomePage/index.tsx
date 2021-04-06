@@ -22,10 +22,10 @@ import LeaveRepository from './components/LeaveRepository';
 import LinkGrid from './components/LinkGrid';
 import MembersWarning from './components/MembersWarning';
 import ScoringConfigWarning from './components/ScoringConfigWarning';
-import ScoringConfigSelector from './components/ScoringConfigSelector';
-import { useUpdateScoring } from '../../api/scoring';
-import { ApiResource } from '../../api/base';
-import { ScoringConfig } from '@ceres/types';
+// import ScoringConfigSelector from './components/ScoringConfigSelector';
+// import { useUpdateScoring } from '../../api/scoring';
+// import { ApiResource } from '../../api/base';
+// import { ScoringConfig } from '@ceres/types';
 import RepoFilter from '../../components/RepositoryFilter';
 import styled from 'styled-components';
 
@@ -38,10 +38,10 @@ const MainContainer = styled.div`
 const RepositoryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { push } = useHistory();
-  const {
-    mutate: updateScoring,
-    isLoading: updateScoreLoading,
-  } = useUpdateScoring();
+  // const {
+  //   mutate: updateScoring,
+  //   isLoading: updateScoreLoading,
+  // } = useUpdateScoring();
   const { user } = useAuthContext();
   const { data, invalidate } = useGetRepository(id);
   const { mutate: addCollaborator } = useAddCollaborator(id);
@@ -49,19 +49,19 @@ const RepositoryPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const isOwner = user?.id === data?.extensions?.owner?.id;
 
-  const handleUpdateScore = (scoringConfig: ApiResource<ScoringConfig>) => {
-    updateScoring(
-      {
-        repositoryId: id,
-        scoringConfigId: scoringConfig?.meta?.id,
-      },
-      {
-        onSuccess: () => {
-          void invalidate();
-        },
-      },
-    );
-  };
+  // const handleUpdateScore = (scoringConfig: ApiResource<ScoringConfig>) => {
+  //   updateScoring(
+  //     {
+  //       repositoryId: id,
+  //       scoringConfigId: scoringConfig?.meta?.id,
+  //     },
+  //     {
+  //       onSuccess: () => {
+  //         void invalidate();
+  //       },
+  //     },
+  //   );
+  // };
 
   const handleAddCollaborator = (payload: AddCollaboratorPayload) => {
     addCollaborator(payload, {
@@ -131,13 +131,13 @@ const RepositoryPage: React.FC = () => {
               onRemoveCollaborator={handleRemoveCollaborator}
             />
           )}
-          {data && isOwner && (
+          {/* {data && isOwner && (
             <ScoringConfigSelector
               isLoading={updateScoreLoading}
               onSubmit={handleUpdateScore}
               repository={data}
             />
-          )}
+          )} */}
           <Grid item xs={12}>
             <RepoFilter />
           </Grid>

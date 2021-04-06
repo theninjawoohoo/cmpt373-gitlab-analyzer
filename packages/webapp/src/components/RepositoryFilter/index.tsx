@@ -28,7 +28,7 @@ const RepoFilter: React.FC = () => {
   return (
     <Paper>
       <Box p={2}>
-        <Typography variant='h2'>Date Filter Config</Typography>
+        <Typography variant='h2'>Filter Config</Typography>
         <MuiPickersUtilsProvider utils={LuxonUtils}>
           <Grid container spacing={1} justify='space-around'>
             <Grid item xs={3}>
