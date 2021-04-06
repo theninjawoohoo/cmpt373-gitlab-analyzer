@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 // import { DateTime } from 'luxon';
 // import { useFilterContext } from '../../contexts/FilterContext';
 import { useGetIssueNotes, useGetMergeRequestNotes } from '../../api/note';
@@ -16,20 +16,21 @@ import { useGetIssueById } from '../../api/issue';
 // import { ApiResource } from '../../api/base';
 // import { Note } from '@ceres/types';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     root: {
       display: 'flex',
       flexWrap: 'wrap',
-      '& > *': {
-        margin: theme.spacing(0.5),
-      },
     },
-    paper: {
-      width: '100%',
-      marginLeft: 5,
-      marginBottom: 10,
-      padding: 15,
+    active_code_review_tab: {
+      backgroundColor: '#b8d8be',
+      borderRadius: 10,
+      fontWeight: 'bold',
+    },
+    active_issue_note_tab: {
+      backgroundColor: '#d0c9ea',
+      borderRadius: 10,
+      fontWeight: 'bold',
     },
   }),
 );
@@ -42,7 +43,7 @@ enum TabOption {
 const Comment: React.FC = () => {
   const classes = useStyles();
 
-  const merge_request_id = '6cc45a67-e562-4014-982c-8973a36d5743';
+  const merge_request_id = '047a9f94-a2a3-4e60-aa87-a4187562b3b0';
   const mergeRequest = useGetMergeRequestById(merge_request_id);
   const issue_id = '61d75c79-8afc-4e59-9b3b-fa994727ea66';
   // const { startDate, endDate, emails } = useFilterContext();
@@ -69,12 +70,28 @@ const Comment: React.FC = () => {
           <Tabs
             value={tab}
             onChange={handleTabs}
-            indicatorColor='primary'
+            // indicatorColor='primary'
             textColor='primary'
             centered
           >
-            <Tab value={TabOption.codeReview} label='Code Reviews' />
-            <Tab value={TabOption.issueNotes} label='Issue Notes' />
+            <Tab
+              value={TabOption.codeReview}
+              label='Code Reviews'
+              className={
+                tab === TabOption.codeReview
+                  ? classes.active_code_review_tab
+                  : classes.root
+              }
+            />
+            <Tab
+              value={TabOption.issueNotes}
+              label='Issue Notes'
+              className={
+                tab === TabOption.issueNotes
+                  ? classes.active_issue_note_tab
+                  : classes.root
+              }
+            />
           </Tabs>
         </Box>
         <Grid
