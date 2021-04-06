@@ -120,7 +120,7 @@ const RepositoryPage: React.FC = () => {
         </Grid>
         <MainContainer>
           <MembersWarning repositoryId={id} />
-          <ScoringConfigWarning repository={data} />
+          <ScoringConfigWarning repository={data} repositoryId={id} />
           {data && !isOwner && (
             <LeaveRepository repository={data} onLeave={handleLeave} />
           )}

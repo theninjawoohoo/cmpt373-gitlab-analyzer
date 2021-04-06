@@ -2,13 +2,16 @@ import { Commit, RepositoryMember } from '@ceres/types';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { useRepositoryAuthors } from '../../api/author';
 import { ApiResource } from '../../api/base';
 import { useRepositoryMembers } from '../../api/repo_members';
 import DefaultPageLayout from '../../components/DefaultPageLayout';
 import Author from './components/Author';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
+import IconButton from '@material-ui/core/IconButton';
+import CancelIcon from '@material-ui/icons/Cancel';
+import Grid from '@material-ui/core/Grid';
 
 function findSelectedMember(
   author: ApiResource<Commit.Author>,
@@ -34,24 +37,37 @@ const Members: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: members } = useRepositoryMembers(id);
   const { data: authors } = useRepositoryAuthors(id);
+  const { push } = useHistory();
+
   return (
     <DefaultPageLayout>
-      <Container maxWidth='sm'>
-        <DefaultPageTitleFormat>Members</DefaultPageTitleFormat>
-        <Box my={4}>
-          {members &&
-            authors?.sort(compareCommitAuthors)?.map((author) => {
-              const member = findSelectedMember(author, members);
-              return (
-                <Author
-                  key={author.meta.id}
-                  author={author}
-                  member={member}
-                  allMembers={members}
-                />
-              );
-            })}
-        </Box>
+      <Container>
+        <Grid container alignItems='center' justify='space-between'>
+          <Grid item>
+            <DefaultPageTitleFormat>Members</DefaultPageTitleFormat>
+          </Grid>
+          <Grid item>
+            <IconButton onClick={() => push(`/setup/${id}`)}>
+              <CancelIcon fontSize='large' />
+            </IconButton>
+          </Grid>
+        </Grid>
+        <Container maxWidth='sm'>
+          <Box>
+            {members &&
+              authors?.sort(compareCommitAuthors)?.map((author) => {
+                const member = findSelectedMember(author, members);
+                return (
+                  <Author
+                    key={author.meta.id}
+                    author={author}
+                    member={member}
+                    allMembers={members}
+                  />
+                );
+              })}
+          </Box>
+        </Container>
       </Container>
     </DefaultPageLayout>
   );

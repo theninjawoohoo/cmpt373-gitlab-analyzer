@@ -16,6 +16,7 @@ import CommitsPage from '../../pages/Commits';
 import Members from '../../pages/Members';
 import RepositoryHomePage from '../../pages/RepositoryHomePage';
 import RepositorySetupPage from '../../pages/RepositorySetup';
+import ScoreRubricPage from '../../pages/ScoreRubric';
 
 export function Router() {
   const { user } = useAuthContext();
@@ -28,10 +29,6 @@ export function Router() {
         <Route path='/sfu' exact>
           <SfuVerify />
         </Route>
-        <Route path='/repository/:id/members' exact>
-          <Members />
-        </Route>
-
         <Route path='/repository' exact>
           <RepositoryPage />
         </Route>
@@ -40,6 +37,12 @@ export function Router() {
         </Route>
         <Route path='/setup/:id' exact>
           <RepositorySetupPage />
+        </Route>
+        <Route path='/setup/:id/members' exact>
+          <Members />
+        </Route>
+        <Route path='/setup/:id/rubric' exact>
+          <ScoreRubricPage />
         </Route>
         <Route path='/graph/:id' exact>
           <Graph />
