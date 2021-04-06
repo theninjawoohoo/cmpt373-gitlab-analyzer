@@ -15,6 +15,7 @@ import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import MemberDropdown from '../MemberDropdown';
 import { useFilterContext } from '../../contexts/FilterContext';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
+import { makeStyles } from '@material-ui/core/styles';
 
 const CommitList: React.FC = () => {
   const location = useLocation();
@@ -22,7 +23,11 @@ const CommitList: React.FC = () => {
   const [page, setPage] = useState(0);
   const { emails } = useFilterContext();
   const { repositoryId } = useRepositoryContext();
-  const gitlabButtonStyle = { marginLeft: 5 };
+  const useStyles = makeStyles(() => ({
+    gitlabButtonStyle: {
+      marginLeft: 5,
+    },
+  }));
   const { data: commits } = useGetCommits(
     {
       repository: query.repository as string,
@@ -31,6 +36,7 @@ const CommitList: React.FC = () => {
     },
     page,
   );
+  const classes = useStyles();
   return (
     <Container>
       <Grid container justify='space-between' alignItems='center'>
@@ -77,7 +83,7 @@ const CommitList: React.FC = () => {
                     View Diff
                   </Button>
                   <Button
-                    style={gitlabButtonStyle}
+                    className={classes.gitlabButtonStyle}
                     variant='outlined'
                     endIcon={<CallMadeIcon />}
                     onClick={() => window.open(commit.web_url)}
