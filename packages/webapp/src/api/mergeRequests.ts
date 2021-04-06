@@ -32,6 +32,10 @@ export function useGetMergeRequests(
   );
 }
 
+export function useGetMergeRequestById(mergeRequestId) {
+  return useApiQuery<MergeRequest>(`/merge_request/${mergeRequestId}`);
+}
+
 export function useInfiniteMergeRequest(
   params: MergeRequestSearchParams,
   pageSize = 15,

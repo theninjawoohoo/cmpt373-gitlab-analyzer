@@ -5,12 +5,14 @@ import Box from '@material-ui/core/Box';
 import { Paper } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { ApiResource } from '../../../api/base';
-import { Note } from '@ceres/types';
+import { Issue, MergeRequest, Note } from '@ceres/types';
 import SmartDate from '../../../components/SmartDate';
 
 interface NoteProps {
   noteType: number;
   noteData: ApiResource<Note>;
+  mergeRequest?: MergeRequest;
+  issue?: Issue;
 }
 
 const useStyles = makeStyles(() =>
@@ -25,34 +27,9 @@ const useStyles = makeStyles(() =>
   }),
 );
 
-// const getMergeRequestNoteData = (date: DateTime, mergeRequestNotes: any[]) => {
-//   let filteredMergeRequestNotes: any[];
-//
-//   for (const result of mergeRequestNotes) {
-//     if (DateTime.fromISO(result.created_at).hasSame(date, 'day')) {
-//       filteredMergeRequestNotes.push(result);
-//     }
-//   }
-//
-//   return {
-//     date: date.toLocaleString(DateTime.DATE_SHORT),
-//     filteredMergeRequestNotes,
-//   };
-// };
-//
-// const getIssueNoteData = (date: DateTime, issueNotes: any[]) => {
-//   let filteredIssueNotes: any[];
-//
-//   for (const result of issueNotes) {
-//     if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
-//       filteredIssueNotes.push(result);
-//     }
-//   }
-//   return {
-//     date: date.toLocaleString(DateTime.DATE_SHORT),
-//     filteredIssueNotes,
-//   };
-// };
+const extractNoteContent = (noteBody: string) => {
+  return noteBody.replace(/\*([^*]+)\*$/g, '').trim();
+};
 
 const NotePaper: React.FC<NoteProps> = (NoteProps) => {
   const classes = useStyles();
@@ -108,7 +85,7 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
             <Box fontSize={18} paddingBottom={1.5}>
               On merge request{' '}
               <Box fontWeight='fontWeightBold' display='inline'>
-                {NoteProps.noteData.id}
+                {NoteProps.mergeRequest.title}
               </Box>
             </Box>
           </Typography>
@@ -136,10 +113,12 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
             </Typography>
           </Grid>
           <Grid item xs={8}>
-            <Typography>{NoteProps.noteData.body}</Typography>
+            <Typography>
+              {extractNoteContent(NoteProps.noteData.body)}
+            </Typography>
             <Typography variant={'body2'} align={'right'}>
               <Box fontSize={16} fontStyle={'italic'} marginTop={2}>
-                <SmartDate>{NoteProps.noteData.updated_at}</SmartDate>
+                <SmartDate>{NoteProps.noteData.created_at}</SmartDate>
               </Box>
             </Typography>
           </Grid>

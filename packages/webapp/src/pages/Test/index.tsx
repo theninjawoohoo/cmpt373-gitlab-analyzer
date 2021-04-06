@@ -11,6 +11,7 @@ import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import { useGetMergeRequestNotes } from '../../api/note';
 // import { useParams } from 'react-router-dom';
 import NotePaper from './NotePaper';
+import { useGetMergeRequestById } from '../../api/mergeRequests';
 // import { ApiResource } from '../../api/base';
 // import { Note } from '@ceres/types';
 
@@ -64,10 +65,10 @@ const useStyles = makeStyles((theme: Theme) =>
 const Comment: React.FC = () => {
   const classes = useStyles();
 
-  // const { merge_request_id } = useParams<{ merge_request_id: string }>();
-  const merge_request_id = '576c9f9b-240f-441f-a5fe-e472e196c741';
+  const merge_request_id = '6cc45a67-e562-4014-982c-8973a36d5743';
+  const mergeRequest = useGetMergeRequestById(merge_request_id);
+  console.log(mergeRequest.data);
   const issue_id = '3d9719cf-c951-4e26-a4ad-9126659a1331';
-  // const { issue_id } = useParams<{ issue_id: string }>();
   console.log(merge_request_id);
   console.log(issue_id);
   // const { startDate, endDate, emails } = useFilterContext();
@@ -139,6 +140,7 @@ const Comment: React.FC = () => {
                 key={note.meta.id}
                 noteType={noteType}
                 noteData={note}
+                mergeRequest={mergeRequest.data}
               />
             );
           })}
