@@ -47,7 +47,6 @@ const LINE_COLOR_MAP = {
 const useStyles = makeStyles(() => ({
   accordionStyle: {
     backgroundColor: '#f8f8f8',
-    marginRight: '50px',
   },
 }));
 
