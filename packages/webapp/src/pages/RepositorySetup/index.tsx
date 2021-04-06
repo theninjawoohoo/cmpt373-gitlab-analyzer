@@ -1,6 +1,5 @@
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import { useSnackbar } from 'notistack';
 import React from 'react';
@@ -15,7 +14,6 @@ import {
 import DefaultPageLayout from '../../components/DefaultPageLayout';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 import SmartDate from '../../components/SmartDate';
-import CancelIcon from '@material-ui/icons/Cancel';
 import { useAuthContext } from '../../contexts/AuthContext';
 import Collaborators from '../RepositorySetup/components/Collaborators';
 import LeaveRepository from '../RepositorySetup/components/LeaveRepository';
@@ -28,6 +26,7 @@ import { ScoringConfig } from '@ceres/types';
 import RepoFilter from '../../components/RepositoryFilter';
 import styled from 'styled-components';
 import AccordionMenu from './components/AccordionMenu';
+import Members from '../Members';
 
 const MainContainer = styled.div`
   display: grid;
@@ -99,11 +98,6 @@ const RepoSetupPage: React.FC = () => {
               {data?.name_with_namespace}
             </DefaultPageTitleFormat>
           </Grid>
-          <Grid item>
-            <IconButton onClick={() => push('/repository')}>
-              <CancelIcon fontSize='large' />
-            </IconButton>
-          </Grid>
         </Grid>
         <Grid container spacing={2}>
           <Grid item xs={6}>
@@ -122,7 +116,15 @@ const RepoSetupPage: React.FC = () => {
         <MainContainer>
           <MembersWarning repositoryId={id} />
           <ScoringConfigWarning repository={data} repositoryId={id} />
-          <AccordionMenu title='Scoring Rubric' color='#ffd9cf'>
+          <AccordionMenu title='Filter Config' color='#e4f5ba'>
+            <Grid item xs={12}>
+              <RepoFilter />
+            </Grid>
+          </AccordionMenu>
+          <AccordionMenu title='Members' color='#ffd9cf'>
+            <Members id={id} />
+          </AccordionMenu>
+          <AccordionMenu title='Scoring Rubric' color='#cff4fc'>
             {data && isOwner && (
               <ScoringConfigSelector
                 isLoading={updateScoreLoading}
@@ -133,6 +135,7 @@ const RepoSetupPage: React.FC = () => {
           </AccordionMenu>
           <AccordionMenu
             title={`Sharing · ${collaborators.length} Collaborator(s)`}
+            color='#e6d9ff'
           >
             {data && isOwner && (
               <Collaborators
@@ -144,11 +147,6 @@ const RepoSetupPage: React.FC = () => {
             {data && !isOwner && (
               <LeaveRepository repository={data} onLeave={handleLeave} />
             )}
-          </AccordionMenu>
-          <AccordionMenu title='Filter Config'>
-            <Grid item xs={12}>
-              <RepoFilter />
-            </Grid>
           </AccordionMenu>
         </MainContainer>
       </Container>

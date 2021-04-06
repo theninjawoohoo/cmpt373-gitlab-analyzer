@@ -13,7 +13,6 @@ import ApiSettingPage from '../../pages/ApiSetting';
 import SettingsPage from '../../pages/GlobalSettings';
 import { useAuthContext } from '../../contexts/AuthContext';
 import CommitsPage from '../../pages/Commits';
-import Members from '../../pages/Members';
 import RepoSetupPage from '../../pages/RepositorySetup';
 import ScoreRubricPage from '../../pages/ScoreRubric';
 
@@ -33,9 +32,6 @@ export function Router() {
         </Route>
         <Route path='/setup/:id' exact>
           <RepoSetupPage />
-        </Route>
-        <Route path='/setup/:id/members' exact>
-          <Members />
         </Route>
         <Route path='/setup/:id/rubric' exact>
           <ScoreRubricPage />

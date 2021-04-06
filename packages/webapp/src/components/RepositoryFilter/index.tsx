@@ -7,8 +7,6 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDateTimePicker,
 } from '@material-ui/pickers';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
 import MemberDropdown from '../../components/MemberDropdown';
 import { Box } from '@material-ui/core';
 import { DateTime } from 'luxon';
@@ -26,50 +24,47 @@ const RepoFilter: React.FC = () => {
   };
 
   return (
-    <Paper>
-      <Box p={2}>
-        <Typography variant='h2'>Filter Config</Typography>
-        <MuiPickersUtilsProvider utils={LuxonUtils}>
-          <Grid container spacing={1} justify='space-around'>
-            <Grid item xs={3}>
-              <KeyboardDateTimePicker
-                variant='inline'
-                format='MM/dd/yyyy hh:mm a'
-                ampm={true}
-                margin='normal'
-                id='date-picker-inline'
-                label='Start Date'
-                value={startDate.toString()}
-                onChange={handleStartDateChange}
-                KeyboardButtonProps={{
-                  'aria-label': 'change date',
-                }}
-              />
-            </Grid>
-            <Grid item xs={3}>
-              <KeyboardDateTimePicker
-                variant='inline'
-                format='MM/dd/yyyy hh:mm a'
-                ampm={true}
-                margin='normal'
-                id='date-picker-inline'
-                label='End Date'
-                value={endDate.toString()}
-                onChange={handleEndDateChange}
-                KeyboardButtonProps={{
-                  'aria-label': 'change date',
-                }}
-              />
-            </Grid>
-            <Grid>
-              <Grid item xs={6}>
-                <MemberDropdown repositoryId={repositoryId} />
-              </Grid>
+    <Box p={2}>
+      <MuiPickersUtilsProvider utils={LuxonUtils}>
+        <Grid container spacing={1} alignItems='center' justify='space-around'>
+          <Grid item xs={3}>
+            <KeyboardDateTimePicker
+              variant='inline'
+              format='MM/dd/yyyy hh:mm a'
+              ampm={true}
+              margin='normal'
+              id='date-picker-inline'
+              label='Start Date'
+              value={startDate.toString()}
+              onChange={handleStartDateChange}
+              KeyboardButtonProps={{
+                'aria-label': 'change date',
+              }}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <KeyboardDateTimePicker
+              variant='inline'
+              format='MM/dd/yyyy hh:mm a'
+              ampm={true}
+              margin='normal'
+              id='date-picker-inline'
+              label='End Date'
+              value={endDate.toString()}
+              onChange={handleEndDateChange}
+              KeyboardButtonProps={{
+                'aria-label': 'change date',
+              }}
+            />
+          </Grid>
+          <Grid>
+            <Grid item xs={6}>
+              <MemberDropdown repositoryId={repositoryId} />
             </Grid>
           </Grid>
-        </MuiPickersUtilsProvider>
-      </Box>
-    </Paper>
+        </Grid>
+      </MuiPickersUtilsProvider>
+    </Box>
   );
 };
 
