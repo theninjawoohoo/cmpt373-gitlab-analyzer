@@ -19,6 +19,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import ScoreOverrideForm from '../../pages/ListMergeRequestPage/components/ScoreOverrideForm';
 import { useScoreOverrideQueue } from '../../pages/ListMergeRequestPage/contexts/ScoreOverrideQueue';
 import WarningIcon from '@material-ui/icons/Warning';
+import { makeStyles } from '@material-ui/core/styles';
 
 const StyledAccordionSummary = styled(AccordionSummary)`
   &.MuiAccordionSummary-root.Mui-focused {
@@ -43,7 +44,12 @@ const LINE_COLOR_MAP = {
   [Line.Type.noChange]: 'black',
 };
 
-const accordionStyle = { backgroundColor: '#f8f8f8', marginRight: '50px' };
+const useStyles = makeStyles(() => ({
+  accordionStyle: {
+    backgroundColor: '#f8f8f8',
+    marginRight: '50px',
+  },
+}));
 
 const TwoColumnGrid = styled.div`
   display: grid;
@@ -166,12 +172,12 @@ const DiffView: React.FC<DiffViewProps> = ({
   const isExcluded = extensions?.override?.exclude;
   const hasOverride = isExcluded || extensions?.override?.score;
   const fileNameTextDecoration = isExcluded ? 'line-through' : '';
-
+  const classes = useStyles();
   return (
     <Accordion
       expanded={expanded || false}
       TransitionProps={{ timeout: 0 }}
-      style={accordionStyle}
+      className={classes.accordionStyle}
     >
       <StyledAccordionSummary
         expandIcon={<ExpandMore />}
