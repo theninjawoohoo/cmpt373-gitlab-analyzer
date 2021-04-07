@@ -35,6 +35,19 @@ const SyncButton = (props: { syncing: boolean; onClick: () => void }) => (
   </Box>
 );
 
+const stringToHslColor = (
+  repoName: string,
+  saturation: number,
+  lightness: number,
+) => {
+  let hash = 0;
+  for (let i = 0; i < repoName.length; i++) {
+    hash = repoName.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const h = hash % 360;
+  return 'hsl(' + h + ', ' + saturation + '%, ' + lightness + '%)';
+};
+
 const RepositoryCard: React.FC<RepositoryCardProps> = ({
   repository,
   isShared,
@@ -58,7 +71,11 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
             <Grid item>
               <Grid alignItems='center' spacing={5} container>
                 <Grid item>
-                  <Box height='5rem' width='5rem' bgcolor='#DBD6FF' />
+                  <Box
+                    height='5rem'
+                    width='5rem'
+                    bgcolor={stringToHslColor(repository.name, 50, 60)}
+                  />
                 </Grid>
                 <Grid item>
                   {isShared && (
