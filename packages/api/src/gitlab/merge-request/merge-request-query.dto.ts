@@ -24,6 +24,6 @@ export class MergeRequestQueryDto extends QueryDto {
   merged_end_date?: string;
 
   @IsOptional()
-  @IsBoolean()
-  only_with_notes: boolean;
+  @IsUUID()
+  note_id?: string;
 }

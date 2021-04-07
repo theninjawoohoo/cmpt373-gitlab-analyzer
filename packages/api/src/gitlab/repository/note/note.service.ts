@@ -53,6 +53,15 @@ export class NoteService {
       });
     }
 
+    if (filters.repository_id) {
+      query.andWhere(
+        'note.merge_request_id in (select id from merge_request where repository_id = :repository_id)',
+        {
+          repository_id: filters.repository_id,
+        },
+      );
+    }
+
     query.orderBy("note.resource #>> '{created_at}'", 'DESC');
     paginate(query, filters);
     return query.getManyAndCount();

@@ -71,16 +71,13 @@ export class MergeRequestService extends BaseService<
         },
       );
     }
-    if (filters.only_with_notes) {
-      query.andWhere(`
-      merge_request.id IN  (
-        SELECT merge_request.resource" #>> '{id}'
-        FROM merge_request 
-        INNER JOIN (
-          SELECT * FROM note
-        ) c ON c.merge_request_id = merge_request.resource #>> '{id}'
-      )
-    `);
+    if (filters.note_id) {
+      query.andWhere(
+        'merge_request.id in (select merge_request_id from note where id = :note_id)',
+        {
+          note_id: filters.note_id,
+        },
+      );
     }
     return query;
   }

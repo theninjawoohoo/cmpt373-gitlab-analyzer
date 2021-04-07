@@ -6,15 +6,9 @@ import Box from '@material-ui/core/Box';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-// import { DateTime } from 'luxon';
-// import { useFilterContext } from '../../contexts/FilterContext';
-import { useGetIssueNotes, useGetMergeRequestNotes } from '../../api/note';
-// import { useParams } from 'react-router-dom';
+import { useGetNotesByRepository } from '../../api/note';
 import NotePaper from './NotePaper';
-import { useGetMergeRequestById } from '../../api/mergeRequests';
-import { useGetIssueById } from '../../api/issue';
-// import { ApiResource } from '../../api/base';
-// import { Note } from '@ceres/types';
+import { useRepositoryContext } from '../../contexts/RepositoryContext';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -43,13 +37,10 @@ enum TabOption {
 const Comment: React.FC = () => {
   const classes = useStyles();
 
-  const merge_request_id = '047a9f94-a2a3-4e60-aa87-a4187562b3b0';
-  const mergeRequest = useGetMergeRequestById(merge_request_id);
-  const { data: mergeRequestNotes } = useGetMergeRequestNotes(merge_request_id);
-
-  const issue_id = '61d75c79-8afc-4e59-9b3b-fa994727ea66';
-  const { data: issueNotes } = useGetIssueNotes(issue_id);
-  const issue = useGetIssueById(issue_id);
+  const { repositoryId } = useRepositoryContext();
+  const { data: mergeRequestNotes } = useGetNotesByRepository(repositoryId);
+  console.log(mergeRequestNotes);
+  const issueNotes = { results: [] };
 
   const [tab, setTab] = useState(TabOption.codeReview);
   const isMergeRequestNote = tab === TabOption.codeReview;
@@ -101,13 +92,12 @@ const Comment: React.FC = () => {
           alignItems={'stretch'}
           spacing={1}
         >
-          {notes.map((note) => {
+          {notes?.map((note) => {
             return (
               <NotePaper
                 key={note.meta.id}
                 noteData={note}
-                mergeRequest={mergeRequest.data}
-                issue={issue.data}
+                issueId={note.meta.id}
                 isMergeRequestNote={isMergeRequestNote}
               />
             );
