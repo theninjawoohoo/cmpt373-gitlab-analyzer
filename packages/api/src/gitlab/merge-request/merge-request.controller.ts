@@ -78,6 +78,18 @@ export class MergeRequestController {
       `Could not find merge request for repository with id: ${id}`,
     );
   }
+
+  @Get('/repository/:id/notes')
+  async findAllForRepositoryWithNotes(@Param() { id }: IdParam) {
+    const repository = await this.repositoryService.findOne(id);
+    if (repository) {
+      return this.mergeRequestService.buildFilters();
+    }
+    throw new NotFoundException(
+      `Could not find merge request for repository with id: ${id}`,
+    );
+  }
+
   @Get(':id')
   async findOne(@Param() { id }: IdParam) {
     const mergeRequest = await this.mergeRequestService.findOne(id);

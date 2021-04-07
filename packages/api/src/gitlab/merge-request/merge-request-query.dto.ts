@@ -1,4 +1,10 @@
-import { IsDateString, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsBoolean,
+  IsDateString,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { QueryDto } from '../../common/query-dto';
 
 export class MergeRequestQueryDto extends QueryDto {
@@ -16,4 +22,8 @@ export class MergeRequestQueryDto extends QueryDto {
   @IsOptional()
   @IsDateString()
   merged_end_date?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  only_with_notes: boolean;
 }

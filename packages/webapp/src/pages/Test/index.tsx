@@ -45,9 +45,9 @@ const Comment: React.FC = () => {
 
   const merge_request_id = '047a9f94-a2a3-4e60-aa87-a4187562b3b0';
   const mergeRequest = useGetMergeRequestById(merge_request_id);
-  const issue_id = '61d75c79-8afc-4e59-9b3b-fa994727ea66';
-  // const { startDate, endDate, emails } = useFilterContext();
   const { data: mergeRequestNotes } = useGetMergeRequestNotes(merge_request_id);
+
+  const issue_id = '61d75c79-8afc-4e59-9b3b-fa994727ea66';
   const { data: issueNotes } = useGetIssueNotes(issue_id);
   const issue = useGetIssueById(issue_id);
 
