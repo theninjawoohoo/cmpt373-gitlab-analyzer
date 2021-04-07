@@ -12,7 +12,7 @@ import { useGetMergeRequestByNoteId } from '../../../api/mergeRequests';
 
 interface NoteProps {
   noteData: ApiResource<Note>;
-  issueId?: string;
+  Id?: string;
   isMergeRequestNote?: boolean;
 }
 
@@ -45,7 +45,7 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
 
   const { data: mergeRequest } = useGetMergeRequestByNoteId({
     repository: repositoryId,
-    note_id: NoteProps.issueId,
+    note_id: NoteProps.noteData.meta.id,
   });
   const classes = useStyles();
   return (
@@ -66,8 +66,10 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
             {NoteProps.isMergeRequestNote ? ' merge request ' : ' issue '}
             <Box fontWeight='fontWeightBold' display='inline'>
               {NoteProps.isMergeRequestNote
-                ? mergeRequest?.title
-                : NoteProps.issueId}
+                ? mergeRequest?.results.map((mr) => {
+                    return mr.title;
+                  })
+                : NoteProps.noteData.noteable_id}
             </Box>
           </Box>
         </Typography>

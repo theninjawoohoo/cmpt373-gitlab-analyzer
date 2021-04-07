@@ -60,6 +60,12 @@ export class NoteService {
           repository_id: filters.repository_id,
         },
       );
+      query.orWhere(
+        'note.issue_id in (select id from issue where repository_id = :repository_id)',
+        {
+          repository_id: filters.repository_id,
+        },
+      );
     }
 
     query.orderBy("note.resource #>> '{created_at}'", 'DESC');

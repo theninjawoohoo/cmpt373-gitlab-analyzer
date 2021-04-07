@@ -38,16 +38,18 @@ const Comment: React.FC = () => {
   const classes = useStyles();
 
   const { repositoryId } = useRepositoryContext();
-  const { data: mergeRequestNotes } = useGetNotesByRepository(repositoryId);
-  console.log(mergeRequestNotes);
-  const issueNotes = { results: [] };
+  const { data: allNotes } = useGetNotesByRepository(repositoryId);
+  const mergeRequestNotes = allNotes?.results.filter(
+    (comment) => comment.noteable_type == 'MergeRequest',
+  );
+  const issueNotes = allNotes?.results.filter(
+    (comment) => comment.noteable_type == 'Issue',
+  );
 
   const [tab, setTab] = useState(TabOption.codeReview);
   const isMergeRequestNote = tab === TabOption.codeReview;
   const notes =
-    tab === TabOption.codeReview
-      ? mergeRequestNotes?.results || []
-      : issueNotes?.results || [];
+    tab === TabOption.codeReview ? mergeRequestNotes || [] : issueNotes || [];
 
   const handleTabs = (event: React.ChangeEvent<unknown>, newTab: any) => {
     setTab(newTab);
@@ -97,7 +99,7 @@ const Comment: React.FC = () => {
               <NotePaper
                 key={note.meta.id}
                 noteData={note}
-                issueId={note.meta.id}
+                Id={note.meta.id}
                 isMergeRequestNote={isMergeRequestNote}
               />
             );
