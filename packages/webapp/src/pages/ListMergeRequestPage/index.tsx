@@ -23,7 +23,7 @@ const IndependentScrollGrid = styled(Grid)`
   height: 100vh;
   position: fixed;
   margin-left: 5rem;
-  padding-right: 6rem;
+  padding-right: 8rem;
   & > * {
     height: 100vh;
     overflow: hidden;
