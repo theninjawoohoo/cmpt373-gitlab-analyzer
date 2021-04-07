@@ -29,7 +29,7 @@ const useStyles = makeStyles(() =>
       padding: 10,
     },
     issue_note_header_row: {
-      backgroundColor: '#eae3ff',
+      backgroundColor: '#f3eef8',
       padding: 10,
     },
   }),

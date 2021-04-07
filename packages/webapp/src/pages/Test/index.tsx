@@ -24,12 +24,26 @@ const useStyles = makeStyles(() =>
     },
     active_code_review_tab: {
       backgroundColor: '#b8d8be',
-      borderRadius: 10,
+      borderTopRightRadius: 10,
+      borderTopLeftRadius: 10,
+      fontWeight: 'bold',
+    },
+    inactive_code_review_tab: {
+      backgroundColor: '#e8f4ea',
+      borderTopRightRadius: 10,
+      borderTopLeftRadius: 10,
       fontWeight: 'bold',
     },
     active_issue_note_tab: {
       backgroundColor: '#d0c9ea',
-      borderRadius: 10,
+      borderTopRightRadius: 10,
+      borderTopLeftRadius: 10,
+      fontWeight: 'bold',
+    },
+    inactive_issue_note_tab: {
+      backgroundColor: '#f3eef8',
+      borderTopRightRadius: 10,
+      borderTopLeftRadius: 10,
       fontWeight: 'bold',
     },
   }),
@@ -67,20 +81,14 @@ const Comment: React.FC = () => {
       <Container>
         <DefaultPageTitleFormat>Comments</DefaultPageTitleFormat>
         <Box my={2} className={classes.root}>
-          <Tabs
-            value={tab}
-            onChange={handleTabs}
-            // indicatorColor='primary'
-            textColor='primary'
-            centered
-          >
+          <Tabs value={tab} onChange={handleTabs} textColor='primary' centered>
             <Tab
               value={TabOption.codeReview}
               label='Code Reviews'
               className={
                 tab === TabOption.codeReview
                   ? classes.active_code_review_tab
-                  : classes.root
+                  : classes.inactive_code_review_tab
               }
             />
             <Tab
@@ -89,7 +97,7 @@ const Comment: React.FC = () => {
               className={
                 tab === TabOption.issueNotes
                   ? classes.active_issue_note_tab
-                  : classes.root
+                  : classes.inactive_issue_note_tab
               }
             />
           </Tabs>
