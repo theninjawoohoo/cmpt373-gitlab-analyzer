@@ -115,7 +115,7 @@ export class NoteService {
       }),
     );
     await this.noteRepository.save(entities);
-    return this.updateWordCount({ merge_request: mergeRequest.id });
+    await this.updateWordCount({ merge_request: mergeRequest.id });
   }
 
   async saveIssueNote(issue: IssueEntity, notes: Note[]) {
@@ -125,7 +125,7 @@ export class NoteService {
       }),
     );
     await this.noteRepository.save(entities);
-    return this.updateWordCount({ issue: issue.id });
+    await this.updateWordCount({ issue: issue.id });
   }
 
   private async createOrUpdateMergeRequestNote(
@@ -202,17 +202,21 @@ export class NoteService {
   async updateWordCount(filters: NoteQueryDto) {
     const [notes] = await this.search(filters);
     const updatedNotes = notes.map((note) => {
-      const wordCount = this.countWords(note);
-      note.resource = Extensions.updateExtensions(note.resource, { wordCount });
+      const wordCount = this.countWords(note.resource.body);
+      console.log(note.resource.body);
+      console.log(this.countWords(note.resource.body) + '\n\n');
+      note.resource = Extensions.updateExtensions(note.resource, {
+        wordCount: wordCount,
+      });
       note.wordCount = wordCount;
+      console.log(note);
       return note;
     });
     return this.noteRepository.save(updatedNotes);
   }
 
-  private countWords(note: NoteEntity) {
-    const sentences = note.resource.body;
-    const content = sentences.replace(/\*([^*]+)\*$/g, '');
+  private countWords(noteBody: string) {
+    const content = noteBody.replace(/\*([^*]+)\*$/g, '');
     const words = content.trim().split(/\s+/);
     return words.length;
   }
