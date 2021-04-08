@@ -18,6 +18,7 @@ import ScoreOverrideForm from '../../pages/ListMergeRequestPage/components/Score
 import { useScoreOverrideQueue } from '../../pages/ListMergeRequestPage/contexts/ScoreOverrideQueue';
 import WarningIcon from '@material-ui/icons/Warning';
 import LineComparison from './components/LineComparison';
+import { makeStyles } from '@material-ui/core/styles';
 
 const StyledAccordionSummary = styled(AccordionSummary)`
   &.MuiAccordionSummary-root.Mui-focused {
@@ -97,69 +98,97 @@ const DiffView: React.FC<DiffViewProps> = ({
     extensions?.override,
     extensions?.score,
   );
+
+  const useStyles = makeStyles(() => ({
+    accordionStyle: {
+      backgroundColor: '#f8f8f8',
+    },
+  }));
+
   const isExcluded = extensions?.override?.exclude;
   const hasOverride = ScoreOverride.hasOverride(extensions?.override);
   const fileNameTextDecoration = isExcluded ? 'line-through' : '';
 
+  const classes = useStyles();
   return (
-    <Accordion expanded={expanded || false} TransitionProps={{ timeout: 0 }}>
-      <StyledAccordionSummary
-        expandIcon={<ExpandMore />}
-        onClick={onSummaryClick}
+    <>
+      <Accordion
+        expanded={expanded || false}
+        TransitionProps={{ timeout: 0, unmountOnExit: true }}
+        className={classes.accordionStyle}
       >
-        <Box width='100%'>
-          <Grid container alignItems='center' justify='space-between'>
-            <Grid item>
-              <Grid container alignItems='center' spacing={2}>
-                {hasOverride && (
+        <StyledAccordionSummary
+          expandIcon={<ExpandMore />}
+          onClick={onSummaryClick}
+        >
+          <Box width='100%'>
+            <Grid container alignItems='center' justify='space-between'>
+              <Grid item>
+                <Grid container alignItems='center' spacing={2}>
+                  {hasOverride && (
+                    <Grid item>
+                      <WarningIcon />
+                    </Grid>
+                  )}
                   <Grid item>
-                    <WarningIcon />
+                    <Typography
+                      style={{
+                        fontFamily: 'monospace',
+                        textDecoration: fileNameTextDecoration,
+                      }}
+                    >
+                      {fileName}
+                    </Typography>
                   </Grid>
-                )}
-                <Grid item>
-                  <Typography
-                    style={{
-                      fontFamily: 'monospace',
-                      textDecoration: fileNameTextDecoration,
-                    }}
-                  >
-                    {fileName}
-                  </Typography>
                 </Grid>
               </Grid>
+              {allowEdit && (
+                <>
+                  <Grid item>
+                    <IconButton onClick={onScoreEdit as any}>
+                      <CancelIcon fontSize='small' />
+                    </IconButton>
+                  </Grid>
+                </>
+              )}
             </Grid>
-            {allowEdit && (
-              <>
-                <Grid item>
-                  <IconButton onClick={onScoreEdit as any}>
-                    <CancelIcon fontSize='small' />
-                  </IconButton>
-                </Grid>
-              </>
-            )}
-          </Grid>
-          <Grid container alignItems='center' spacing={2}>
-            <Grid item xs={2}>
-              <DiffFactWrapper
-                name='Score'
-                value={
-                  <ScorePopover
-                    hasOverride={hasOverride}
-                    scoreCount={score.toFixed(1)}
-                    scoreSummary={summary}
-                  />
-                }
+            <Grid container alignItems='center' spacing={2}>
+              <Grid item xs={2}>
+                <DiffFactWrapper
+                  name='Score'
+                  value={
+                    <ScorePopover
+                      hasOverride={hasOverride}
+                      scoreCount={score.toFixed(1)}
+                      scoreSummary={summary}
+                    />
+                  }
+                />
+              </Grid>
+              <Grid item xs={2}>
+                <DiffFactWrapper
+                  name='Weight'
+                  value={extensions?.weight || 0}
+                />
+              </Grid>
+              <Grid item>
+                <DiffFactWrapper name='Filetype' value={extensions?.glob} />
+              </Grid>
+            </Grid>
+          </Box>
+        </StyledAccordionSummary>
+        <AccordionDetails>
+          <Root>
+            {lines?.map((line, index) => (
+              <LineComparison
+                key={index}
+                line={line}
+                weight={extensions?.weight || 0}
               />
-            </Grid>
-            <Grid item xs={2}>
-              <DiffFactWrapper name='Weight' value={extensions?.weight || 0} />
-            </Grid>
-            <Grid item>
-              <DiffFactWrapper name='Filetype' value={extensions?.glob} />
-            </Grid>
-          </Grid>
-        </Box>
-      </StyledAccordionSummary>
+            ))}
+          </Root>
+        </AccordionDetails>
+      </Accordion>
       {open && (
         <ScoreOverrideForm
           open={open}
@@ -169,18 +198,7 @@ const DiffView: React.FC<DiffViewProps> = ({
           defaultValues={extensions?.override}
         />
       )}
-      <AccordionDetails>
-        <Root>
-          {lines?.map((line, index) => (
-            <LineComparison
-              key={index}
-              line={line}
-              weight={extensions?.weight || 0}
-            />
-          ))}
-        </Root>
-      </AccordionDetails>
-    </Accordion>
+    </>
   );
 };
 
