@@ -35,7 +35,7 @@ const SyncButton = (props: { syncing: boolean; onClick: () => void }) => (
   </Box>
 );
 
-const stringToHslColor = (
+const generateColor = (
   repoName: string,
   saturation: number,
   lightness: number,
@@ -74,7 +74,7 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
                   <Box
                     height='5rem'
                     width='5rem'
-                    bgcolor={stringToHslColor(repository.name, 50, 60)}
+                    bgcolor={generateColor(repository.name, 50, 60)}
                   />
                 </Grid>
                 <Grid item>
