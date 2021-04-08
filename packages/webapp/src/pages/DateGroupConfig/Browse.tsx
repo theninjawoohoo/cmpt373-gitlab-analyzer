@@ -7,11 +7,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSearchGroupConfigs } from '../../api/groupConfig';
 import SmartDate from '../../components/SmartDate';
+import GroupLayout from './components/GroupLayout';
 
-const GroupConfig: React.FC = () => {
+const BrowseGroupConfigPage: React.FC = () => {
   const { data } = useSearchGroupConfigs();
+  console.log(data);
   return (
-    <>
+    <GroupLayout showCreateButton showBackButton>
       <Box mx={2}>
         <Grid container>
           <Grid item xs={6}>
@@ -23,26 +25,26 @@ const GroupConfig: React.FC = () => {
         </Grid>
       </Box>
       <List>
-        {data?.results?.map((scoringConfig) => (
+        {data?.results?.map((groupConfig) => (
           <ListItem
-            key={scoringConfig.meta.id}
+            key={groupConfig.meta.id}
             button
             component={Link}
-            to={`/settings/scoring/edit?id=${scoringConfig.meta.id}`}
+            to={`/settings/calendar/edit?id=${groupConfig.meta.id}`}
           >
             <Grid item xs={6}>
-              <Typography>{scoringConfig.name}</Typography>
+              <Typography>{groupConfig.name}</Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography>
-                <SmartDate>{scoringConfig.meta.updatedAt}</SmartDate>
+                <SmartDate>{groupConfig.meta.updatedAt}</SmartDate>
               </Typography>
             </Grid>
           </ListItem>
         ))}
       </List>
-    </>
+    </GroupLayout>
   );
 };
 
-export default GroupConfig;
+export default BrowseGroupConfigPage;
