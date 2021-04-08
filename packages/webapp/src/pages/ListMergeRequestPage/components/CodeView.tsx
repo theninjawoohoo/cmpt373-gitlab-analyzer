@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { ApiResource } from '../../../api/base';
 import { useGetDiffs } from '../../../api/diff';
 import DiffView from '../../../components/DiffView';
+import CallMadeIcon from '@material-ui/icons/CallMade';
 
 interface CodeViewProps {
   mergeRequest?: ApiResource<MergeRequest>;
@@ -32,6 +33,18 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
           Expand All
         </Button>
         <Button onClick={() => setExpandedDiffs([])}>Collapse All</Button>
+        <Button
+          variant='text'
+          color={'primary'}
+          endIcon={<CallMadeIcon />}
+          onClick={
+            commit?.web_url
+              ? () => window.open(commit.web_url)
+              : () => window.open(mergeRequest.web_url)
+          }
+        >
+          View on GitLab
+        </Button>
       </Box>
       <Box>
         {diffs?.results.map((diff) => {
@@ -39,6 +52,7 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
           return (
             <DiffView
               key={diff.meta.id}
+              diffId={diff.meta.id}
               fileName={diff.new_path}
               lines={diff.lines}
               summary={diff.summary}
@@ -53,6 +67,7 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
                   setExpandedDiffs([...expandedDiffs, diff]);
                 }
               }}
+              allowEdit
             />
           );
         })}

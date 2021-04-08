@@ -13,6 +13,7 @@ import {
   GlobWeight,
   Line,
   LINE_SCORING,
+  ScoreOverride,
 } from '@ceres/types';
 import { parsePatch } from 'diff';
 import DiffInterpreter from './helpers/DiffInterpreter';
@@ -46,6 +47,14 @@ export class DiffService {
     return query.getManyAndCount();
   }
 
+  async updateOverride(id: string, override: ScoreOverride) {
+    const diff = await this.diffRepository.findOne({ id });
+    diff.resource = Extensions.updateExtensions(diff.resource, {
+      override: override,
+    });
+    return this.diffRepository.save(diff);
+  }
+
   async syncForCommit(commit: Commit, token: string) {
     let diffs: GitlabDiff[] = [];
     let page = 1;
@@ -69,7 +78,7 @@ export class DiffService {
       if (summary) {
         score = Object.keys(summary)
           .map((lineType) => LINE_SCORING[lineType] * (summary[lineType] || 0))
-          .reduce((a, b) => a + b, 0);
+          .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
       }
       const weight = this.getWeight(diff.resource.new_path, weights);
       diff.resource = Extensions.updateExtensions(diff.resource, {
@@ -79,9 +88,21 @@ export class DiffService {
       return diff;
     });
     await this.diffRepository.save(updatedDiffs);
-    return updatedDiffs
-      .map((diff) => diff.resource?.extensions?.score || 0)
-      .reduce((a, b) => a + b, 0);
+    const score = updatedDiffs
+      .map((diff) =>
+        ScoreOverride.computeScore(
+          diff.resource?.extensions.override,
+          diff.resource?.extensions?.score,
+        ),
+      )
+      .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+    const hasOverride = updatedDiffs.some((diff) =>
+      ScoreOverride.hasOverride(diff?.resource?.extensions?.override),
+    );
+    return {
+      score,
+      hasOverride,
+    };
   }
 
   async syncForMergeRequest(mergeRequest: MergeRequest, token: string) {

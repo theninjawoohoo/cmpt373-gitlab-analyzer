@@ -16,12 +16,14 @@ import Box from '@material-ui/core/Box';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 import styled from 'styled-components';
 import { useFilterContext } from '../../contexts/FilterContext';
+import { ScoreOverrideQueueProvider } from './contexts/ScoreOverrideQueue';
+import ScoreOverrideQueueInfo from './components/ScoreOverrideQueueInfo';
 
 const IndependentScrollGrid = styled(Grid)`
   height: 100vh;
   position: fixed;
   margin-left: 5rem;
-  padding-right: 6rem;
+  padding-right: 8rem;
   & > * {
     height: 100vh;
     overflow: hidden;
@@ -68,8 +70,11 @@ const RegularTableHeaders: React.FC = () => {
         <Grid item xs={2}>
           <Typography>Date</Typography>
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={1}>
           <Typography>Score</Typography>
+        </Grid>
+        <Grid item xs={1}>
+          <Typography>Σ Commits</Typography>
         </Grid>
       </Grid>
     </Box>
@@ -110,61 +115,68 @@ const ListMergeRequestPage = () => {
   return (
     <>
       <DefaultPageLayout>
-        <GridComponent container spacing={activeMergeRequest ? 3 : 0}>
-          <Grid item xs={activeMergeRequest ? 5 : 12}>
-            <Container>
-              <Box my={2}>
-                <DefaultPageTitleFormat>Merge Requests</DefaultPageTitleFormat>
-              </Box>
-              {!activeMergeRequest ? (
-                <RegularTableHeaders />
-              ) : (
-                <CompactTableHeaders />
-              )}
-              {reducedMergeRequests.map((mergeRequest) => {
-                const active =
-                  mergeRequest.meta.id === activeMergeRequest?.meta.id;
-                return (
-                  <MergeRequestRenderer
-                    key={mergeRequest.meta.id}
-                    mergeRequest={mergeRequest}
-                    active={active}
-                    shrink={!!activeMergeRequest}
-                    onClickSummary={() => {
-                      setActiveCommit(undefined);
-                      setActiveMergeRequest(active ? undefined : mergeRequest);
+        <ScoreOverrideQueueProvider>
+          <GridComponent container spacing={activeMergeRequest ? 3 : 0}>
+            <Grid item xs={activeMergeRequest ? 5 : 12}>
+              <Container>
+                <ScoreOverrideQueueInfo />
+                <Box my={2}>
+                  <DefaultPageTitleFormat>
+                    Merge Requests
+                  </DefaultPageTitleFormat>
+                </Box>
+                {!activeMergeRequest ? (
+                  <RegularTableHeaders />
+                ) : (
+                  <CompactTableHeaders />
+                )}
+                {reducedMergeRequests.map((mergeRequest) => {
+                  const active =
+                    mergeRequest.meta.id === activeMergeRequest?.meta.id;
+                  return (
+                    <MergeRequestRenderer
+                      key={mergeRequest.meta.id}
+                      mergeRequest={mergeRequest}
+                      active={active}
+                      shrink={!!activeMergeRequest}
+                      onClickSummary={() => {
+                        setActiveCommit(undefined);
+                        setActiveMergeRequest(
+                          active ? undefined : mergeRequest,
+                        );
+                      }}
+                    >
+                      {active && (
+                        <CommitList
+                          mergeRequest={mergeRequest}
+                          activeCommit={activeCommit}
+                          setActiveCommit={setActiveCommit}
+                          authorEmails={emails}
+                        />
+                      )}
+                    </MergeRequestRenderer>
+                  );
+                })}
+                {hasNextPage && (
+                  <LoadMore
+                    onClick={() => {
+                      void fetchNextPage();
                     }}
-                  >
-                    {active && (
-                      <CommitList
-                        mergeRequest={mergeRequest}
-                        activeCommit={activeCommit}
-                        setActiveCommit={setActiveCommit}
-                        authorEmails={emails}
-                      />
-                    )}
-                  </MergeRequestRenderer>
-                );
-              })}
-              {hasNextPage && (
-                <LoadMore
-                  onClick={() => {
-                    void fetchNextPage();
-                  }}
-                  ref={loadMoreRef}
-                />
-              )}
-            </Container>
-          </Grid>
-          {activeMergeRequest && (
-            <Grid item xs={7}>
-              <CodeView
-                mergeRequest={activeMergeRequest}
-                commit={activeCommit}
-              />
+                    ref={loadMoreRef}
+                  />
+                )}
+              </Container>
             </Grid>
-          )}
-        </GridComponent>
+            {activeMergeRequest && (
+              <Grid item xs={7}>
+                <CodeView
+                  mergeRequest={activeMergeRequest}
+                  commit={activeCommit}
+                />
+              </Grid>
+            )}
+          </GridComponent>
+        </ScoreOverrideQueueProvider>
       </DefaultPageLayout>
     </>
   );

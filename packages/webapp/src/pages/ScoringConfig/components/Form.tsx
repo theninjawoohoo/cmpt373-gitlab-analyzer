@@ -38,7 +38,6 @@ interface FormProps {
 }
 
 const Form: React.FC<FormProps> = ({ defaultValues, onSubmit }) => {
-  console.log({ defaultValues });
   const { control, handleSubmit, register, errors } = useForm<ScoringConfig>({
     defaultValues: {
       name: defaultValues?.name || '',
