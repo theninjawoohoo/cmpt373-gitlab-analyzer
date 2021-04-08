@@ -2,16 +2,10 @@ import { Commit, RepositoryMember } from '@ceres/types';
 import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import React from 'react';
-// import { useHistory} from 'react-router-dom';
 import { useRepositoryAuthors } from '../../api/author';
 import { ApiResource } from '../../api/base';
 import { useRepositoryMembers } from '../../api/repo_members';
-// import DefaultPageLayout from '../../components/DefaultPageLayout';
 import Author from './components/Author';
-// import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
-// import IconButton from '@material-ui/core/IconButton';
-// import CancelIcon from '@material-ui/icons/Cancel';
-// import Grid from '@material-ui/core/Grid';
 
 interface MembersProps {
   id: string;
@@ -40,21 +34,8 @@ function compareCommitAuthors(a: Commit.Author, b: Commit.Author) {
 const Members: React.FC<MembersProps> = ({ id }) => {
   const { data: members } = useRepositoryMembers(id);
   const { data: authors } = useRepositoryAuthors(id);
-  // const { push } = useHistory();
 
   return (
-    // <DefaultPageLayout>
-    //   <Container>
-    //     <Grid container alignItems='center' justify='space-between'>
-    //       <Grid item>
-    //         <DefaultPageTitleFormat>Members</DefaultPageTitleFormat>
-    //       </Grid>
-    //       <Grid item>
-    //         <IconButton onClick={() => push(`/setup/${id}`)}>
-    //           <CancelIcon fontSize='large' />
-    //         </IconButton>
-    //       </Grid>
-    //     </Grid>
     <Container maxWidth='sm'>
       <Box>
         {members &&
@@ -71,8 +52,6 @@ const Members: React.FC<MembersProps> = ({ id }) => {
           })}
       </Box>
     </Container>
-    //   </Container>
-    // </DefaultPageLayout>
   );
 };
 
