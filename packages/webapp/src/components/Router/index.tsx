@@ -6,6 +6,8 @@ import Login from '../../pages/Login';
 import OperationsPage from '../../pages/Operations';
 import BrowseScoringConfigsPage from '../../pages/ScoringConfig/Browse';
 import EditScoringConfigPage from '../../pages/ScoringConfig/Edit';
+import BrowseGroupConfigPage from '../../pages/DateGroupConfig/Browse';
+import EditGroupConfigPage from '../../pages/DateGroupConfig/Edit';
 import SfuVerify from '../../pages/SfuVerify';
 import Graph from '../../pages/Graph';
 import ListMergeRequestPage from '../../pages/ListMergeRequestPage';
@@ -48,6 +50,9 @@ export function Router() {
         <Route path='/settings/scoring' exact>
           <BrowseScoringConfigsPage />
         </Route>
+        <Route path='/settings/calendar' exact>
+          <BrowseGroupConfigPage />
+        </Route>
         <Route path='/commits' exact>
           <CommitsPage />
         </Route>
@@ -62,6 +67,9 @@ export function Router() {
         </Route>
         <Route path='/settings/scoring/edit' exact>
           <EditScoringConfigPage />
+        </Route>
+        <Route path='/settings/group/edit' exact>
+          <EditGroupConfigPage />
         </Route>
         <Route path='/logout' exact>
           <Login />
