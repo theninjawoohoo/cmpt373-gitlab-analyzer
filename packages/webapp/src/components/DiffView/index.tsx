@@ -8,12 +8,11 @@ import {
 } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
-import ExpandMore from '@material-ui/icons/ExpandMore';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Root from './components/root';
 import ScorePopover from './components/ScorePopper';
-import CancelIcon from '@material-ui/icons/Cancel';
+import EditIcon from '@material-ui/icons/Edit';
 import ScoreOverrideForm from '../../pages/ListMergeRequestPage/components/ScoreOverrideForm';
 import { useScoreOverrideQueue } from '../../pages/ListMergeRequestPage/contexts/ScoreOverrideQueue';
 import WarningIcon from '@material-ui/icons/Warning';
@@ -117,10 +116,7 @@ const DiffView: React.FC<DiffViewProps> = ({
         TransitionProps={{ timeout: 0, unmountOnExit: true }}
         className={classes.accordionStyle}
       >
-        <StyledAccordionSummary
-          expandIcon={<ExpandMore />}
-          onClick={onSummaryClick}
-        >
+        <StyledAccordionSummary onClick={onSummaryClick}>
           <Box width='100%'>
             <Grid container alignItems='center' justify='space-between'>
               <Grid item>
@@ -143,13 +139,11 @@ const DiffView: React.FC<DiffViewProps> = ({
                 </Grid>
               </Grid>
               {allowEdit && (
-                <>
-                  <Grid item>
-                    <IconButton onClick={onScoreEdit as any}>
-                      <CancelIcon fontSize='small' />
-                    </IconButton>
-                  </Grid>
-                </>
+                <Grid item>
+                  <IconButton onClick={onScoreEdit as any}>
+                    <EditIcon />
+                  </IconButton>
+                </Grid>
               )}
             </Grid>
             <Grid container alignItems='center' spacing={2}>
