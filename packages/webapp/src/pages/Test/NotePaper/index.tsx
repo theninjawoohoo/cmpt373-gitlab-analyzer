@@ -7,12 +7,12 @@ import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { ApiResource } from '../../../api/base';
 import { Note } from '@ceres/types';
 import SmartDate from '../../../components/SmartDate';
-// import { useRepositoryContext } from '../../../contexts/RepositoryContext';
-// import { useGetMergeRequestByNoteId } from '../../../api/mergeRequests';
+import { useGetMergeRequestByNoteId } from '../../../api/mergeRequests';
+import { useGetIssueByNoteId } from '../../../api/issue';
+import { useRepositoryContext } from '../../../contexts/RepositoryContext';
 
 interface NoteProps {
   noteData: ApiResource<Note>;
-  Id?: string;
   isMergeRequestNote?: boolean;
 }
 
@@ -41,13 +41,18 @@ const extractNoteContent = (noteBody: string) => {
 };
 
 const NotePaper: React.FC<NoteProps> = (NoteProps) => {
-  // const { repositoryId } = useRepositoryContext();
-  //
-  // const { data: mergeRequest } = useGetMergeRequestByNoteId({
-  //   repository: repositoryId,
-  //   note_id: NoteProps.noteData.meta.id,
-  // });
+  const { repositoryId } = useRepositoryContext();
   const classes = useStyles();
+
+  const { data: mergeRequests } = useGetMergeRequestByNoteId({
+    repository: repositoryId,
+    note_id: NoteProps.noteData.meta.id,
+  });
+  const { data: issues } = useGetIssueByNoteId({
+    repository: repositoryId,
+    note_id: NoteProps.noteData.meta.id,
+  });
+
   return (
     <Paper elevation={3} className={classes.paper} key={NoteProps.noteData.id}>
       <Grid
@@ -65,12 +70,13 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
             On
             {NoteProps.isMergeRequestNote ? ' merge request ' : ' issue '}
             <Box fontWeight='fontWeightBold' display='inline'>
-              {NoteProps.isMergeRequestNote
-                ? NoteProps.noteData
-                    .noteable_iid /*mergeRequest?.results.map((mr) => {
-                    return mr.title;
-                  })*/
-                : NoteProps.noteData.noteable_id}
+              {NoteProps.noteData.noteable_type === 'MergeRequest'
+                ? mergeRequests?.results.map((mergeRequest) => {
+                    return mergeRequest.title;
+                  })
+                : issues?.results.map((issue) => {
+                    return issue.title;
+                  })}
             </Box>
           </Box>
         </Typography>
