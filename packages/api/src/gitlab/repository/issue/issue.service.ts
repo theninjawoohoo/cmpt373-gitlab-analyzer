@@ -53,12 +53,6 @@ export class IssueService extends BaseService<
     return this.serviceRepository.find({ where: { repository } });
   }
 
-  async findOne(id: string) {
-    return this.serviceRepository.findOne({
-      where: { id },
-    });
-  }
-
   async fetchForRepository(repository: Repository, token: string) {
     let issues: Issue[] = [];
     let page = 1;

@@ -1,26 +1,29 @@
 import { Note } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository as TypeORMNote } from 'typeorm';
+import { SelectQueryBuilder } from 'typeorm';
 import { Note as NoteEntity } from './note.entity';
 import { MergeRequest as MergeRequestEntity } from '../../merge-request/merge-request.entity';
 import { Issue as IssueEntity } from '../issue/issue.entity';
-import { paginate, withDefaults } from '../../../common/query-dto';
 import alwaysArray from '../../../common/alwaysArray';
 import { NoteQueryDto } from './note-query.dto';
+import { BaseService } from '../../../common/base.service';
+import { Repository as TypeORMRepository } from 'typeorm/repository/Repository';
 
 @Injectable()
-export class NoteService {
+export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
   constructor(
     private readonly httpService: HttpService,
     @InjectRepository(NoteEntity)
-    private readonly noteRepository: TypeORMNote<NoteEntity>,
-  ) {}
+    serviceRepository: TypeORMRepository<NoteEntity>,
+  ) {
+    super(serviceRepository, 'note');
+  }
 
-  async search(filters: NoteQueryDto) {
-    filters = withDefaults(filters);
-    const query = this.noteRepository.createQueryBuilder('note');
-
+  buildFilters(
+    query: SelectQueryBuilder<NoteEntity>,
+    filters: NoteQueryDto,
+  ): SelectQueryBuilder<NoteEntity> {
     if (filters.merge_request) {
       query.where('note.merge_request_id = :merge_request', {
         merge_request: filters.merge_request,
@@ -67,26 +70,23 @@ export class NoteService {
         },
       );
     }
-
-    query.orderBy("note.resource #>> '{created_at}'", 'DESC');
-    paginate(query, filters);
-    return query.getManyAndCount();
+    return query;
   }
 
-  async findOne(id: string) {
-    return this.noteRepository.findOne({
-      where: { id },
-    });
+  buildSort(
+    query: SelectQueryBuilder<NoteEntity>,
+  ): SelectQueryBuilder<NoteEntity> {
+    return query.orderBy("note.resource #>> '{created_at}'", 'DESC');
   }
 
   async findAllForMergeRequest(mergeRequest: MergeRequestEntity) {
-    return this.noteRepository.find({
+    return this.serviceRepository.find({
       where: { mergeRequest: mergeRequest },
     });
   }
 
   async findAllForIssue(issue: IssueEntity) {
-    return this.noteRepository.find({
+    return this.serviceRepository.find({
       where: { issue: issue },
     });
   }
@@ -137,7 +137,7 @@ export class NoteService {
         return this.createOrUpdateMergeRequestNote(mergeRequest, note);
       }),
     );
-    return this.noteRepository.save(entities);
+    return this.serviceRepository.save(entities);
   }
 
   async saveIssueNote(issue: IssueEntity, notes: Note[]) {
@@ -146,7 +146,7 @@ export class NoteService {
         return this.createOrUpdateIssueNote(issue, note);
       }),
     );
-    return this.noteRepository.save(entities);
+    return this.serviceRepository.save(entities);
   }
 
   private async createOrUpdateMergeRequestNote(
@@ -176,7 +176,7 @@ export class NoteService {
     mergeRequest: MergeRequestEntity,
     note: Note,
   ) {
-    return this.noteRepository
+    return this.serviceRepository
       .createQueryBuilder()
       .where('resource @> :resource', {
         resource: {
@@ -190,7 +190,7 @@ export class NoteService {
   }
 
   private queryNoteForIssue(issue: IssueEntity, note: Note) {
-    return this.noteRepository
+    return this.serviceRepository
       .createQueryBuilder()
       .where('resource @> :resource', {
         resource: {
@@ -207,14 +207,14 @@ export class NoteService {
     mergeRequest: MergeRequestEntity,
     note: Note,
   ) {
-    return this.noteRepository.create({
+    return this.serviceRepository.create({
       mergeRequest: mergeRequest,
       resource: note,
     });
   }
 
   private createNoteForIssue(issue: IssueEntity, note: Note) {
-    return this.noteRepository.create({
+    return this.serviceRepository.create({
       issue: issue,
       resource: note,
     });
