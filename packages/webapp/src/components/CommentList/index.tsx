@@ -48,7 +48,7 @@ enum TabOption {
   issueNotes = 'issue notes',
 }
 
-const Comment: React.FC = () => {
+const CommentList: React.FC = () => {
   const classes = useStyles();
 
   const { repositoryId } = useRepositoryContext();
@@ -117,4 +117,4 @@ const Comment: React.FC = () => {
   );
 };
 
-export default Comment;
+export default CommentList;

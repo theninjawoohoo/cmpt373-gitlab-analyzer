@@ -15,7 +15,7 @@ import { useAuthContext } from '../../contexts/AuthContext';
 import CommitsPage from '../../pages/Commits';
 import Members from '../../pages/Members';
 import RepositoryHomePage from '../../pages/RepositoryHomePage';
-import Test from '../../pages/Test';
+import CommentPage from '../../pages/Comment';
 
 export function Router() {
   const { user } = useAuthContext();
@@ -39,6 +39,9 @@ export function Router() {
         </Route>
         <Route path='/graph/:id' exact>
           <Graph />
+        </Route>
+        <Route path='/comment/:id' exact>
+          <CommentPage />
         </Route>
         <Route path='/settings' exact>
           <SettingsPage />
@@ -66,9 +69,6 @@ export function Router() {
         </Route>
         <Route path='/logout' exact>
           <Login />
-        </Route>
-        <Route path='/test' exact>
-          <Test />
         </Route>
       </Switch>
     </BrowserRouter>
