@@ -20,4 +20,8 @@ export class NoteQueryDto extends QueryDto {
   @IsOptional()
   @IsDateString()
   end_date?: string;
+
+  @IsOptional()
+  @IsUUID()
+  repository_id: string;
 }

@@ -37,7 +37,6 @@ export class MergeRequestService extends BaseService<
   ): SelectQueryBuilder<MergeRequestEntity> {
     const { repository } = filters;
     query.andWhere('merge_request.repository_id = :repository', { repository });
-
     if (filters.author_email) {
       query.andWhere(
         `
@@ -68,6 +67,14 @@ export class MergeRequestService extends BaseService<
         "(merge_request.resource #>> '{merged_at}') <= (:endDate)",
         {
           endDate: filters.merged_end_date,
+        },
+      );
+    }
+    if (filters.note_id) {
+      query.andWhere(
+        'merge_request.id in (select merge_request_id from note where id = :note_id)',
+        {
+          note_id: filters.note_id,
         },
       );
     }

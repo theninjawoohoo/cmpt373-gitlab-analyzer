@@ -19,3 +19,10 @@ export function useGetMergeRequestNotes(mergeRequestId: string) {
 export function useGetIssueNotes(issueId: string) {
   return useApiQuery<SearchResults<Note>>(`/note?issue=${issueId}`);
 }
+
+export function useGetNotesByRepository(repository_Id: string) {
+  return useApiQuery<SearchResults<Note>>(
+    `/note?repository_id=${repository_Id}`,
+    { pageSize: 5000 },
+  );
+}

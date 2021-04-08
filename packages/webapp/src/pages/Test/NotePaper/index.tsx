@@ -5,13 +5,14 @@ import Box from '@material-ui/core/Box';
 import { Paper } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { ApiResource } from '../../../api/base';
-import { Issue, MergeRequest, Note } from '@ceres/types';
+import { Note } from '@ceres/types';
 import SmartDate from '../../../components/SmartDate';
+import { useRepositoryContext } from '../../../contexts/RepositoryContext';
+import { useGetMergeRequestByNoteId } from '../../../api/mergeRequests';
 
 interface NoteProps {
   noteData: ApiResource<Note>;
-  mergeRequest?: MergeRequest;
-  issue?: Issue;
+  Id?: string;
   isMergeRequestNote?: boolean;
 }
 
@@ -40,6 +41,12 @@ const extractNoteContent = (noteBody: string) => {
 };
 
 const NotePaper: React.FC<NoteProps> = (NoteProps) => {
+  const { repositoryId } = useRepositoryContext();
+
+  const { data: mergeRequest } = useGetMergeRequestByNoteId({
+    repository: repositoryId,
+    note_id: NoteProps.noteData.meta.id,
+  });
   const classes = useStyles();
   return (
     <Paper elevation={3} className={classes.paper} key={NoteProps.noteData.id}>
@@ -59,8 +66,10 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
             {NoteProps.isMergeRequestNote ? ' merge request ' : ' issue '}
             <Box fontWeight='fontWeightBold' display='inline'>
               {NoteProps.isMergeRequestNote
-                ? NoteProps.mergeRequest.title
-                : NoteProps.issue.title}
+                ? mergeRequest?.results.map((mr) => {
+                    return mr.title;
+                  })
+                : NoteProps.noteData.noteable_id}
             </Box>
           </Box>
         </Typography>
