@@ -1,4 +1,3 @@
-import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
 import MuiAccordion from '@material-ui/core/Accordion';
@@ -36,14 +35,14 @@ const AccordionMenu: React.FC<AccordionMenuProps> = ({
   children,
 }) => {
   return (
-    <Container>
+    <div>
       <Accordion color={color}>
         <AccordionSummary color={color} expandIcon={<ExpandMoreIcon />}>
           <Typography variant='h3'>{title}</Typography>
         </AccordionSummary>
         <AccordionDetails>{children}</AccordionDetails>
       </Accordion>
-    </Container>
+    </div>
   );
 };
 

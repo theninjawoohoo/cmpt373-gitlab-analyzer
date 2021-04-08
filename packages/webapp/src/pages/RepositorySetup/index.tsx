@@ -154,40 +154,4 @@ const RepoSetupPage: React.FC = () => {
   );
 };
 
-// const RepoSetupPage: React.FC = () => {
-//   const { id } = useParams<{ id: string }>();
-
-//   return (
-//     <div>
-//       <DefaultPageLayout>
-//         <Container>
-//           <Grid container direction='column' spacing={2}>
-//             <Grid item>
-//               <DefaultPageTitleFormat>Repository Setup</DefaultPageTitleFormat>
-//             </Grid>
-//             <Grid item xs={12}>
-//               <LinkCard
-//                 color='#e4f5ba'
-//                 icon='members'
-//                 to={`/setup/${id}/members`}
-//               >
-//                 Members
-//               </LinkCard>
-//             </Grid>
-//             <Grid item xs={12}>
-//               <LinkCard
-//                 color='#ffd9cf'
-//                 icon='rubric'
-//                 to={`/setup/${id}/rubric`}
-//               >
-//                 Score Rubric
-//               </LinkCard>
-//             </Grid>
-//           </Grid>
-//         </Container>
-//       </DefaultPageLayout>
-//     </div>
-//   );
-// };
-
 export default RepoSetupPage;
