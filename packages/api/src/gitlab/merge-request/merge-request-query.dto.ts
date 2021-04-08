@@ -1,10 +1,4 @@
-import {
-  IsBoolean,
-  IsDateString,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { IsDateString, IsOptional, IsString, IsUUID } from 'class-validator';
 import { QueryDto } from '../../common/query-dto';
 
 export class MergeRequestQueryDto extends QueryDto {

@@ -85,6 +85,12 @@ export class NoteService {
     });
   }
 
+  async findAllForIssue(issue: IssueEntity) {
+    return this.noteRepository.find({
+      where: { issue: issue },
+    });
+  }
+
   async syncForMergeRequest(mergeRequest: MergeRequestEntity, token: string) {
     const note = await this.fetchForMergeRequest(mergeRequest, token);
     return this.saveMergeRequestNote(mergeRequest, note);

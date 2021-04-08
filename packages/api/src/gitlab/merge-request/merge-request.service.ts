@@ -37,6 +37,7 @@ export class MergeRequestService extends BaseService<
   ): SelectQueryBuilder<MergeRequestEntity> {
     const { repository } = filters;
     query.andWhere('merge_request.repository_id = :repository', { repository });
+
     if (filters.author_email) {
       query.andWhere(
         `

@@ -9,6 +9,9 @@ import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { useGetNotesByRepository } from '../../api/note';
 import NotePaper from './NotePaper';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
+import { useGetMergeRequestByNoteId } from '../../api/mergeRequests';
+import { useGetIssueByNoteId } from '../../api/issue';
+// import {useGetMergeRequestById} from "../../api/mergeRequests";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -68,6 +71,18 @@ const Comment: React.FC = () => {
   const handleTabs = (event: React.ChangeEvent<unknown>, newTab: any) => {
     setTab(newTab);
   };
+
+  const { data: mergeRequest } = useGetMergeRequestByNoteId({
+    repository: repositoryId,
+    note_id: '053212e3-9135-47fe-a5d2-be4155887aef',
+  });
+  console.log(mergeRequest?.results);
+
+  const { data: issue } = useGetIssueByNoteId({
+    repository: repositoryId,
+    note_id: '0c03b54e-ddc4-44be-bdf4-e3e89ffdb0cd',
+  });
+  console.log(issue?.results);
 
   return (
     <>

@@ -17,7 +17,9 @@ export function useGetMergeRequestNotes(mergeRequestId: string) {
 }
 
 export function useGetIssueNotes(issueId: string) {
-  return useApiQuery<SearchResults<Note>>(`/note?issue=${issueId}`);
+  return useApiQuery<SearchResults<Note>>(`/note?issue=${issueId}`, {
+    pageSize: 5000,
+  });
 }
 
 export function useGetNotesByRepository(repository_Id: string) {
