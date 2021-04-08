@@ -74,7 +74,7 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
                   <Box
                     height='5rem'
                     width='5rem'
-                    bgcolor={generateColor(repository.name, 50, 60)}
+                    bgcolor={generateColor(repository.name, 30, 60)}
                   />
                 </Grid>
                 <Grid item>
