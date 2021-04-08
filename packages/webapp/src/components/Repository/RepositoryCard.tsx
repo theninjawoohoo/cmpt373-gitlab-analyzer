@@ -34,7 +34,7 @@ const SyncButton = (props: { syncing: boolean; onClick: () => void }) => (
     )}
   </Box>
 );
-
+// https://medium.com/@pppped/compute-an-arbitrary-color-for-user-avatar-starting-from-his-username-with-javascript-cd0675943b66
 const generateColor = (
   repoName: string,
   saturation: number,
