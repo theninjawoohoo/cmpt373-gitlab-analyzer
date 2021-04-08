@@ -202,20 +202,17 @@ export class NoteService {
   async updateWordCount(filters: NoteQueryDto) {
     const [notes] = await this.search(filters);
     const updatedNotes = notes.map((note) => {
-      const wordCount = this.countWords(note.resource.body);
-      console.log(note.resource.body);
-      console.log(this.countWords(note.resource.body) + '\n\n');
+      const wordCount = NoteService.countWords(note.resource.body);
       note.resource = Extensions.updateExtensions(note.resource, {
         wordCount: wordCount,
       });
       note.wordCount = wordCount;
-      console.log(note);
       return note;
     });
     return this.noteRepository.save(updatedNotes);
   }
 
-  private countWords(noteBody: string) {
+  private static countWords(noteBody: string) {
     const content = noteBody.replace(/\*([^*]+)\*$/g, '');
     const words = content.trim().split(/\s+/);
     return words.length;
