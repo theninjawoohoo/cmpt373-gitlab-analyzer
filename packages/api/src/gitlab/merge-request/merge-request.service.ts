@@ -12,6 +12,7 @@ import { MergeRequestQueryDto } from './merge-request-query.dto';
 import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
 import { NoteService } from '../repository/note/note.service';
 import { BaseService } from 'src/common/base.service';
+import { groupBy, mapValues } from 'lodash';
 
 @Injectable()
 export class MergeRequestService extends BaseService<
@@ -305,22 +306,33 @@ export class MergeRequestService extends BaseService<
     );
     const commitScores = await Promise.all(
       commits.map(async (commit) => {
-        return this.diffService.calculateDiffScore(
+        const score = await this.diffService.calculateDiffScore(
           {
             commit: commit.id,
           },
           weights,
         );
+        return {
+          authorEmail: commit.resource.author_email,
+          ...score,
+        };
       }),
     );
-    const score = commitScores
-      .map(({ score }) => score)
-      .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-    const hasOverride = commitScores.some(({ hasOverride }) => hasOverride);
-    return {
-      score,
-      hasOverride,
-    };
+    // Group commits by author email, and then sum each group individually
+    const groupedScores = groupBy(
+      commitScores,
+      (commitScore) => commitScore.authorEmail,
+    );
+    return mapValues(groupedScores, (authorScore) => {
+      const sum = authorScore
+        .map(({ score }) => score)
+        .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+      const hasOverride = authorScore.some(({ hasOverride }) => hasOverride);
+      return {
+        sum,
+        hasOverride,
+      };
+    });
   }
 
   async storeScore(mergeRequest: MergeRequestEntity, weights?: GlobWeight[]) {
@@ -333,18 +345,16 @@ export class MergeRequestService extends BaseService<
       },
       weights,
     );
-    const {
-      score: commitScoreSum,
-      hasOverride: commitHasOverride,
-    } = await this.getSumScoreForMergeRequest(mergeRequest, weights);
+    const commitScoreSums = await this.getSumScoreForMergeRequest(
+      mergeRequest,
+      weights,
+    );
     mergeRequest.resource = Extensions.updateExtensions(mergeRequest.resource, {
       diffScore,
       diffHasOverride,
-      commitScoreSum,
-      commitHasOverride,
+      commitScoreSums,
     });
     mergeRequest.diffScore = diffScore;
-    mergeRequest.commitScoreSum = commitScoreSum;
     await this.serviceRepository.save(mergeRequest);
   }
 

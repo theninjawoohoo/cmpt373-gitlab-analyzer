@@ -26,42 +26,46 @@ const ScoringLayout: React.FC<ScoringLayoutProps> = ({
         <Grid container alignItems='center' justify='space-between'>
           <Grid item>
             <Grid container alignItems='center'>
-              {showBackButton && (
-                <Grid item>
-                  <IconButton onClick={() => push('/settings')}>
-                    <CancelIcon fontSize='large' />
-                  </IconButton>
-                </Grid>
-              )}
               <Grid item>
                 <DefaultPageTitleFormat>Scoring Config</DefaultPageTitleFormat>
               </Grid>
             </Grid>
           </Grid>
-          <Grid item>
-            {showCreateButton ? (
-              <Button
-                variant='contained'
-                color='primary'
-                size='large'
-                component={Link}
-                to='/settings/scoring/edit'
-              >
-                Create
-              </Button>
-            ) : (
-              <Button
-                variant='contained'
-                color='secondary'
-                component={Link}
-                to='/settings/scoring'
-              >
-                Cancel
-              </Button>
-            )}
-          </Grid>
+          {showBackButton && (
+            <Grid item>
+              <IconButton onClick={() => push('/settings')}>
+                <CancelIcon fontSize='large' />
+              </IconButton>
+            </Grid>
+          )}
         </Grid>
         {children}
+        <Grid container alignItems='center' justify='center'>
+          <Grid item>
+            <Grid container alignItems='center'>
+              {showCreateButton ? (
+                <Button
+                  variant='contained'
+                  color='primary'
+                  size='large'
+                  component={Link}
+                  to='/settings/scoring/edit'
+                >
+                  Create
+                </Button>
+              ) : (
+                <Button
+                  variant='contained'
+                  color='secondary'
+                  component={Link}
+                  to='/settings/scoring'
+                >
+                  Cancel
+                </Button>
+              )}
+            </Grid>
+          </Grid>
+        </Grid>
       </Container>
     </DefaultPageLayout>
   );

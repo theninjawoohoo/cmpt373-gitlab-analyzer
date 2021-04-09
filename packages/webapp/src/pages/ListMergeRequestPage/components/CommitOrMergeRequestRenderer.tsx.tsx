@@ -11,8 +11,9 @@ import React from 'react';
 import { ApiResource } from '../../../api/base';
 import ScoringChip from '../../../components/ScoringChip';
 import SmartDate from '../../../components/SmartDate';
+import { useFilterContext } from '../../../contexts/FilterContext';
 
-interface MergeRequestRendererProps {
+interface CommitOrMergeRequestRendererProps {
   mergeRequest?: ApiResource<MergeRequest>;
   commit?: ApiResource<Commit>;
   active?: boolean;
@@ -28,7 +29,25 @@ function shortenTitle(title: string, shrink?: boolean) {
   return title.substr(0, maxLength) + '...';
 }
 
-const CommitOrMergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
+function getSumAndHasOverride(
+  emails: string[],
+  commitScoreSums: MergeRequest['extensions']['commitScoreSums'],
+) {
+  let hasOverride = false;
+  let score = 0;
+  Object.keys(commitScoreSums).forEach((authorEmail) => {
+    if (emails.length === 0 || emails.includes(authorEmail)) {
+      hasOverride = commitScoreSums[authorEmail].hasOverride || hasOverride;
+      score += commitScoreSums[authorEmail].sum;
+    }
+  });
+  return {
+    hasOverride,
+    score,
+  };
+}
+
+const CommitOrMergeRequestRenderer: React.FC<CommitOrMergeRequestRendererProps> = ({
   active,
   mergeRequest,
   commit,
@@ -47,21 +66,24 @@ const CommitOrMergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
     ? mergeRequest?.extensions?.diffHasOverride
     : commit?.extensions?.diffHasOverride;
 
-  const commitHasOverride = mergeRequest
-    ? mergeRequest?.extensions?.diffHasOverride
-    : false;
-
-  const commitScoreSum = mergeRequest
-    ? mergeRequest?.extensions?.commitScoreSum.toFixed(1)
-    : commit?.extensions?.score.toFixed(1);
-
   const diffScoreSum = mergeRequest
     ? mergeRequest?.extensions?.diffScore.toFixed(1)
     : commit?.extensions?.score.toFixed(1);
 
   const accordionColor = mergeRequest ? '' : '#f7ebef';
+  const { emails } = useFilterContext();
+  const {
+    hasOverride: commitHasOverride,
+    score: commitScoreSum,
+  } = getSumAndHasOverride(
+    emails || [],
+    mergeRequest.extensions?.commitScoreSums || {},
+  );
   return (
-    <Accordion expanded={active} TransitionProps={{ timeout: 0 }}>
+    <Accordion
+      expanded={active}
+      TransitionProps={{ timeout: 0, unmountOnExit: true }}
+    >
       <AccordionSummary
         expandIcon={<ExpandMore />}
         onClick={onClickSummary}
@@ -97,7 +119,7 @@ const CommitOrMergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
               <Grid item xs={2}>
                 <Typography align='right'>
                   <ScoringChip hasOverride={commitHasOverride}>
-                    {commitScoreSum}
+                    {commitScoreSum?.toFixed(1)}
                   </ScoringChip>
                 </Typography>
               </Grid>
@@ -122,7 +144,7 @@ const CommitOrMergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
               <Grid item xs={1}>
                 <Typography align='right'>
                   <ScoringChip hasOverride={commitHasOverride}>
-                    {commitScoreSum}
+                    {commitScoreSum?.toFixed(1)}
                   </ScoringChip>
                 </Typography>
               </Grid>

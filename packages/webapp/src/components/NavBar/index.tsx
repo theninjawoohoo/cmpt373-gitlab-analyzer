@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
   },
 
   listCSS: {
-    width: '6rem',
+    width: '6.5rem',
     position: 'fixed',
     height: '100%',
     backgroundColor: '#0A4D63',
@@ -30,13 +30,15 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
 
   return (
     <>
-      <div style={{ width: '6rem' }} className={styles.root}>
+      <div style={{ width: '6.5rem' }} className={styles.root}>
         <List className={styles.listCSS}>
           <ItemBox icon='user' primary={UserNameProps.username} />
+          <ItemBox icon='repo' primary={'Repositories'} url={'/repository'} />
           <ItemBox
-            icon='repo'
-            primary={'Repository'}
-            url={repositoryId ? `/repository/${repositoryId}` : '/repository'}
+            icon='setup'
+            primary={'Repository Setup'}
+            url={`/setup/${repositoryId}`}
+            repositoryDependent
           />
           <ItemBox
             icon='merge'
@@ -56,13 +58,7 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
             url={`/graph/${repositoryId}`}
             repositoryDependent
           />
-          <ItemBox
-            icon='members'
-            primary={'Members'}
-            url={`/repository/${repositoryId}/members`}
-            repositoryDependent
-          />
-          <ItemBox icon='setting' primary={'Settings'} url='/settings' />
+          <ItemBox icon='setting' primary={'Global Settings'} url='/settings' />
           <ItemBox icon='operation' primary={'Operations'} url='/operations' />
           <ItemBox icon='logout' primary={'Logout'} url='/logout' />
         </List>

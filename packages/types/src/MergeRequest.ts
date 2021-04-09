@@ -83,9 +83,9 @@ interface MergeRequestExtensions {
   diffScore?: number;
   // indicates a diff in this merge request has an override
   diffHasOverride?: boolean;
-  commitScoreSum?: number;
-  // indicates a commit in this merge request has an override
-  commitHasOverride?: boolean;
+  commitScoreSums?: {
+    [email: string]: { sum: number, hasOverride?: boolean };
+  },
   override?: ScoreOverride;
 }
 
