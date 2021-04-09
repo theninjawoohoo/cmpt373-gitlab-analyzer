@@ -14,6 +14,6 @@ export class Note extends BaseEntity<NotesResource> {
   @JoinColumn({ name: 'issue_id' })
   issue: Issue;
 
-  @Column({ name: 'word_count', nullable: true, type: 'integer' })
+  // @Column({ name: 'word_count', nullable: true, type: 'integer' })
   wordCount: number;
 }
