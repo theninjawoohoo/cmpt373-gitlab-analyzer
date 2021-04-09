@@ -206,7 +206,6 @@ export class NoteService {
       note.resource = Extensions.updateExtensions(note.resource, {
         wordCount: wordCount,
       });
-      note.wordCount = wordCount;
       return note;
     });
     return this.noteRepository.save(updatedNotes);
