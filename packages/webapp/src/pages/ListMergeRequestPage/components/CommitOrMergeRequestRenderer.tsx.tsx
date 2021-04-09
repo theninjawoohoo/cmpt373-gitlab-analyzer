@@ -56,19 +56,17 @@ const CommitOrMergeRequestRenderer: React.FC<CommitOrMergeRequestRendererProps> 
   shrink,
 }) => {
   const theme = useTheme();
-  const title = mergeRequest ? mergeRequest?.title : commit?.title;
-  const author = mergeRequest
-    ? mergeRequest?.author.name
-    : commit?.committer_name;
+  const title = mergeRequest?.title || commit?.title;
+  const author = mergeRequest?.author.name || commit?.committer_name;
 
-  const date = mergeRequest ? mergeRequest?.merged_at : commit?.created_at;
-  const diffHasOverride = mergeRequest
-    ? mergeRequest?.extensions?.diffHasOverride
-    : commit?.extensions?.diffHasOverride;
+  const date = mergeRequest?.merged_at || commit?.created_at;
+  const diffHasOverride =
+    mergeRequest?.extensions?.diffHasOverride ||
+    commit?.extensions?.diffHasOverride;
 
-  const diffScoreSum = mergeRequest
-    ? mergeRequest?.extensions?.diffScore.toFixed(1)
-    : commit?.extensions?.score.toFixed(1);
+  const diffScoreSum =
+    mergeRequest?.extensions?.diffScore.toFixed(1) ||
+    commit?.extensions?.score.toFixed(1);
 
   const accordionColor = mergeRequest ? '' : '#f7ebef';
   const { emails } = useFilterContext();
@@ -77,7 +75,7 @@ const CommitOrMergeRequestRenderer: React.FC<CommitOrMergeRequestRendererProps> 
     score: commitScoreSum,
   } = getSumAndHasOverride(
     emails || [],
-    mergeRequest.extensions?.commitScoreSums || {},
+    mergeRequest?.extensions?.commitScoreSums || {},
   );
   return (
     <Accordion

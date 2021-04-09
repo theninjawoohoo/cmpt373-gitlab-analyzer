@@ -19,6 +19,7 @@ import { useFilterContext } from '../../contexts/FilterContext';
 import { ScoreOverrideQueueProvider } from './contexts/ScoreOverrideQueue';
 import ScoreOverrideQueueInfo from './components/ScoreOverrideQueueInfo';
 import { useInfiniteCommit } from '../../api/commit';
+import { DateTime } from 'luxon';
 
 const IndependentScrollGrid = styled(Grid)`
   height: 100vh;
@@ -134,16 +135,16 @@ const ListMergeRequestPage = () => {
 
   commitsAndMergeRequests.sort((a, b) => {
     if (a.meta.resourceType == 'MergeRequest') {
-      a = new Date(a.merged_at);
+      a = DateTime.fromISO(a.merged_at);
     } else {
-      a = new Date(a.committed_date);
+      a = DateTime.fromISO(a.committed_date);
     }
     if (b.meta.resourceType == 'MergeRequest') {
-      b = new Date(b.merged_at);
+      b = DateTime.fromISO(b.merged_at);
     } else {
-      b = new Date(b.committed_date);
+      b = DateTime.fromISO(b.committed_date);
     }
-    return b.getTime() - a.getTime();
+    return b - a;
   });
 
   const GridComponent = activeMergeRequest ? IndependentScrollGrid : Grid;
