@@ -70,14 +70,16 @@ export class DiffService {
   }
 
   async calculateDiffScore(filters: DiffQueryDto, weights: GlobWeight[] = []) {
-    filters.pageSize = 50000;
     const [diffs] = await this.search(filters);
     const updatedDiffs = diffs.map((diff) => {
       const summary = diff.resource?.summary;
       let score = 0;
       if (summary) {
         score = Object.keys(summary)
-          .map((lineType) => LINE_SCORING[lineType] * (summary[lineType] || 0))
+          .map(
+            (lineType) =>
+              (LINE_SCORING[lineType] || 0) * (summary[lineType] || 0),
+          )
           .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
       }
       const weight = this.getWeight(diff.resource.new_path, weights);

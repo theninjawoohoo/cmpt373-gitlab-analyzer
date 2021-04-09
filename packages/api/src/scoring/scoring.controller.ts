@@ -1,25 +1,20 @@
-import { StagedScoreOverride } from '@ceres/types';
 import { BadRequestException } from '@nestjs/common';
 import { Body, Controller, Post } from '@nestjs/common';
-import { DiffService } from 'src/gitlab/repository/diff/diff.service';
-import { RepositoryService } from 'src/gitlab/repository/repository.service';
-import { MergeRequestService } from '../gitlab/merge-request/merge-request.service';
-import { CommitService } from '../gitlab/repository/commit/commit.service';
+import { RepositoryService } from '../gitlab/repository/repository.service';
 import { ScoringConfig } from './scoring-config/scoring-config.entity';
 import { ScoringConfigService } from './scoring-config/scoring-config.service';
 import {
   UpdateScoreOverridesPayload,
   UpdateScoringPayload,
 } from './scoring.payloads';
+import { ScoringService } from './scoring.service';
 
 @Controller('scoring')
 export class ScoringController {
   constructor(
-    private readonly mergeRequestService: MergeRequestService,
-    private readonly commitService: CommitService,
     private readonly repositoryService: RepositoryService,
     private readonly scoringConfigService: ScoringConfigService,
-    private readonly diffService: DiffService,
+    private readonly scoringService: ScoringService,
   ) {}
 
   @Post()
@@ -33,21 +28,7 @@ export class ScoringController {
         config.scoringConfigId,
       );
     }
-    await Promise.all([
-      this.mergeRequestService.updateMergeRequestScoreByRepository(
-        config.repositoryId,
-        scoringConfig?.resource?.weights,
-      ),
-      this.commitService.updateCommitScoreByRepository(
-        config.repositoryId,
-        scoringConfig?.resource?.weights,
-      ),
-    ]);
-    await this.repositoryService.updateScoringConfig(repository, {
-      config: scoringConfig?.resource,
-      id: config.scoringConfigId,
-      lastRan: new Date().toISOString(),
-    });
+    await this.scoringService.updateRepositoryScores(repository, scoringConfig);
   }
 
   @Post('override')
@@ -58,14 +39,13 @@ export class ScoringController {
     if (!repository) {
       throw new BadRequestException('Invalid repository id');
     }
-    const diffOverrides = StagedScoreOverride.getDiffOverrides(
-      config.overrides,
+    await this.scoringService.updateOverrides(config.overrides);
+
+    // We need to rescore commits and diff once the overrides have changed.
+    const scoringConfig = await this.scoringConfigService.findOne(
+      repository?.resource?.extensions?.scoringConfig?.id,
     );
-    await Promise.all(
-      diffOverrides.map((override) => {
-        const { id } = StagedScoreOverride.parseEntityId(override.id);
-        this.diffService.updateOverride(id, override.override);
-      }),
-    );
+    await this.scoringService.updateOverrides(config.overrides);
+    await this.scoringService.updateRepositoryScores(repository, scoringConfig);
   }
 }
