@@ -16,13 +16,11 @@ const Accordion = styled(MuiAccordion)<{ color: string }>`
   border: 3px solid;
   border-color: ${(p) => p.color};
   border-radius: 5px;
-  }
 `;
 
 const AccordionSummary = styled(MuiAccordionSummary)<{ color: string }>`
   min-height: 4rem;
   background: ${(p) => p.color};
-  marginbottom: -1;
 `;
 
 const AccordionDetails = styled(MuiAccordionDetails)`
