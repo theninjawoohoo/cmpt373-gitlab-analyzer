@@ -7,10 +7,8 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDateTimePicker,
 } from '@material-ui/pickers';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
 import MemberDropdown from '../../components/MemberDropdown';
-import { Box } from '@material-ui/core';
+import { Box, Typography, Paper } from '@material-ui/core';
 import { DateTime } from 'luxon';
 
 const RepoFilter: React.FC = () => {
