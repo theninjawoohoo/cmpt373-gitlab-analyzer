@@ -24,19 +24,19 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
     query: SelectQueryBuilder<NoteEntity>,
     filters: NoteQueryDto,
   ): SelectQueryBuilder<NoteEntity> {
+    query.where("note.resource #>> '{system}' <> 'true'");
+
     if (filters.merge_request) {
-      query.where('note.merge_request_id = :merge_request', {
+      query.andWhere('note.merge_request_id = :merge_request', {
         merge_request: filters.merge_request,
       });
     }
 
     if (filters.issue) {
-      query.andWhere('note.issue_id = :issue', {
+      query.orWhere('note.issue_id = :issue', {
         issue: filters.issue,
       });
     }
-
-    query.andWhere("note.resource #>> '{system}' <> 'true'");
 
     if (filters.author_email) {
       query.andWhere("note.resource #>> '{author_email}' IN (:...author)", {
