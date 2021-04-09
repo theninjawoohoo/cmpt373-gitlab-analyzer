@@ -11,7 +11,7 @@ export class NoteQueryDto extends QueryDto {
   issue?: string;
 
   @IsOptional()
-  author_email: string;
+  author_email?: string;
 
   @IsOptional()
   @IsDateString()

@@ -13,7 +13,6 @@ interface NoteExtensions {
     wordCount?: number;
 }
 
-
 export interface Note extends WithExtensions<NoteExtensions> {
     id: number;
     body: string;

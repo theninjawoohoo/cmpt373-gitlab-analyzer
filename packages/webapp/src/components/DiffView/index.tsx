@@ -18,6 +18,7 @@ import ScoreOverrideForm from '../../pages/ListMergeRequestPage/components/Score
 import { useScoreOverrideQueue } from '../../pages/ListMergeRequestPage/contexts/ScoreOverrideQueue';
 import WarningIcon from '@material-ui/icons/Warning';
 import LineComparison from './components/LineComparison';
+import { makeStyles } from '@material-ui/core/styles';
 
 const StyledAccordionSummary = styled(AccordionSummary)`
   &.MuiAccordionSummary-root.Mui-focused {
@@ -97,12 +98,24 @@ const DiffView: React.FC<DiffViewProps> = ({
     extensions?.override,
     extensions?.score,
   );
+
+  const useStyles = makeStyles(() => ({
+    accordionStyle: {
+      backgroundColor: '#f8f8f8',
+    },
+  }));
+
   const isExcluded = extensions?.override?.exclude;
   const hasOverride = ScoreOverride.hasOverride(extensions?.override);
   const fileNameTextDecoration = isExcluded ? 'line-through' : '';
 
+  const classes = useStyles();
   return (
-    <Accordion expanded={expanded || false} TransitionProps={{ timeout: 0 }}>
+    <Accordion
+      expanded={expanded || false}
+      TransitionProps={{ timeout: 0 }}
+      className={classes.accordionStyle}
+    >
       <StyledAccordionSummary
         expandIcon={<ExpandMore />}
         onClick={onSummaryClick}

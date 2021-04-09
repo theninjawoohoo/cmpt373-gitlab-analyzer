@@ -1,4 +1,4 @@
-import { Note } from '@ceres/types';
+import { Extensions, Note } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SelectQueryBuilder } from 'typeorm';
@@ -137,7 +137,8 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
         return this.createOrUpdateMergeRequestNote(mergeRequest, note);
       }),
     );
-    return this.serviceRepository.save(entities);
+    await this.serviceRepository.save(entities);
+    await this.updateWordCount({ merge_request: mergeRequest.id });
   }
 
   async saveIssueNote(issue: IssueEntity, notes: Note[]) {
@@ -146,7 +147,8 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
         return this.createOrUpdateIssueNote(issue, note);
       }),
     );
-    return this.serviceRepository.save(entities);
+    await this.serviceRepository.save(entities);
+    await this.updateWordCount({ issue: issue.id });
   }
 
   private async createOrUpdateMergeRequestNote(
@@ -218,5 +220,23 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
       issue: issue,
       resource: note,
     });
+  }
+
+  async updateWordCount(filters: NoteQueryDto) {
+    const [notes] = await this.search(filters);
+    const updatedNotes = notes.map((note) => {
+      const wordCount = NoteService.countWords(note.resource.body);
+      note.resource = Extensions.updateExtensions(note.resource, {
+        wordCount: wordCount,
+      });
+      return note;
+    });
+    return this.noteRepository.save(updatedNotes);
+  }
+
+  private static countWords(noteBody: string) {
+    const content = noteBody.replace(/\*([^*]+)\*$/g, '');
+    const words = content.trim().split(/\s+/);
+    return words.length;
   }
 }
