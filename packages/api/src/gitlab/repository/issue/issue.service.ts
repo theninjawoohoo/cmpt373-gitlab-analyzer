@@ -63,17 +63,28 @@ export class IssueService {
     page: number,
     pageSize = 10,
   ): Promise<AxiosResponse<Issue[]>> {
-    return await this.httpService
-      .get<Issue[]>(`projects/${repo.resource.id}/issues`, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: pageSize,
-          page,
-        },
-      })
-      .toPromise();
+    let axiosResponse: AxiosResponse<Issue[]>;
+    let attemptsCount = 0;
+    while (!axiosResponse && attemptsCount < 5) {
+      try {
+        axiosResponse = await this.httpService
+          .get<Issue[]>(`projects/${repo.resource.id}/issues`, {
+            headers: {
+              'PRIVATE-TOKEN': token,
+            },
+            params: {
+              per_page: pageSize,
+              page,
+            },
+          })
+          .toPromise();
+      } catch {}
+      attemptsCount++;
+    }
+    if (!axiosResponse) {
+      throw new Error('Could not fetch issues from GitLab');
+    }
+    return axiosResponse;
   }
 
   private async createAndSaveIssues(repository: Repository, issues: Issue[]) {

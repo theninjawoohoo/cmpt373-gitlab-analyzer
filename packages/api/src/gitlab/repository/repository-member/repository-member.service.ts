@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository as TypeORMRepository } from 'typeorm';
 import { Repository } from '../repository.entity';
 import { RepositoryMember as RepositoryMemberEntity } from './repository-member.entity';
+import { AxiosResponse } from 'axios';
 
 @Injectable()
 export class RepositoryMemberService {
@@ -61,16 +62,26 @@ export class RepositoryMemberService {
 
   private async fetchForRepository(repository: Repository, token: string) {
     const url = `/projects/${repository.resource.id}/members/all`;
-    const axiosResponse = await this.httpService
-      .get<RepositoryMember[]>(url, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: 50,
-        },
-      })
-      .toPromise();
+    let axiosResponse: AxiosResponse<RepositoryMember[]>;
+    let attemptsCount = 0;
+    while (!axiosResponse && attemptsCount < 5) {
+      try {
+        axiosResponse = await this.httpService
+          .get<RepositoryMember[]>(url, {
+            headers: {
+              'PRIVATE-TOKEN': token,
+            },
+            params: {
+              per_page: 50,
+            },
+          })
+          .toPromise();
+      } catch {}
+      attemptsCount++;
+    }
+    if (!axiosResponse) {
+      throw new Error('Could not fetch repository-members from GitLab');
+    }
     return axiosResponse.data;
   }
 }

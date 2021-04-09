@@ -174,18 +174,29 @@ export class CommitService extends BaseService<
     page: number,
     pageSize = 10,
   ): Promise<AxiosResponse<Commit[]>> {
-    return await this.httpService
-      .get<Commit[]>(`projects/${repo.resource.id}/repository/commits`, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: pageSize,
-          page,
-          ref_name: 'master',
-        },
-      })
-      .toPromise();
+    let axiosResponse: AxiosResponse<Commit[]>;
+    let attemptsCount = 0;
+    while (!axiosResponse && attemptsCount < 5) {
+      try {
+        axiosResponse = await this.httpService
+          .get<Commit[]>(`projects/${repo.resource.id}/repository/commits`, {
+            headers: {
+              'PRIVATE-TOKEN': token,
+            },
+            params: {
+              per_page: pageSize,
+              page,
+              ref_name: 'master',
+            },
+          })
+          .toPromise();
+      } catch {}
+      attemptsCount++;
+    }
+    if (!axiosResponse) {
+      throw new Error('Could not fetch commits from GitLab');
+    }
+    return axiosResponse;
   }
 
   private async createIfNotExists(repository: Repository, commits: Commit[]) {

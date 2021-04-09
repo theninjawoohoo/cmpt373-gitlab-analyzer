@@ -18,6 +18,7 @@ import {
 import { parsePatch } from 'diff';
 import DiffInterpreter from './helpers/DiffInterpreter';
 import { isMatch } from 'picomatch';
+import { AxiosResponse } from 'axios';
 
 type GitlabDiff = Omit<Diff, 'hunks' | 'lines'>;
 
@@ -163,17 +164,27 @@ export class DiffService {
     page: number,
   ) {
     const url = `/projects/${commit.repository.resource.id}/repository/commits/${commit.resource.id}/diff`;
-    const axiosResponse = await this.httpService
-      .get<GitlabDiff[]>(url, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: 5,
-          page,
-        },
-      })
-      .toPromise();
+    let axiosResponse: AxiosResponse<GitlabDiff[]>;
+    let attemptsCount = 0;
+    while (!axiosResponse && attemptsCount < 5) {
+      try {
+        axiosResponse = await this.httpService
+          .get<GitlabDiff[]>(url, {
+            headers: {
+              'PRIVATE-TOKEN': token,
+            },
+            params: {
+              per_page: 5,
+              page,
+            },
+          })
+          .toPromise();
+      } catch {}
+      attemptsCount++;
+    }
+    if (!axiosResponse) {
+      throw new Error('Could not fetch diffs from GitLab');
+    }
     return axiosResponse.data;
   }
 

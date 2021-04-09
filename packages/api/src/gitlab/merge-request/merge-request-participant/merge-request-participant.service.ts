@@ -4,6 +4,7 @@ import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository as TypeORMRepository } from 'typeorm';
 import { MergeRequestParticipant as MergeRequestParticipantEntity } from './merge-request-participant.entity';
+import { AxiosResponse } from 'axios';
 
 @Injectable()
 export class MergeRequestParticipantService {
@@ -62,16 +63,26 @@ export class MergeRequestParticipantService {
     token: string,
   ) {
     const url = `/projects/${mergeRequest.resource.project_id}/merge_requests/${mergeRequest.resource.iid}/participants`;
-    const axiosResponse = await this.httpService
-      .get<MergeRequestParticipant[]>(url, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: 50,
-        },
-      })
-      .toPromise();
+    let axiosResponse: AxiosResponse<MergeRequestParticipant[]>;
+    let attemptsCount = 0;
+    while (!axiosResponse && attemptsCount < 5) {
+      try {
+        axiosResponse = await this.httpService
+          .get<MergeRequestParticipant[]>(url, {
+            headers: {
+              'PRIVATE-TOKEN': token,
+            },
+            params: {
+              per_page: 50,
+            },
+          })
+          .toPromise();
+      } catch {}
+      attemptsCount++;
+    }
+    if (!axiosResponse) {
+      throw new Error('Could not fetch merge-request-participants from GitLab');
+    }
     return axiosResponse.data;
   }
 }

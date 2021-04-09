@@ -13,6 +13,7 @@ import {
 import { User } from '../../user/entities/user.entity';
 import { RepositoryQueryDto } from './repository-query.dto';
 import { BaseService } from 'src/common/base.service';
+import { AxiosResponse } from 'axios';
 
 @Injectable()
 export class RepositoryService extends BaseService<
@@ -180,18 +181,28 @@ export class RepositoryService extends BaseService<
     token: string,
     page: number,
   ): Promise<Repository[]> {
-    const axiosResponse = await this.httpService
-      .get<Repository[]>('/projects', {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          membership: true,
-          per_page: 10,
-          page,
-        },
-      })
-      .toPromise();
+    let axiosResponse: AxiosResponse<Repository[]>;
+    let attemptsCount = 0;
+    while (!axiosResponse && attemptsCount < 5) {
+      try {
+        axiosResponse = await this.httpService
+          .get<Repository[]>('/projects', {
+            headers: {
+              'PRIVATE-TOKEN': token,
+            },
+            params: {
+              membership: true,
+              per_page: 10,
+              page,
+            },
+          })
+          .toPromise();
+      } catch {}
+      attemptsCount++;
+    }
+    if (!axiosResponse) {
+      throw new Error('Could not fetch repositories from GitLab');
+    }
     return axiosResponse.data;
   }
 }

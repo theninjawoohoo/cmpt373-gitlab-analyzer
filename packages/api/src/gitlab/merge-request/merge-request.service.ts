@@ -260,16 +260,26 @@ export class MergeRequestService extends BaseService<
     repository: Repository,
     mergeRequest: MergeRequest,
   ) {
-    const axiosResponse = await this.httpService
-      .get<Commit[]>(
-        `projects/${repository.resource.id}/merge_requests/${mergeRequest.iid}/commits`,
-        {
-          headers: {
-            'PRIVATE-TOKEN': token,
-          },
-        },
-      )
-      .toPromise();
+    let axiosResponse: AxiosResponse<Commit[]>;
+    let attemptsCount = 0;
+    while (!axiosResponse && attemptsCount < 5) {
+      try {
+        axiosResponse = await this.httpService
+          .get<Commit[]>(
+            `projects/${repository.resource.id}/merge_requests/${mergeRequest.iid}/commits`,
+            {
+              headers: {
+                'PRIVATE-TOKEN': token,
+              },
+            },
+          )
+          .toPromise();
+      } catch {}
+      attemptsCount++;
+    }
+    if (!axiosResponse) {
+      throw new Error('Could not fetch merge-request-commits from GitLab');
+    }
     return axiosResponse.data;
   }
 
@@ -279,19 +289,30 @@ export class MergeRequestService extends BaseService<
     page: number,
     pageSize = 10,
   ): Promise<AxiosResponse<MergeRequest[]>> {
-    return await this.httpService
-      .get<MergeRequest[]>(`projects/${repo.resource.id}/merge_requests`, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          state: 'merged',
-          target_branch: 'master',
-          per_page: pageSize,
-          page,
-        },
-      })
-      .toPromise();
+    let axiosResponse: AxiosResponse<MergeRequest[]>;
+    let attemptsCount = 0;
+    while (!axiosResponse && attemptsCount < 5) {
+      try {
+        axiosResponse = await this.httpService
+          .get<MergeRequest[]>(`projects/${repo.resource.id}/merge_requests`, {
+            headers: {
+              'PRIVATE-TOKEN': token,
+            },
+            params: {
+              state: 'merged',
+              target_branch: 'master',
+              per_page: pageSize,
+              page,
+            },
+          })
+          .toPromise();
+      } catch {}
+      attemptsCount++;
+    }
+    if (!axiosResponse) {
+      throw new Error('Could not fetch merge-requests from GitLab');
+    }
+    return axiosResponse;
   }
 
   public async getSumScoreForMergeRequest(
