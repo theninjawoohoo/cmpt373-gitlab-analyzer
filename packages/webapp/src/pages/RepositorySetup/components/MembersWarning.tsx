@@ -1,9 +1,7 @@
 import { Commit } from '@ceres/types';
 import Alert from '@material-ui/lab/Alert';
-import AlertTitle from '@material-ui/lab/AlertTitle';
 import React from 'react';
 import { useRepositoryAuthors } from '../../../api/author';
-import { Link } from 'react-router-dom';
 
 interface MembersWarningProps {
   repositoryId: string;
@@ -21,10 +19,8 @@ const MembersWarning: React.FC<MembersWarningProps> = ({ repositoryId }) => {
   }
   return (
     <Alert severity='warning'>
-      <AlertTitle>Warning</AlertTitle>
       There are <strong>{orphanCount}</strong> commit authors that are not
-      linked to a repository member. You can link members{' '}
-      <Link to={`/repository/${repositoryId}/members`}>here</Link>.
+      linked to a repository member.
     </Alert>
   );
 };

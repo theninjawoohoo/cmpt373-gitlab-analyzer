@@ -51,100 +51,102 @@ const Form: React.FC<FormProps> = ({ defaultValues, onSubmit }) => {
   });
 
   return (
-    <form
-      autoComplete='off'
-      spellCheck={false}
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <Box my={2}>
-        <TextField
-          fullWidth
-          name='name'
-          label='Name'
-          inputRef={register}
-          variant='outlined'
-          error={!!errors?.name}
-          helperText={errors?.name?.message}
-        />
-      </Box>
-      <Typography variant='h2'>Filetype Scaling</Typography>
-      {fields.map((field, index) => (
-        <div key={field.id}>
-          <Box my={1} p={1}>
-            <Grid container spacing={1}>
-              <Grid item xs={7}>
-                <TextField
-                  label='Glob'
-                  name={`weights[${index}].glob`}
-                  variant='outlined'
-                  inputRef={register()}
-                  error={!!errors?.weights?.[index]?.glob}
-                  helperText={errors?.weights?.[index]?.glob?.message}
-                  defaultValue={field?.glob}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={2}>
-                <TextField
-                  label='Weight'
-                  name={`weights[${index}].weight`}
-                  variant='outlined'
-                  inputRef={register()}
-                  error={!!errors?.weights?.[index]?.weight}
-                  helperText={errors?.weights?.[index]?.weight?.message}
-                  defaultValue={field?.weight}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={3}>
-                <Grid justify='flex-end' alignItems='center' container>
-                  {index !== 0 && (
-                    <IconButton onClick={() => swap(index - 1, index)}>
-                      <ArrowUpwardIcon />
+    <Box marginY={2}>
+      <form
+        autoComplete='off'
+        spellCheck={false}
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <Box my={2}>
+          <TextField
+            fullWidth
+            name='name'
+            label='Name'
+            inputRef={register}
+            variant='outlined'
+            error={!!errors?.name}
+            helperText={errors?.name?.message}
+          />
+        </Box>
+        <Typography variant='h2'>Filetype Scaling</Typography>
+        {fields.map((field, index) => (
+          <div key={field.id}>
+            <Box my={1} p={1}>
+              <Grid container spacing={1}>
+                <Grid item xs={7}>
+                  <TextField
+                    label='Glob'
+                    name={`weights[${index}].glob`}
+                    variant='outlined'
+                    inputRef={register()}
+                    error={!!errors?.weights?.[index]?.glob}
+                    helperText={errors?.weights?.[index]?.glob?.message}
+                    defaultValue={field?.glob}
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={2}>
+                  <TextField
+                    label='Weight'
+                    name={`weights[${index}].weight`}
+                    variant='outlined'
+                    inputRef={register()}
+                    error={!!errors?.weights?.[index]?.weight}
+                    helperText={errors?.weights?.[index]?.weight?.message}
+                    defaultValue={field?.weight}
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={3}>
+                  <Grid justify='flex-end' alignItems='center' container>
+                    {index !== 0 && (
+                      <IconButton onClick={() => swap(index - 1, index)}>
+                        <ArrowUpwardIcon />
+                      </IconButton>
+                    )}
+                    {index !== fields.length - 1 && (
+                      <IconButton onClick={() => swap(index, index + 1)}>
+                        <ArrowDownwardIcon />
+                      </IconButton>
+                    )}
+                    <IconButton onClick={() => remove(index)}>
+                      <DeleteIcon />
                     </IconButton>
-                  )}
-                  {index !== fields.length - 1 && (
-                    <IconButton onClick={() => swap(index, index + 1)}>
-                      <ArrowDownwardIcon />
-                    </IconButton>
-                  )}
-                  <IconButton onClick={() => remove(index)}>
-                    <DeleteIcon />
-                  </IconButton>
+                  </Grid>
                 </Grid>
               </Grid>
-            </Grid>
-          </Box>
-          {index !== fields.length - 1 && (
-            <Box position='relative' py={2}>
-              <Divider variant='middle' />
-              <Box position='absolute' top={-5} left='50%'>
-                <IconButton onClick={() => insert(index + 1, {})}>
-                  <AddCircleIcon />
-                </IconButton>
-              </Box>
             </Box>
-          )}
-        </div>
-      ))}
-      <Grid container justify='center' alignItems='center'>
-        <Box mr={2}>
-          <Button
-            type='button'
-            variant='contained'
-            color='secondary'
-            onClick={() => {
-              append({});
-            }}
-          >
-            Add
+            {index !== fields.length - 1 && (
+              <Box position='relative' py={2}>
+                <Divider variant='middle' />
+                <Box position='absolute' top={-5} left='50%'>
+                  <IconButton onClick={() => insert(index + 1, {})}>
+                    <AddCircleIcon />
+                  </IconButton>
+                </Box>
+              </Box>
+            )}
+          </div>
+        ))}
+        <Grid container justify='center' alignItems='center'>
+          <Box mr={2}>
+            <Button
+              type='button'
+              variant='outlined'
+              color='primary'
+              onClick={() => {
+                append({});
+              }}
+            >
+              Add
+            </Button>
+          </Box>
+          <Button type='submit' variant='contained' color='primary'>
+            Submit
           </Button>
-        </Box>
-        <Button type='submit' variant='contained' color='primary'>
-          Submit
-        </Button>
-      </Grid>
-    </form>
+        </Grid>
+      </form>
+    </Box>
   );
 };
 

@@ -17,6 +17,7 @@ const Root = styled(UndecoratedLink)<{ color: string }>`
   min-height: 8rem;
   display: flex;
   background: ${(p) => p.color};
+  border-radius: 5px;
 `;
 
 const LinkCard: React.FC<LinkCardProps> = ({ to, color, icon, children }) => {

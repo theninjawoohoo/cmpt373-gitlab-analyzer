@@ -1,7 +1,4 @@
 import { Repository } from '@ceres/types';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
@@ -14,7 +11,6 @@ import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import React, { useState } from 'react';
 import {
   AddCollaboratorPayload,
@@ -144,32 +140,23 @@ const Collaborators: React.FC<CollaboratorsProps> = ({
 }) => {
   const collaborators = repository?.extensions?.collaborators || [];
   return (
-    <Accordion>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography>
-          Sharing · {collaborators.length} Collaborator(s)
-        </Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Grid container>
-          <Grid item xs={6}>
-            {collaborators.length > 0 ? (
-              <CollaboratorList
-                collaborators={collaborators}
-                onRemoveCollaborator={onRemoveCollaborator}
-              />
-            ) : (
-              <NoCollaborators />
-            )}
-          </Grid>
-          <Grid item xs={6}>
-            <Container maxWidth='xs'>
-              <AddCollaboratorForm handleAdd={onAddCollaborator} />
-            </Container>
-          </Grid>
-        </Grid>
-      </AccordionDetails>
-    </Accordion>
+    <Grid container>
+      <Grid item xs={6}>
+        {collaborators.length > 0 ? (
+          <CollaboratorList
+            collaborators={collaborators}
+            onRemoveCollaborator={onRemoveCollaborator}
+          />
+        ) : (
+          <NoCollaborators />
+        )}
+      </Grid>
+      <Grid item xs={6}>
+        <Container maxWidth='xs'>
+          <AddCollaboratorForm handleAdd={onAddCollaborator} />
+        </Container>
+      </Grid>
+    </Grid>
   );
 };
 
