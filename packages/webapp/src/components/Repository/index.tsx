@@ -23,7 +23,7 @@ import {
 } from '@material-ui/core';
 import { TextField } from '@material-ui/core';
 import Tab from '@material-ui/core/Tab/Tab';
-
+import { useInterval } from '../../util/useInterval';
 function hasPendingSync(operations: Operation[], id: string) {
   return (
     operations.filter((operation) => operation.input.repository_id === id)
@@ -47,7 +47,7 @@ const RepositoryList: React.FC = () => {
   const [sort, setSort] = useState('-project_created');
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState(TabOption.all);
-  const { data } = useRepository({
+  const { data: data, invalidate: invalidateData } = useRepository({
     sort,
     name: search,
     role: tabToRoleMappings[tab],
@@ -67,10 +67,11 @@ const RepositoryList: React.FC = () => {
     status: [Operation.Status.PROCESSING, Operation.Status.PENDING],
     type: [Operation.Type.FETCH_REPOSITORIES],
   });
+
   const { sync } = useSyncRepository();
   const { fetch } = useFetchRepositories();
   const isFetchingRepositories = pendingFetches?.total > 0;
-
+  const isSyncingRepositories = operationsData?.total > 0;
   const syncRepository = (id: string) => {
     sync(id, {
       onSuccess: () => {
@@ -85,7 +86,20 @@ const RepositoryList: React.FC = () => {
       },
     });
   };
-
+  useInterval(
+    () => {
+      void invalidatePendingFetches();
+      void invalidateData();
+    },
+    isFetchingRepositories ? 1000 * 4 : null,
+  );
+  useInterval(
+    () => {
+      void invalidateOperations();
+      void invalidateData();
+    },
+    isSyncingRepositories ? 1000 * 5 : null,
+  );
   const message =
     data?.results.length == 0 ? (
       <h3>You have no repositories on your profile</h3>
@@ -95,7 +109,7 @@ const RepositoryList: React.FC = () => {
     <Container>
       <Grid container justify='space-between' alignItems='center'>
         <Grid item>
-          <DefaultPageTitleFormat>Projects</DefaultPageTitleFormat>
+          <DefaultPageTitleFormat>Repositories</DefaultPageTitleFormat>
         </Grid>
         <Grid item>
           <Box position='relative'>

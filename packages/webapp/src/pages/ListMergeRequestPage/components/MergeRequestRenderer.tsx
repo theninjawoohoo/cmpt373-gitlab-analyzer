@@ -9,7 +9,9 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import React from 'react';
 import { ApiResource } from '../../../api/base';
+import ScoringChip from '../../../components/ScoringChip';
 import SmartDate from '../../../components/SmartDate';
+import { useFilterContext } from '../../../contexts/FilterContext';
 
 interface MergeRequestRendererProps {
   mergeRequest: ApiResource<MergeRequest>;
@@ -26,6 +28,24 @@ function shortenTitle(title: string, shrink?: boolean) {
   return title.substr(0, maxLength) + '...';
 }
 
+function getSumAndHasOverride(
+  emails: string[],
+  commitScoreSums: MergeRequest['extensions']['commitScoreSums'],
+) {
+  let hasOverride = false;
+  let score = 0;
+  Object.keys(commitScoreSums).forEach((authorEmail) => {
+    if (emails.length === 0 || emails.includes(authorEmail)) {
+      hasOverride = commitScoreSums[authorEmail].hasOverride || hasOverride;
+      score += commitScoreSums[authorEmail].sum;
+    }
+  });
+  return {
+    hasOverride,
+    score,
+  };
+}
+
 const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
   active,
   mergeRequest,
@@ -34,8 +54,19 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
   shrink,
 }) => {
   const theme = useTheme();
+  const { emails } = useFilterContext();
+  const {
+    hasOverride: commitHasOverride,
+    score: commitScoreSum,
+  } = getSumAndHasOverride(
+    emails || [],
+    mergeRequest.extensions?.commitScoreSums || {},
+  );
   return (
-    <Accordion expanded={active} TransitionProps={{ timeout: 0 }}>
+    <Accordion
+      expanded={active}
+      TransitionProps={{ timeout: 0, unmountOnExit: true }}
+    >
       <AccordionSummary
         expandIcon={<ExpandMore />}
         onClick={onClickSummary}
@@ -61,12 +92,18 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
             <>
               <Grid item xs={2}>
                 <Typography align='right'>
-                  {mergeRequest.extensions?.diffScore?.toFixed(1)}
+                  <ScoringChip
+                    hasOverride={mergeRequest?.extensions?.diffHasOverride}
+                  >
+                    {mergeRequest.extensions?.diffScore?.toFixed(1)}
+                  </ScoringChip>
                 </Typography>
               </Grid>
               <Grid item xs={2}>
                 <Typography align='right'>
-                  {mergeRequest.extensions?.commitScoreSum?.toFixed(1)}
+                  <ScoringChip hasOverride={commitHasOverride}>
+                    {commitScoreSum?.toFixed(1)}
+                  </ScoringChip>
                 </Typography>
               </Grid>
             </>
@@ -80,19 +117,21 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
                   <SmartDate>{mergeRequest.merged_at}</SmartDate>
                 </Typography>
               </Grid>
-              <Grid item xs={2}>
-                <Grid container>
-                  <Grid item xs={6}>
-                    <Typography>
-                      {mergeRequest.extensions?.diffScore?.toFixed(1)}
-                    </Typography>
-                  </Grid>
-                  <Grid item>
-                    <Typography>
-                      {mergeRequest.extensions?.commitScoreSum?.toFixed(1)}
-                    </Typography>
-                  </Grid>
-                </Grid>
+              <Grid item xs={1}>
+                <Typography align='right'>
+                  <ScoringChip
+                    hasOverride={mergeRequest?.extensions?.diffHasOverride}
+                  >
+                    {mergeRequest.extensions?.diffScore?.toFixed(1)}
+                  </ScoringChip>
+                </Typography>
+              </Grid>
+              <Grid item xs={1}>
+                <Typography align='right'>
+                  <ScoringChip hasOverride={commitHasOverride}>
+                    {commitScoreSum?.toFixed(1)}
+                  </ScoringChip>
+                </Typography>
               </Grid>
             </>
           )}

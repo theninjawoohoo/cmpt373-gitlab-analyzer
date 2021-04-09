@@ -2,10 +2,11 @@ import React from 'react';
 import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import { Diff } from '@ceres/types';
-import { Chip } from '@material-ui/core';
+import { Diff, Line } from '@ceres/types';
+import ScoringChip from '../../ScoringChip';
 
 interface ScorePopperProps {
+  hasOverride?: boolean;
   scoreCount: string;
   scoreSummary?: Diff['summary'];
 }
@@ -23,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ScorePopover: React.FC<ScorePopperProps> = ({
+  hasOverride,
   scoreCount,
   scoreSummary,
 }) => {
@@ -47,7 +49,9 @@ const ScorePopover: React.FC<ScorePopperProps> = ({
         onMouseEnter={handlePopoverOpen}
         onMouseLeave={handlePopoverClose}
       >
-        <Chip size='small' label={scoreCount || 0} />
+        <ScoringChip size='small' hasOverride={hasOverride}>
+          {scoreCount || 0}
+        </ScoringChip>
       </Typography>
       <Popover
         id='mouse-over-popover'
@@ -92,7 +96,7 @@ const ScorePopover: React.FC<ScorePopperProps> = ({
         <div className={classes.summaryFlex}>
           <Typography display='inline'>syntax: </Typography>
           <Typography display='inline'>
-            {scoreSummary.syntax.toFixed(1) || 0}
+            {scoreSummary?.[Line.Type.syntaxChange]?.toFixed(1) || 0}
           </Typography>
         </div>
       </Popover>

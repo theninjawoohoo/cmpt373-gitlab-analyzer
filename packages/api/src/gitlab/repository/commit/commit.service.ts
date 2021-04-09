@@ -82,13 +82,6 @@ export class CommitService extends BaseService<
     return query;
   }
 
-  async updateLastSync(commit: CommitEntity, timestamp = new Date()) {
-    commit.resource = Extensions.updateExtensions(commit.resource, {
-      lastSync: timestamp.toISOString(),
-    });
-    return this.serviceRepository.save(commit);
-  }
-
   async findAllForRepository(repository: Repository) {
     return this.serviceRepository.find({
       where: { repository: repository },
@@ -232,13 +225,19 @@ export class CommitService extends BaseService<
   }
 
   async storeScore(commit: CommitEntity, weights?: GlobWeight[]) {
-    const score = await this.diffService.calculateDiffScore(
+    const {
+      score,
+      hasOverride: diffHasOverride,
+    } = await this.diffService.calculateDiffScore(
       {
         commit: commit.id,
       },
       weights,
     );
-    commit.resource = Extensions.updateExtensions(commit.resource, { score });
+    commit.resource = Extensions.updateExtensions(commit.resource, {
+      score,
+      diffHasOverride,
+    });
     commit.score = score;
     await this.serviceRepository.save(commit);
   }

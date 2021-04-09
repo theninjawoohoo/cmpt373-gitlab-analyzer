@@ -23,7 +23,7 @@ const IndependentScrollGrid = styled(Grid)`
   height: 100vh;
   position: fixed;
   margin-left: 5rem;
-  padding-right: 6rem;
+  padding-right: 8rem;
   & > * {
     height: 100vh;
     overflow: hidden;
@@ -70,8 +70,11 @@ const RegularTableHeaders: React.FC = () => {
         <Grid item xs={2}>
           <Typography>Date</Typography>
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={1}>
           <Typography>Score</Typography>
+        </Grid>
+        <Grid item xs={1}>
+          <Typography>Σ Commits</Typography>
         </Grid>
       </Grid>
     </Box>
