@@ -25,7 +25,7 @@ const SettingsPage: React.FC = () => {
               </LinkCard>
             </Grid>
             <Grid item xs={12}>
-              <LinkCard color='#B2F34D' icon='calendar' to='/settings/calendar'>
+              <LinkCard color='#B2F34D' icon='calendar' to='/settings/group'>
                 Iteration Config
               </LinkCard>
             </Grid>

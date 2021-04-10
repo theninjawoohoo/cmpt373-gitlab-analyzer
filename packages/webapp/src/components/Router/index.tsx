@@ -52,7 +52,7 @@ export function Router() {
         <Route path='/settings/scoring' exact>
           <BrowseScoringConfigsPage />
         </Route>
-        <Route path='/settings/calendar' exact>
+        <Route path='/settings/group' exact>
           <BrowseGroupConfigPage />
         </Route>
         <Route path='/merge/:id' exact>

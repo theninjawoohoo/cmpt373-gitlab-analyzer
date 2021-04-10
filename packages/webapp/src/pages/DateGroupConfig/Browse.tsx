@@ -11,7 +11,6 @@ import GroupLayout from './components/GroupLayout';
 
 const BrowseGroupConfigPage: React.FC = () => {
   const { data } = useSearchGroupConfigs();
-  console.log(data);
   return (
     <GroupLayout showCreateButton showBackButton>
       <Box mx={2}>
@@ -30,7 +29,7 @@ const BrowseGroupConfigPage: React.FC = () => {
             key={groupConfig.meta.id}
             button
             component={Link}
-            to={`/settings/calendar/edit?id=${groupConfig.meta.id}`}
+            to={`/settings/group/edit?id=${groupConfig.meta.id}`}
           >
             <Grid item xs={6}>
               <Typography>{groupConfig.name}</Typography>
