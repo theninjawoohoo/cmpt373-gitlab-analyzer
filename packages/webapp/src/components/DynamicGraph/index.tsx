@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import { useGetCommits } from '../../api/commit';
-import { DateTime } from 'luxon';
 import DefaultPageTitleFormat from '../DefaultPageTitleFormat';
 import { useFilterContext } from '../../contexts/FilterContext';
 import DynamicBarChart from './BarChartComponent';
@@ -11,113 +9,77 @@ import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import RepoFilter from '../../components/RepositoryFilter';
+import { useGetCountMergeRequests } from '../../api/mergeRequests';
+import { useGetCountCommits } from '../../api/commit';
+import { Commit, MergeRequest } from '@ceres/types';
+import { uniq } from 'lodash';
+import { DateTime } from 'luxon';
+import { isSameDay } from 'date-fns';
 
-const getCodeData = (
-  date: DateTime,
-  commits: any[],
-  merges: any[],
-  commit_index: number,
-) => {
-  let commitCount = 0;
-  let mergeCount = 0;
-  let c_index = commit_index;
-  for (let i = c_index; i < commits.length; i++) {
-    const result = commits[i];
-    if (DateTime.fromISO(result.authored_date).hasSame(date, 'day')) {
-      commitCount += 1;
-    } else {
-      c_index = i;
-      break;
-    }
+function combineData(
+  startDate: string,
+  endDate: string,
+  commitCounts: Commit.DailyCount[] = [],
+  mergeRequestCounts: MergeRequest.DailyCount[] = [],
+) {
+  const allDates = uniq([
+    ...commitCounts.map((count) => count.date),
+    ...mergeRequestCounts.map((count) => count.date),
+  ]).sort((a, b) => a.localeCompare(b));
+  const startDateRounded = DateTime.fromISO(startDate)
+    .startOf('day')
+    .toJSDate();
+  const earliestDateDatset = new Date(allDates[0]);
+  const endDateRounded = DateTime.fromISO(endDate).startOf('day').toJSDate();
+  let date =
+    startDateRounded < earliestDateDatset
+      ? startDateRounded
+      : earliestDateDatset;
+  const dates: Date[] = [];
+  while (date <= endDateRounded) {
+    dates.push(date);
+    date = DateTime.fromISO(date.toISOString()).plus({ days: 1 }).toJSDate();
   }
-  for (const result of merges) {
-    if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
-      mergeCount += result.count;
-    }
-  }
-  return {
-    date: date.toLocaleString(DateTime.DATE_SHORT),
-    commitCount,
-    mergeCount,
-    c_index,
-  };
-};
-
-const getScoreData = (date: DateTime, scores: any[]) => {
-  let score = 0;
-  for (const result of scores) {
-    if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
-      score += result.total_score;
-    }
-  }
-  return {
-    date: date.toLocaleString(DateTime.DATE_SHORT),
-    score,
-  };
-};
-
-const getCommentData = (date: DateTime, wordCounts: any[]) => {
-  let wordCount = 0;
-  for (const result of wordCounts) {
-    if (DateTime.fromISO(result.date).hasSame(date, 'day')) {
-      wordCount += result.count;
-    }
-  }
-  return {
-    date: date.toLocaleString(DateTime.DATE_SHORT),
-    wordCount,
-  };
-};
+  return dates.map((date) => ({
+    date: date.toISOString(),
+    commitCount:
+      commitCounts.find((count) => isSameDay(date, new Date(count.date)))
+        ?.count || 0,
+    commitScore:
+      commitCounts.find((count) => isSameDay(date, new Date(count.date)))
+        ?.score || 0,
+    mergeRequestCount:
+      -mergeRequestCounts.find((count) => isSameDay(date, new Date(count.date)))
+        ?.count || 0,
+    mergeRequestScore:
+      -mergeRequestCounts.find((count) => isSameDay(date, new Date(count.date)))
+        ?.score || 0,
+  }));
+}
 
 const DynamicGraph: React.FC = () => {
   const { startDate, endDate, emails } = useFilterContext();
   const { repositoryId } = useRepositoryContext();
-  const { data: commits } = useGetCommits(
-    {
-      repository: repositoryId,
-      author_email: emails,
-      start_date: startDate,
-      end_date: endDate,
-      sort: '+authored_date',
-    },
-    0,
-    9000,
-  );
+  const { data: commitCounts } = useGetCountCommits({
+    repository: repositoryId,
+    author_email: emails,
+    start_date: startDate,
+    end_date: endDate,
+    sort: '+authored_date',
+  });
+  const { data: mergeRequestCounts } = useGetCountMergeRequests({
+    repository: repositoryId,
+    author_email: emails,
+    merged_start_date: startDate,
+    merged_end_date: endDate,
+  });
   const [graphType, setGraphType] = useState(0);
-  const [graphData, setGraphData] = useState([]);
-
-  useEffect(() => {
-    if (startDate && endDate) {
-      let date = DateTime.fromISO(startDate);
-      let commit_index = 0;
-      const countsByDay = [];
-      if (graphType == 0) {
-        do {
-          const codeData = getCodeData(
-            date,
-            commits?.results || [],
-            [],
-            commit_index,
-          );
-          const { date: day, commitCount, mergeCount } = codeData;
-          commit_index = codeData.c_index;
-          countsByDay.push({ date: day, commitCount, mergeCount });
-          date = date.plus({ days: 1 });
-        } while (date <= DateTime.fromISO(endDate));
-      } else if (graphType == 1) {
-        do {
-          countsByDay.push(getScoreData(date, commits?.results || []));
-          date = date.plus({ days: 1 });
-        } while (date <= DateTime.fromISO(endDate));
-      } else {
-        do {
-          countsByDay.push(getCommentData(date, []));
-          date = date.plus({ days: 1 });
-        } while (date <= DateTime.fromISO(endDate));
-      }
-      setGraphData(countsByDay);
-    }
-  }, [graphType, commits?.results, /* merges?.results, */ startDate, endDate]);
+  const graphData = combineData(
+    startDate,
+    endDate,
+    commitCounts || [],
+    mergeRequestCounts || [],
+  );
 
   const handleTabs = (event: React.ChangeEvent<unknown>, newType: number) => {
     setGraphType(newType);

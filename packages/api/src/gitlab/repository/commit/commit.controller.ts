@@ -26,6 +26,11 @@ export class CommitController {
     return paginatedToResponse(this.commitService.search(query));
   }
 
+  @Get('count')
+  dailyCounts(@Query() query: CommitQueryDto) {
+    return this.commitService.buildDailyCounts(query);
+  }
+
   @Post('score/repository/:id')
   async syncCommitScoreByRepository(@Param() { id }: IdParam) {
     return this.commitService.updateCommitScoreByRepository(id);
