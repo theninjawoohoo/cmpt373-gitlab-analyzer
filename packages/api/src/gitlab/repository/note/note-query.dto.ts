@@ -15,11 +15,11 @@ export class NoteQueryDto extends QueryDto {
 
   @IsOptional()
   @IsDateString()
-  start_date?: string;
+  created_start_date?: string;
 
   @IsOptional()
   @IsDateString()
-  end_date?: string;
+  created_end_date?: string;
 
   @IsOptional()
   @IsUUID()

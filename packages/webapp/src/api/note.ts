@@ -1,12 +1,12 @@
-import { SearchResults, useApiQuery } from './base';
+import { SearchResults, useApiQuery, usePaginatedQuery } from './base';
 import { Note } from '@ceres/types';
 
-// interface NoteSearchParams {
-//   repository: string;
-//   author_email?: string[];
-//   start_date?: string;
-//   end_date?: string;
-// }
+interface NoteSearchParams {
+  repository_id?: string;
+  author_email?: string[];
+  created_start_date?: string;
+  created_end_date?: string;
+}
 
 export function useGetMergeRequestNotes(mergeRequestId: string) {
   return useApiQuery<SearchResults<Note>>(
@@ -21,9 +21,10 @@ export function useGetIssueNotes(issueId: string) {
   });
 }
 
-export function useGetNotesByRepository(repository_id: string) {
-  return useApiQuery<SearchResults<Note>>(
-    `/note?repository_id=${repository_id}`,
-    { pageSize: 5000 },
-  );
+export function useGetNotesByRepository(
+  params: NoteSearchParams,
+  page?: number,
+  pageSize?: number,
+) {
+  return usePaginatedQuery<Note>('/note', params, page, pageSize);
 }

@@ -44,15 +44,15 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
       });
     }
 
-    if (filters.start_date) {
+    if (filters.created_start_date) {
       query.andWhere("(note.resource #>> '{created_at}') >= (:startDate)", {
-        startDate: filters.start_date,
+        startDate: filters.created_start_date,
       });
     }
 
-    if (filters.end_date) {
+    if (filters.created_end_date) {
       query.andWhere("(note.resource #>> '{created_at}') <= (:endDate)", {
-        endDate: filters.end_date,
+        endDate: filters.created_end_date,
       });
     }
 

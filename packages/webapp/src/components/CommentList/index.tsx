@@ -9,7 +9,7 @@ import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { useGetNotesByRepository } from '../../api/note';
 import NotePaper from './NotePaper';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
-// import { useFilterContext } from '../../contexts/FilterContext';
+import { useFilterContext } from '../../contexts/FilterContext';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -52,9 +52,20 @@ enum TabOption {
 const CommentList: React.FC = () => {
   const classes = useStyles();
 
-  // const { startDate, endDate /*emails*/ } = useFilterContext();
+  const { startDate, endDate /*emails*/ } = useFilterContext();
+  console.log(startDate);
+  console.log(endDate);
   const { repositoryId } = useRepositoryContext();
-  const { data: allNotes } = useGetNotesByRepository(repositoryId);
+  const { data: allNotes } = useGetNotesByRepository(
+    {
+      repository_id: repositoryId,
+      created_start_date: startDate.toString(),
+      created_end_date: endDate.toString(),
+    },
+    0,
+    9000,
+  );
+  console.log(allNotes?.results || []);
   const mergeRequestNotes = allNotes?.results.filter(
     (comment) => comment.noteable_type == 'MergeRequest',
   );
