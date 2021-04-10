@@ -23,5 +23,5 @@ export class NoteQueryDto extends QueryDto {
 
   @IsOptional()
   @IsUUID()
-  repository_id: string;
+  repository_id?: string;
 }

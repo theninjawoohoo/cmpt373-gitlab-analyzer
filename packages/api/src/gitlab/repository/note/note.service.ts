@@ -231,7 +231,7 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
       });
       return note;
     });
-    return this.noteRepository.save(updatedNotes);
+    return this.serviceRepository.save(updatedNotes);
   }
 
   private static countWords(noteBody: string) {
