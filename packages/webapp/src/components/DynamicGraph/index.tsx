@@ -12,7 +12,10 @@ import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import RepoFilter from '../../components/RepositoryFilter';
-import { MergeRequest } from '@ceres/types';
+import { MergeRequest /*, RepositoryMember*/ } from '@ceres/types';
+// import { useGetNotesByRepository } from '../../api/note';
+// import { ApiResource } from '../../api/base';
+// import { useRepositoryMembers } from '../../api/repo_members';
 
 const getCodeData = (
   date: DateTime,
@@ -94,8 +97,19 @@ const getCommentData = (date: DateTime, wordCounts: any[]) => {
   };
 };
 
+// function findRepoNameForMember(
+//   filtered_id: string,
+//   members: ApiResource<RepositoryMember>[],
+// ) {
+//   const filtered = (members || []).filter(
+//     (member) => member.meta.id === filtered_id,
+//   );
+//   console.log(filtered);
+//   return filtered.map((member) => member.name);
+// }
+
 const DynamicGraph: React.FC = () => {
-  const { startDate, endDate, emails } = useFilterContext();
+  const { startDate, endDate, emails /*, author*/ } = useFilterContext();
   const { repositoryId } = useRepositoryContext();
   const { data: commits } = useGetCommits(
     {
@@ -114,6 +128,18 @@ const DynamicGraph: React.FC = () => {
     merged_start_date: startDate,
     merged_end_date: endDate,
   });
+  // const { data: members } = useRepositoryMembers(repositoryId);
+  // const names = findRepoNameForMember(author, members);
+  // const { data: notes } = useGetNotesByRepository(
+  //   {
+  //     repository_id: repositoryId,
+  //     created_start_date: startDate,
+  //     created_end_date: endDate,
+  //     author_names: names,
+  //   },
+  //   0,
+  //   9000,
+  // );
 
   const [graphType, setGraphType] = useState(0); // 0 = code, 1 = score, 2 = comments
   const [graphData, setGraphData] = useState([]);
