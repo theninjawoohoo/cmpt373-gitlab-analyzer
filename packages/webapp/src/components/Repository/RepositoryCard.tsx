@@ -51,7 +51,7 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
     <Box my={3} position='relative'>
       <UndecoratedLink
         onClick={handleClick}
-        to={hasBeenSynced ? `/repository/${repository.meta.id}` : undefined}
+        to={hasBeenSynced ? `/setup/${repository.meta.id}` : undefined}
       >
         <Box component={Paper} p={3} bgcolor='#F3FCFF'>
           <Grid container justify='space-between' alignItems='center'>

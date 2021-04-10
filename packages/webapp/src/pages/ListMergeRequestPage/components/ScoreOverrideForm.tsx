@@ -26,7 +26,7 @@ const ScoreOverrideForm: React.FC<ScoreOverrideFormProps> = ({
   onSubmit,
   defaultValues,
 }) => {
-  const { handleSubmit, register } = useForm<ScoreOverride>({
+  const { handleSubmit, register, reset } = useForm<ScoreOverride>({
     defaultValues,
   });
   return (
@@ -74,7 +74,11 @@ const ScoreOverrideForm: React.FC<ScoreOverrideFormProps> = ({
                 </Grid>
                 <Grid item>
                   <Grid container justify='space-between'>
-                    <Button variant='contained' color='secondary'>
+                    <Button
+                      variant='contained'
+                      color='secondary'
+                      onClick={() => reset({})}
+                    >
                       Reset
                     </Button>
                     <Button variant='contained' color='primary' type='submit'>

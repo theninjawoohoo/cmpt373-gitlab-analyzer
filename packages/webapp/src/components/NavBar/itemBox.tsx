@@ -21,7 +21,7 @@ const useStyles = makeStyles(() => ({
   buttonStyle: {
     color: 'white',
     display: 'flex',
-    width: '6rem',
+    width: '6.5rem',
     alignItems: 'center',
     flexDirection: 'column',
     textAlign: 'center',
