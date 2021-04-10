@@ -6,15 +6,18 @@ import { Repository } from '../repository.entity';
 import { Issue } from '@ceres/types';
 import { AxiosResponse } from 'axios';
 import { NoteService } from '../note/note.service';
+import { Fetch } from '../../../common/fetchWithRetry';
 
 @Injectable()
-export class IssueService {
+export class IssueService extends Fetch {
   constructor(
-    private readonly httpService: HttpService,
+    readonly httpService: HttpService,
     @InjectRepository(IssueEntity)
     private readonly repository: TypeORMRepository<IssueEntity>,
     private readonly noteService: NoteService,
-  ) {}
+  ) {
+    super(httpService);
+  }
 
   async findAllForRepository(repository: Repository) {
     return this.repository.find({ where: { repository } });
@@ -63,17 +66,9 @@ export class IssueService {
     page: number,
     pageSize = 10,
   ): Promise<AxiosResponse<Issue[]>> {
-    return await this.httpService
-      .get<Issue[]>(`projects/${repo.resource.id}/issues`, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: pageSize,
-          page,
-        },
-      })
-      .toPromise();
+    const url = `projects/${repo.resource.id}/issues`;
+    const params = { per_page: pageSize, page: page };
+    return await this.fetchWithRetries<Issue>(token, url, params, 5);
   }
 
   private async createAndSaveIssues(repository: Repository, issues: Issue[]) {

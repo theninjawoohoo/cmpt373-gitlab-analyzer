@@ -4,14 +4,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository as TypeORMRepository } from 'typeorm';
 import { Repository } from '../repository.entity';
 import { RepositoryMember as RepositoryMemberEntity } from './repository-member.entity';
+import { Fetch } from '../../../common/fetchWithRetry';
 
 @Injectable()
-export class RepositoryMemberService {
+export class RepositoryMemberService extends Fetch {
   constructor(
-    private readonly httpService: HttpService,
+    readonly httpService: HttpService,
     @InjectRepository(RepositoryMemberEntity)
     private readonly memberRepository: TypeORMRepository<RepositoryMemberEntity>,
-  ) {}
+  ) {
+    super(httpService);
+  }
 
   async syncForRepository(repository: Repository, token: string) {
     const members = await this.fetchForRepository(repository, token);
@@ -61,16 +64,13 @@ export class RepositoryMemberService {
 
   private async fetchForRepository(repository: Repository, token: string) {
     const url = `/projects/${repository.resource.id}/members/all`;
-    const axiosResponse = await this.httpService
-      .get<RepositoryMember[]>(url, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: 50,
-        },
-      })
-      .toPromise();
+    const params = { per_page: 50 };
+    const axiosResponse = await this.fetchWithRetries<RepositoryMember>(
+      token,
+      url,
+      params,
+      5,
+    );
     return axiosResponse.data;
   }
 }

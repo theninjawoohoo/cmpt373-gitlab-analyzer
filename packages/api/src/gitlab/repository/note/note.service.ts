@@ -8,14 +8,17 @@ import { Issue as IssueEntity } from '../issue/issue.entity';
 import { paginate, withDefaults } from '../../../common/query-dto';
 import alwaysArray from '../../../common/alwaysArray';
 import { NoteQueryDto } from './note-query.dto';
+import { Fetch } from '../../../common/fetchWithRetry';
 
 @Injectable()
-export class NoteService {
+export class NoteService extends Fetch {
   constructor(
-    private readonly httpService: HttpService,
+    readonly httpService: HttpService,
     @InjectRepository(NoteEntity)
     private readonly noteRepository: TypeORMNote<NoteEntity>,
-  ) {}
+  ) {
+    super(httpService);
+  }
 
   async search(filters: NoteQueryDto) {
     filters = withDefaults(filters);
@@ -80,31 +83,25 @@ export class NoteService {
 
   async fetchForMergeRequest(mergeRequest: MergeRequestEntity, token: string) {
     const url = `/projects/${mergeRequest.resource.project_id}/merge_requests/${mergeRequest.resource.iid}/notes`;
-    const axiosResponse = await this.httpService
-      .get<Note[]>(url, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: 50,
-        },
-      })
-      .toPromise();
+    const params = { per_page: 50 };
+    const axiosResponse = await this.fetchWithRetries<Note>(
+      token,
+      url,
+      params,
+      5,
+    );
     return axiosResponse.data;
   }
 
   async fetchForIssue(issue: IssueEntity, token: string) {
     const url = `/projects/${issue.resource.project_id}/issues/${issue.resource.iid}/notes`;
-    const axiosResponse = await this.httpService
-      .get<Note[]>(url, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: 50,
-        },
-      })
-      .toPromise();
+    const params = { per_page: 50 };
+    const axiosResponse = await this.fetchWithRetries<Note>(
+      token,
+      url,
+      params,
+      5,
+    );
     return axiosResponse.data;
   }
 
