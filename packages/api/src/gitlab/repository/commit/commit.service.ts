@@ -17,12 +17,12 @@ export class CommitService extends BaseService<
   CommitQueryDto
 > {
   constructor(
-    private readonly httpService: HttpService,
     @InjectRepository(CommitEntity)
     serviceRepository: TypeORMCommit<CommitEntity>,
     private readonly diffService: DiffService,
+    readonly httpService: HttpService,
   ) {
-    super(serviceRepository, 'commit');
+    super(serviceRepository, 'commit', httpService);
   }
 
   buildFilters(
@@ -186,18 +186,9 @@ export class CommitService extends BaseService<
     page: number,
     pageSize = 10,
   ): Promise<AxiosResponse<Commit[]>> {
-    return await this.httpService
-      .get<Commit[]>(`projects/${repo.resource.id}/repository/commits`, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: pageSize,
-          page,
-          ref_name: 'master',
-        },
-      })
-      .toPromise();
+    const url = `projects/${repo.resource.id}/repository/commits`;
+    const params = { page: page, per_page: pageSize, target_branch: 'master' };
+    return await this.fetchWithRetries<Commit>(token, url, params);
   }
 
   private async createIfNotExists(repository: Repository, commits: Commit[]) {

@@ -20,6 +20,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Typography,
 } from '@material-ui/core';
 import { TextField } from '@material-ui/core';
 import Tab from '@material-ui/core/Tab/Tab';
@@ -102,7 +103,7 @@ const RepositoryList: React.FC = () => {
   );
   const message =
     data?.results.length == 0 ? (
-      <h3>You have no repositories on your profile</h3>
+      <Typography>No repositories found.</Typography>
     ) : null;
 
   return (
