@@ -11,8 +11,8 @@ import NotePaper from './NotePaper';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import { useFilterContext } from '../../contexts/FilterContext';
 import { ApiResource } from '../../api/base';
-import { Commit } from '@ceres/types';
-import { useRepositoryAuthors } from '../../api/author';
+import { RepositoryMember } from '@ceres/types';
+import { useRepositoryMembers } from '../../api/repo_members';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -52,14 +52,15 @@ enum TabOption {
   issueNotes = 'issue notes',
 }
 
-function findNamesForMember(
+function findRepoNameForMember(
   filtered_id: string,
-  authors: ApiResource<Commit.Author>[],
+  members: ApiResource<RepositoryMember>[],
 ) {
-  const filtered = (authors || []).filter(
-    (author) => author.repository_member_id === filtered_id,
+  const filtered = (members || []).filter(
+    (member) => member.meta.id === filtered_id,
   );
-  return filtered.map((author) => author.author_name);
+  console.log(filtered);
+  return filtered.map((member) => member.name);
 }
 
 const CommentList: React.FC = () => {
@@ -70,9 +71,9 @@ const CommentList: React.FC = () => {
   console.log(startDate);
   console.log(endDate);
   const { repositoryId } = useRepositoryContext();
-  const { data: authors } = useRepositoryAuthors(repositoryId);
+  const { data: authors } = useRepositoryMembers(repositoryId);
   console.log(authors);
-  const names = findNamesForMember(author, authors);
+  const names = findRepoNameForMember(author, authors);
   console.log(names);
   const { data: allNotes } = useGetNotesByRepository(
     {

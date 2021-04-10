@@ -34,6 +34,8 @@ function compareCommitAuthors(a: Commit.Author, b: Commit.Author) {
 const Members: React.FC<MembersProps> = ({ id }) => {
   const { data: members } = useRepositoryMembers(id);
   const { data: authors } = useRepositoryAuthors(id);
+  console.log(members);
+  console.log(authors);
 
   return (
     <Container maxWidth='sm'>
