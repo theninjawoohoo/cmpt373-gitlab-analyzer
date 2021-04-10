@@ -1,4 +1,9 @@
-import { useApiQuery, SearchResults, usePaginatedQuery } from './base';
+import {
+  useApiQuery,
+  SearchResults,
+  usePaginatedQuery,
+  useApiInfiniteQuery,
+} from './base';
 import { Commit } from '@ceres/types';
 
 export function useCommitsForMergeRequest(mergeRequestId: string) {
@@ -14,6 +19,7 @@ interface CommitSearchParams {
   start_date?: string;
   end_date?: string;
   sort?: string;
+  not_associated_with_any_mr?: boolean;
 }
 
 export function useGetCountCommits(params: CommitSearchParams) {
@@ -26,4 +32,8 @@ export function useGetCommits(
   pageSize?: number,
 ) {
   return usePaginatedQuery<Commit>(`/commit`, params, page, pageSize);
+}
+
+export function useInfiniteCommit(params: CommitSearchParams, pageSize = 15) {
+  return useApiInfiniteQuery<Commit>('/commit', params, pageSize);
 }

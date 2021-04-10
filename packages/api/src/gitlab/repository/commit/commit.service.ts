@@ -67,6 +67,15 @@ export class CommitService extends BaseService<
         endDate: filters.end_date,
       });
     }
+
+    if (filters.not_associated_with_any_mr && filters.repository) {
+      query.andWhere(`commit.repository_id = :repository_id`, {
+        repository_id: filters.repository,
+      });
+      query.andWhere(
+        `commit.id NOT IN (SELECT "commitId" FROM merge_request_commits_commit)`,
+      );
+    }
     return query;
   }
 
