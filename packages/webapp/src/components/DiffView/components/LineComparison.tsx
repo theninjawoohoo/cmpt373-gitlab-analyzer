@@ -11,8 +11,9 @@ const LINE_COLOR_MAP = {
   [Line.Type.noChange]: 'black',
   [Line.Type.syntaxChange]: 'blue',
   [Line.Type.spaceChange]: 'blue',
-  [Line.Type.comment]: 'grey',
-  [Line.Type.syntaxLine]: 'grey',
+  [Line.Type.comment]: '#bebebe',
+  [Line.Type.syntaxLine]: '#bebebe',
+  [Line.Type.blank]: '#bebebe',
 };
 
 const TwoColumnGrid = styled.div`
