@@ -2,19 +2,21 @@ import { DeepPartial, Repository, SelectQueryBuilder } from 'typeorm';
 import alwaysArray from './alwaysArray';
 import { BaseEntity } from './base-entity';
 import { paginate, QueryDto, withDefaults } from './query-dto';
-import { AxiosResponse } from 'axios';
 import { HttpService } from '@nestjs/common';
+import { Fetch } from './fetchWithRetry';
 
 export abstract class BaseService<
   TResource,
   TEntity extends BaseEntity<TResource>,
   TFilters extends QueryDto
-> {
+> extends Fetch {
   protected constructor(
     protected readonly serviceRepository: Repository<TEntity>,
     protected readonly tableName: string,
     readonly httpService: HttpService,
-  ) {}
+  ) {
+    super(httpService);
+  }
 
   search(filters: TFilters, isPaginated = true) {
     filters = withDefaults(filters);
@@ -65,32 +67,5 @@ export abstract class BaseService<
       sortKey,
       order: firstChar === '+' ? 'ASC' : 'DESC',
     };
-  }
-
-  async fetchWithRetries<T>(
-    token: string,
-    url: string,
-    params: any,
-    maxRetries = 5,
-  ): Promise<AxiosResponse<T[]>> {
-    let data: AxiosResponse<T[]>;
-    let attemptsCount = 0;
-    while (!data && attemptsCount < maxRetries) {
-      try {
-        data = await this.httpService
-          .get<T[]>(url, {
-            headers: {
-              'PRIVATE-TOKEN': token,
-            },
-            params: params,
-          })
-          .toPromise();
-      } catch {}
-      attemptsCount++;
-    }
-    if (!data) {
-      throw new Error('Could not fetch resources from GitLab');
-    }
-    return data;
   }
 }
