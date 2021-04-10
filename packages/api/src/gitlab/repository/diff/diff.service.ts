@@ -18,16 +18,19 @@ import {
 import { parsePatch } from 'diff';
 import DiffInterpreter from './helpers/DiffInterpreter';
 import { isMatch } from 'picomatch';
+import { Fetch } from '../../../common/fetchWithRetry';
 
 type GitlabDiff = Omit<Diff, 'hunks' | 'lines'>;
 
 @Injectable()
-export class DiffService {
+export class DiffService extends Fetch {
   constructor(
-    private readonly httpService: HttpService,
+    readonly httpService: HttpService,
     @InjectRepository(DiffEntity)
     private readonly diffRepository: TypeORMRepository<DiffEntity>,
-  ) {}
+  ) {
+    super(httpService);
+  }
 
   search(filters: DiffQueryDto) {
     filters = withDefaults(filters);
@@ -147,13 +150,12 @@ export class DiffService {
     token: string,
   ) {
     const url = `/projects/${mergeRequest.repository.resource.id}/merge_requests/${mergeRequest.resource.iid}/changes`;
-    const axiosResponse = await this.httpService
-      .get(url, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-      })
-      .toPromise();
+    const axiosResponse = await this.fetchWithRetries_noType(
+      token,
+      url,
+      undefined,
+      5,
+    );
     return axiosResponse.data.changes as GitlabDiff[];
   }
 
@@ -163,17 +165,13 @@ export class DiffService {
     page: number,
   ) {
     const url = `/projects/${commit.repository.resource.id}/repository/commits/${commit.resource.id}/diff`;
-    const axiosResponse = await this.httpService
-      .get<GitlabDiff[]>(url, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: 5,
-          page,
-        },
-      })
-      .toPromise();
+    const params = { per_page: 5, page: page };
+    const axiosResponse = await this.fetchWithRetries<GitlabDiff>(
+      token,
+      url,
+      params,
+      5,
+    );
     return axiosResponse.data;
   }
 
