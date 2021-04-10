@@ -1,4 +1,4 @@
-import { Note } from '@ceres/types';
+import { Extensions, Note } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository as TypeORMNote } from 'typeorm';
@@ -22,13 +22,13 @@ export class NoteService {
     const query = this.noteRepository.createQueryBuilder('note');
 
     if (filters.merge_request) {
-      query.where('merge_request.id = :merge_request', {
+      query.where('note.merge_request_id = :merge_request', {
         merge_request: filters.merge_request,
       });
     }
 
     if (filters.issue) {
-      query.andWhere('issue.id = :issue', {
+      query.andWhere('note.issue_id = :issue', {
         issue: filters.issue,
       });
     }
@@ -39,7 +39,19 @@ export class NoteService {
       });
     }
 
-    query.orderBy("note.resource #>> '{authored_date}'", 'DESC');
+    if (filters.start_date) {
+      query.andWhere("(note.resource #>> '{created_at}') >= (:startDate)", {
+        startDate: filters.start_date,
+      });
+    }
+
+    if (filters.end_date) {
+      query.andWhere("(note.resource #>> '{created_at}') <= (:endDate)", {
+        endDate: filters.end_date,
+      });
+    }
+
+    query.orderBy("note.resource #>> '{created_at}'", 'DESC');
     paginate(query, filters);
     return query.getManyAndCount();
   }
@@ -102,7 +114,8 @@ export class NoteService {
         return this.createOrUpdateMergeRequestNote(mergeRequest, note);
       }),
     );
-    return this.noteRepository.save(entities);
+    await this.noteRepository.save(entities);
+    await this.updateWordCount({ merge_request: mergeRequest.id });
   }
 
   async saveIssueNote(issue: IssueEntity, notes: Note[]) {
@@ -111,7 +124,8 @@ export class NoteService {
         return this.createOrUpdateIssueNote(issue, note);
       }),
     );
-    return this.noteRepository.save(entities);
+    await this.noteRepository.save(entities);
+    await this.updateWordCount({ issue: issue.id });
   }
 
   private async createOrUpdateMergeRequestNote(
@@ -183,5 +197,27 @@ export class NoteService {
       issue: issue,
       resource: note,
     });
+  }
+
+  async updateWordCount(filters: NoteQueryDto) {
+    const [notes] = await this.search(filters);
+    const updatedNotes = notes.map((note) => {
+      const wordCount = this.countWords(note.resource.body);
+      note.resource = Extensions.updateExtensions(note.resource, {
+        wordCount: wordCount,
+      });
+      return note;
+    });
+    return this.noteRepository.save(updatedNotes);
+  }
+
+  private countWords(noteBody: string) {
+    const contentByRepoMember = this.excludeContentGeneratedBySystem(noteBody);
+    const words = contentByRepoMember.trim().split(/\s+/);
+    return words.length;
+  }
+
+  private excludeContentGeneratedBySystem(noteBody: string) {
+    return noteBody.replace(/\*([^*]+)\*$/g, '');
   }
 }

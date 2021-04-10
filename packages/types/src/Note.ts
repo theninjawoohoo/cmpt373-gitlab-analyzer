@@ -1,3 +1,5 @@
+import {WithExtensions} from "./WithExtensions";
+
 interface Author {
     id: number;
     username: string;
@@ -7,7 +9,11 @@ interface Author {
     created_at: string;
 }
 
-export interface Note {
+interface NoteExtensions {
+    wordCount?: number;
+}
+
+export interface Note extends WithExtensions<NoteExtensions> {
     id: number;
     body: string;
     attachment: string;

@@ -1,4 +1,4 @@
-import { IsOptional, IsUUID } from 'class-validator';
+import { IsDateString, IsOptional, IsUUID } from 'class-validator';
 import { QueryDto } from '../../../common/query-dto';
 
 export class NoteQueryDto extends QueryDto {
@@ -11,5 +11,13 @@ export class NoteQueryDto extends QueryDto {
   issue?: string;
 
   @IsOptional()
-  author_email: string;
+  author_email?: string;
+
+  @IsOptional()
+  @IsDateString()
+  start_date?: string;
+
+  @IsOptional()
+  @IsDateString()
+  end_date?: string;
 }
