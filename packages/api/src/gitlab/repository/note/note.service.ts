@@ -24,32 +24,31 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
     query: SelectQueryBuilder<NoteEntity>,
     filters: NoteQueryDto,
   ): SelectQueryBuilder<NoteEntity> {
-    query.where("note.resource #>> '{system}' <> 'true'");
+    query.andWhere("note.resource #>> '{system}' <> 'true'");
 
     if (filters.merge_request) {
       query.andWhere('note.merge_request_id = :merge_request', {
         merge_request: filters.merge_request,
       });
     }
-
     if (filters.issue) {
-      query.orWhere('note.issue_id = :issue', {
+      query.andWhere('note.issue_id = :issue', {
         issue: filters.issue,
       });
     }
-
-    if (filters.author_email) {
-      query.andWhere("note.resource #>> '{author_email}' IN (:...author)", {
-        author_email: alwaysArray(filters.author_email),
-      });
+    if (filters.author_names) {
+      query.andWhere(
+        "note.resource #> '{author}'->>'name' IN (:...authorNames)",
+        {
+          authorNames: alwaysArray(filters.author_names),
+        },
+      );
     }
-
     if (filters.created_start_date) {
       query.andWhere("(note.resource #>> '{created_at}') >= (:startDate)", {
         startDate: filters.created_start_date,
       });
     }
-
     if (filters.created_end_date) {
       query.andWhere("(note.resource #>> '{created_at}') <= (:endDate)", {
         endDate: filters.created_end_date,
@@ -70,6 +69,7 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
         },
       );
     }
+
     return query;
   }
 
