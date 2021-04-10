@@ -76,7 +76,7 @@ export class CommitService extends BaseService<
         },
       );
       query.andWhere(
-        `commit.id NOT IN (SELECT commitId FROM merge_request_commits_commit)`,
+        `commit.id NOT IN (SELECT "commitId" FROM merge_request_commits_commit)`,
       );
     }
     return query;

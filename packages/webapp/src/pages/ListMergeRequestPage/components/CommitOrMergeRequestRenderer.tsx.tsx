@@ -77,6 +77,7 @@ const CommitOrMergeRequestRenderer: React.FC<CommitOrMergeRequestRendererProps> 
     emails || [],
     mergeRequest?.extensions?.commitScoreSums || {},
   );
+
   return (
     <Accordion
       expanded={active}
@@ -117,7 +118,7 @@ const CommitOrMergeRequestRenderer: React.FC<CommitOrMergeRequestRendererProps> 
               <Grid item xs={2}>
                 <Typography align='right'>
                   <ScoringChip hasOverride={commitHasOverride}>
-                    {commitScoreSum?.toFixed(1)}
+                    {mergeRequest ? commitScoreSum?.toFixed(1) : null}
                   </ScoringChip>
                 </Typography>
               </Grid>
@@ -142,7 +143,7 @@ const CommitOrMergeRequestRenderer: React.FC<CommitOrMergeRequestRendererProps> 
               <Grid item xs={1}>
                 <Typography align='right'>
                   <ScoringChip hasOverride={commitHasOverride}>
-                    {commitScoreSum?.toFixed(1)}
+                    {mergeRequest ? commitScoreSum?.toFixed(1) : null}
                   </ScoringChip>
                 </Typography>
               </Grid>

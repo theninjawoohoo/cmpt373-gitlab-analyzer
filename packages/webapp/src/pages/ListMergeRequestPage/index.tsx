@@ -110,6 +110,7 @@ const ListMergeRequestPage = () => {
     author_email: emails,
     start_date: startDate.toString(),
     end_date: endDate.toString(),
+    not_associated_with_any_mr: true,
   });
 
   useEffect(() => {
