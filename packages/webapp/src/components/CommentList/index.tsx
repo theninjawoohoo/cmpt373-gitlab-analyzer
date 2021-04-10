@@ -71,9 +71,9 @@ const CommentList: React.FC = () => {
   console.log(startDate);
   console.log(endDate);
   const { repositoryId } = useRepositoryContext();
-  const { data: authors } = useRepositoryMembers(repositoryId);
-  console.log(authors);
-  const names = findRepoNameForMember(author, authors);
+  const { data: members } = useRepositoryMembers(repositoryId);
+  console.log(members);
+  const names = findRepoNameForMember(author, members);
   console.log(names);
   const { data: allNotes } = useGetNotesByRepository(
     {

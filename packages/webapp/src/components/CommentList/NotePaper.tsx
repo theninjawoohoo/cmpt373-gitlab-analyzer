@@ -5,7 +5,7 @@ import Box from '@material-ui/core/Box';
 import { Paper } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { ApiResource } from '../../api/base';
-import { Note } from '@ceres/types';
+import { /*Issue,*/ /*MergeRequest*/ Note } from '@ceres/types';
 import SmartDate from '../SmartDate';
 import { useGetMergeRequestByNoteId } from '../../api/mergeRequests';
 import { useGetIssueByNoteId } from '../../api/issue';
@@ -40,18 +40,35 @@ const extractNoteContent = (noteBody: string) => {
   return noteBody.replace(/\*([^*]+)\*$/g, '').trim();
 };
 
+// const onMyOwnMergeRequest = (
+//   noteAuthorId: number,
+//   mergeRequest: ApiResource<MergeRequest>,
+// ) => {
+//   return noteAuthorId === mergeRequest?.author.id;
+// };
+
+// const onMyOwnIssue = (noteAuthorId: number, issue: ApiResource<Issue>) => {
+//   return noteAuthorId === issue.author.id;
+// };
+
 const NotePaper: React.FC<NoteProps> = (NoteProps) => {
   const { repositoryId } = useRepositoryContext();
   const classes = useStyles();
 
-  const { data: mergeRequests } = useGetMergeRequestByNoteId({
+  const { data: mergeRequest } = useGetMergeRequestByNoteId({
     repository: repositoryId,
     note_id: NoteProps.noteData.meta.id,
   });
-  const { data: issues } = useGetIssueByNoteId({
+  if (mergeRequest) {
+    console.log(mergeRequest?.results.find((element) => element));
+  }
+  const { data: issue } = useGetIssueByNoteId({
     repository: repositoryId,
     note_id: NoteProps.noteData.meta.id,
   });
+
+  const shouldDisplayMergeRequestNote =
+    NoteProps.noteData.noteable_type === 'MergeRequest';
 
   return (
     <Paper elevation={3} className={classes.paper} key={NoteProps.noteData.id}>
@@ -60,26 +77,52 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
         justify={'space-between'}
         alignItems={'center'}
         className={
-          NoteProps.isMergeRequestNote
+          shouldDisplayMergeRequestNote
             ? classes.merge_request_note_header_row
             : classes.issue_note_header_row
         }
       >
-        <Typography>
-          <Box fontSize={18}>
-            On
-            {NoteProps.isMergeRequestNote ? ' merge request ' : ' issue '}
-            <Box fontWeight='fontWeightBold' display='inline'>
-              {NoteProps.noteData.noteable_type === 'MergeRequest'
-                ? mergeRequests?.results.map((mergeRequest) => {
-                    return mergeRequest.title;
-                  })
-                : issues?.results.map((issue) => {
-                    return issue.title;
-                  })}
-            </Box>
-          </Box>
-        </Typography>
+        {shouldDisplayMergeRequestNote && (
+          <>
+            <Typography>
+              <Box fontSize={18}>
+                On merge request{' '}
+                <Box fontWeight='fontWeightBold' display='inline'>
+                  {mergeRequest?.results.find((element) => element).title}
+                </Box>
+              </Box>
+            </Typography>
+
+            <Typography>
+              <Box>
+                {NoteProps.noteData.author.id ===
+                mergeRequest?.results.find((element) => element).author.id
+                  ? 'My MR'
+                  : "Other's MR"}
+              </Box>
+            </Typography>
+          </>
+        )}
+        {!shouldDisplayMergeRequestNote && (
+          <>
+            <Typography>
+              <Box fontSize={18}>
+                On issue{' '}
+                <Box fontWeight='fontWeightBold' display='inline'>
+                  {issue?.results.find((element) => element).title}
+                </Box>
+              </Box>
+            </Typography>
+            <Typography>
+              <Box>
+                {NoteProps.noteData.author.id ===
+                issue?.results.find((element) => element).author.id
+                  ? 'My Issue'
+                  : "Other's Issue"}
+              </Box>
+            </Typography>
+          </>
+        )}
       </Grid>
       <Grid
         id='content-row'
