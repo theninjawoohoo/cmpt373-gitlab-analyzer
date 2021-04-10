@@ -9,6 +9,11 @@ const LINE_COLOR_MAP = {
   [Line.Type.add]: 'green',
   [Line.Type.delete]: 'red',
   [Line.Type.noChange]: 'black',
+  [Line.Type.syntaxChange]: 'blue',
+  [Line.Type.spaceChange]: 'blue',
+  [Line.Type.comment]: '#bebebe',
+  [Line.Type.syntaxLine]: '#bebebe',
+  [Line.Type.blank]: '#bebebe',
 };
 
 const TwoColumnGrid = styled.div`
