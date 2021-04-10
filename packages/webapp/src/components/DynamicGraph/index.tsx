@@ -62,19 +62,8 @@ export enum GraphTab {
   comments = 'comments',
 }
 
-// function findRepoNameForMember(
-//   filtered_id: string,
-//   members: ApiResource<RepositoryMember>[],
-// ) {
-//   const filtered = (members || []).filter(
-//     (member) => member.meta.id === filtered_id,
-//   );
-//   console.log(filtered);
-//   return filtered.map((member) => member.name);
-// }
-
 const DynamicGraph: React.FC = () => {
-  const { startDate, endDate, emails /*, author*/ } = useFilterContext();
+  const { startDate, endDate, emails } = useFilterContext();
   const { repositoryId } = useRepositoryContext();
   const { data: commitCounts } = useGetCountCommits({
     repository: repositoryId,
