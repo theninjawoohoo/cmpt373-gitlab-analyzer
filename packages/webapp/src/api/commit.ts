@@ -16,6 +16,10 @@ interface CommitSearchParams {
   sort?: string;
 }
 
+export function useGetCountCommits(params: CommitSearchParams) {
+  return useApiQuery<Commit.DailyCount[]>('/commit/count', params);
+}
+
 export function useGetCommits(
   params: CommitSearchParams,
   page?: number,
