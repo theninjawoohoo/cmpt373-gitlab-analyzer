@@ -20,7 +20,13 @@ const ScoringConfigOverrides: React.FC = () => {
   }
 
   return (
-    <Drawer open={showDrawer} anchor='right'>
+    <Drawer
+      open={showDrawer}
+      anchor='right'
+      onClose={() => {
+        setShowDrawer(false);
+      }}
+    >
       <Box p={2}>
         <ScoringConfigForm
           defaultValues={{ weights: overrides }}
