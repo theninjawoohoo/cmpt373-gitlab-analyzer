@@ -32,13 +32,13 @@ export function useGetMergeRequests(
   );
 }
 
+export function useGetCountMergeRequests(params: MergeRequestSearchParams) {
+  return useApiQuery<MergeRequest.DailyCount[]>('/merge_request/count', params);
+}
+
 export function useInfiniteMergeRequest(
   params: MergeRequestSearchParams,
   pageSize = 15,
 ) {
   return useApiInfiniteQuery<MergeRequest>('/merge_request', params, pageSize);
-}
-
-export function useGetCountMergeRequests(params: MergeRequestSearchParams) {
-  return useApiQuery<MergeRequest.DailyCount>('/merge_request/count', params);
 }

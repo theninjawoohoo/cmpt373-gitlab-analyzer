@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import React from 'react';
 import {
   BarChart,
@@ -9,22 +10,42 @@ import {
   ReferenceLine,
   ResponsiveContainer,
 } from 'recharts';
+import { GraphTab } from '..';
+import SmartDate from '../../SmartDate';
 
 interface BarChartProps {
   graphData: any[];
-  graphType: number;
+  graphTab: GraphTab;
 }
 
-const DynamicBarChart: React.FC<BarChartProps> = (BarChartProps) => {
-  if (BarChartProps.graphType == 0) {
+// // https://recharts.org/en-US/examples/CustomizedLabelLineChart
+const DateTick: React.FC<any> = (props) => {
+  const { x, y, payload } = props;
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={16} textAnchor='end' fill='#666'>
+        <SmartDate includeTime={false}>{payload.value}</SmartDate>
+      </text>
+    </g>
+  );
+};
+
+const DynamicBarChart: React.FC<BarChartProps> = ({ graphData, graphTab }) => {
+  if (graphTab === GraphTab.code) {
     return (
       <ResponsiveContainer width={1200} height={500}>
-        <BarChart stackOffset='sign' data={BarChartProps.graphData}>
-          <XAxis dataKey='date' />
+        <BarChart stackOffset='sign' data={graphData}>
+          <XAxis dataKey='date' tick={DateTick} />
           <YAxis tickFormatter={(value) => Math.abs(value).toString()} />
-          <Tooltip formatter={(value) => Math.abs(value).toString()} />
-          <Legend layout='horizontal' align='center' verticalAlign='bottom' />
           <ReferenceLine y={0} stroke='#000' />
+          <Tooltip
+            labelFormatter={(value) =>
+              DateTime.fromISO(value).toFormat('LLL dd yyyy')
+            }
+            formatter={(value) => Math.abs(value).toString()}
+          />
+          <Legend layout='vertical' align='right' verticalAlign='top' />
           <Bar
             dataKey='commitCount'
             name='Commits'
@@ -32,7 +53,7 @@ const DynamicBarChart: React.FC<BarChartProps> = (BarChartProps) => {
             fill='#0A4D63'
           />
           <Bar
-            dataKey='mergeCount'
+            dataKey='mergeRequestCount'
             name='Merge Requests'
             stackId='a'
             fill='#e37500'
@@ -40,21 +61,41 @@ const DynamicBarChart: React.FC<BarChartProps> = (BarChartProps) => {
         </BarChart>
       </ResponsiveContainer>
     );
-  } else if (BarChartProps.graphType == 1) {
+  } else if (graphTab === GraphTab.scores) {
     return (
       <ResponsiveContainer width={1200} height={500}>
-        <BarChart data={BarChartProps.graphData}>
-          <XAxis dataKey='date' />
-          <YAxis tickFormatter={(value) => Math.round(value).toString()} />
-          <Tooltip formatter={(value) => Math.round(value).toString()} />
-          <Bar dataKey='score' name='Score' fill='#FFAA00' />
+        <BarChart stackOffset='sign' data={graphData}>
+          <XAxis dataKey='date' tick={DateTick} />
+          <YAxis
+            tickFormatter={(value) => Math.round(Math.abs(value)).toString()}
+          />
+          <ReferenceLine y={0} stroke='#000' />
+          <Tooltip
+            labelFormatter={(value) =>
+              DateTime.fromISO(value).toFormat('LLL dd yyyy')
+            }
+            formatter={(value) => Math.abs(value).toFixed(1)}
+          />
+          <Legend layout='vertical' align='right' verticalAlign='top' />
+          <Bar
+            dataKey='commitScore'
+            name='Commits'
+            stackId='a'
+            fill='#0A4D63'
+          />
+          <Bar
+            dataKey='mergeRequestScore'
+            name='Merge Requests'
+            stackId='a'
+            fill='#e37500'
+          />
         </BarChart>
       </ResponsiveContainer>
     );
   } else {
     return (
       <ResponsiveContainer width={1200} height={500}>
-        <BarChart data={BarChartProps.graphData}>
+        <BarChart data={graphData}>
           <XAxis dataKey='date' />
           <YAxis />
           <Tooltip />

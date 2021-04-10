@@ -1,4 +1,10 @@
-import { IsDateString, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsBoolean,
+  IsDateString,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { QueryDto } from '../../../common/query-dto';
 
 export class CommitQueryDto extends QueryDto {
@@ -23,5 +29,6 @@ export class CommitQueryDto extends QueryDto {
   end_date?: string;
 
   @IsOptional()
-  sort_order?: 'ASC' | 'DESC';
+  @IsBoolean()
+  not_associated_with_any_mr?: boolean;
 }
