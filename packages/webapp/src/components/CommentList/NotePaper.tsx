@@ -4,6 +4,9 @@ import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import { Paper } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
+// import AutoAwesome from '@material-ui/icons/';
+import FilterVintageIcon from '@material-ui/icons/FilterVintage';
+import EmojiNatureIcon from '@material-ui/icons/EmojiNature';
 import { ApiResource } from '../../api/base';
 import { /*Issue,*/ /*MergeRequest*/ Note } from '@ceres/types';
 import SmartDate from '../SmartDate';
@@ -13,7 +16,6 @@ import { useRepositoryContext } from '../../contexts/RepositoryContext';
 
 interface NoteProps {
   noteData: ApiResource<Note>;
-  isMergeRequestNote?: boolean;
 }
 
 const useStyles = makeStyles(() =>
@@ -67,8 +69,19 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
     note_id: NoteProps.noteData.meta.id,
   });
 
-  const shouldDisplayMergeRequestNote =
+  const isMergeRequestNote =
     NoteProps.noteData.noteable_type === 'MergeRequest';
+
+  const onMyOwnMergeRequest =
+    mergeRequest &&
+    !issue &&
+    NoteProps.noteData.author.id ===
+      mergeRequest?.results.find((element) => element).author.id;
+  const onMyOwnIssue =
+    issue &&
+    !mergeRequest &&
+    NoteProps.noteData.author.id ===
+      issue?.results.find((element) => element).author.id;
 
   return (
     <Paper elevation={3} className={classes.paper} key={NoteProps.noteData.id}>
@@ -76,14 +89,16 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
         id='header-row'
         justify={'space-between'}
         alignItems={'center'}
+        direction={'row'}
+        container
         className={
-          shouldDisplayMergeRequestNote
+          isMergeRequestNote
             ? classes.merge_request_note_header_row
             : classes.issue_note_header_row
         }
       >
-        {shouldDisplayMergeRequestNote && (
-          <>
+        <Grid item>
+          {isMergeRequestNote && (
             <Typography>
               <Box fontSize={18}>
                 On merge request{' '}
@@ -92,19 +107,8 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
                 </Box>
               </Box>
             </Typography>
-
-            <Typography>
-              <Box>
-                {NoteProps.noteData.author.id ===
-                mergeRequest?.results.find((element) => element).author.id
-                  ? 'My MR'
-                  : "Other's MR"}
-              </Box>
-            </Typography>
-          </>
-        )}
-        {!shouldDisplayMergeRequestNote && (
-          <>
+          )}
+          {!isMergeRequestNote && (
             <Typography>
               <Box fontSize={18}>
                 On issue{' '}
@@ -113,17 +117,28 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
                 </Box>
               </Box>
             </Typography>
-            <Typography>
-              <Box>
-                {NoteProps.noteData.author.id ===
-                issue?.results.find((element) => element).author.id
-                  ? 'My Issue'
-                  : "Other's Issue"}
-              </Box>
-            </Typography>
-          </>
-        )}
+          )}
+        </Grid>
+        <Grid item>
+          {((isMergeRequestNote && onMyOwnMergeRequest) ||
+            (!isMergeRequestNote && onMyOwnIssue)) && (
+            <FilterVintageIcon
+              style={{
+                color: '#f3bfb3',
+              }}
+            />
+          )}
+          {((isMergeRequestNote && !onMyOwnMergeRequest) ||
+            (!isMergeRequestNote && !onMyOwnIssue)) && (
+            <EmojiNatureIcon
+              style={{
+                color: '#57838d',
+              }}
+            />
+          )}
+        </Grid>
       </Grid>
+
       <Grid
         id='content-row'
         alignItems={'flex-start'}

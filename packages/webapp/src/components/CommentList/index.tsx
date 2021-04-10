@@ -100,7 +100,6 @@ const CommentList: React.FC = () => {
   if (issueNotes) console.log(issueNotes.length);
 
   const [tab, setTab] = useState(TabOption.codeReview);
-  const isMergeRequestNote = tab === TabOption.codeReview;
   const notes =
     tab === TabOption.codeReview ? mergeRequestNotes || [] : issueNotes || [];
 
@@ -142,13 +141,7 @@ const CommentList: React.FC = () => {
           spacing={1}
         >
           {notes?.map((note) => {
-            return (
-              <NotePaper
-                key={note.meta.id}
-                noteData={note}
-                isMergeRequestNote={isMergeRequestNote}
-              />
-            );
+            return <NotePaper key={note.meta.id} noteData={note} />;
           })}
         </Grid>
       </Container>
