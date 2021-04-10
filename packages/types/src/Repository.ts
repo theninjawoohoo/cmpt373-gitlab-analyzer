@@ -1,5 +1,5 @@
 // Generated using: http://json2ts.com/
-import { ScoringConfig } from './ScoringConfig';
+import { GlobWeight, ScoringConfig } from './ScoringConfig';
 import { WithExtensions } from './WithExtensions';
 
 interface Namespace {
@@ -61,6 +61,7 @@ interface RepositoryExtensions {
   lastSync?: string;
   scoringConfig?: {
     config?: ScoringConfig;
+    overrides?: GlobWeight[];
     id?: string;
     lastRan?: string;
   };
