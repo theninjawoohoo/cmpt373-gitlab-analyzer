@@ -8,7 +8,6 @@ import DynamicBarChart from './BarChartComponent';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
-import RepoFilter from '../../components/RepositoryFilter';
 import { useGetCountMergeRequests } from '../../api/mergeRequests';
 import { useGetCountCommits } from '../../api/commit';
 import { Commit, MergeRequest } from '@ceres/types';
@@ -57,6 +56,12 @@ function combineData(
   }));
 }
 
+export enum GraphTab {
+  code = 'code',
+  scores = 'scores',
+  comments = 'comments',
+}
+
 const DynamicGraph: React.FC = () => {
   const { startDate, endDate, emails } = useFilterContext();
   const { repositoryId } = useRepositoryContext();
@@ -73,7 +78,7 @@ const DynamicGraph: React.FC = () => {
     merged_start_date: startDate,
     merged_end_date: endDate,
   });
-  const [graphType, setGraphType] = useState(0);
+  const [graphTab, setGraphTab] = useState(GraphTab.code);
   const graphData = combineData(
     startDate,
     endDate,
@@ -81,36 +86,29 @@ const DynamicGraph: React.FC = () => {
     mergeRequestCounts || [],
   );
 
-  const handleTabs = (event: React.ChangeEvent<unknown>, newType: number) => {
-    setGraphType(newType);
+  const handleTabs = (event: React.ChangeEvent<unknown>, newTab: GraphTab) => {
+    setGraphTab(newTab);
   };
 
   return (
     <>
       <Container>
         <DefaultPageTitleFormat>Contribution Graph</DefaultPageTitleFormat>
-        <Container maxWidth='md'>
-          <Grid container alignItems='flex-end' spacing={1}>
-            <Grid item xs={12}>
-              <RepoFilter />
-            </Grid>
-          </Grid>
-        </Container>
         <Box my={2}>
           <Tabs
-            value={graphType}
+            value={graphTab}
             onChange={handleTabs}
             indicatorColor='primary'
             textColor='primary'
             centered
           >
-            <Tab label='Codes' />
-            <Tab label='Scores' />
-            <Tab label='Comments' />
+            <Tab label='Codes' value={GraphTab.code} />
+            <Tab label='Scores' value={GraphTab.scores} />
+            <Tab label='Comments' value={GraphTab.comments} />
           </Tabs>
         </Box>
         <Grid justify='center' container>
-          <DynamicBarChart graphData={graphData} graphType={graphType} />
+          <DynamicBarChart graphData={graphData} graphTab={graphTab} />
         </Grid>
       </Container>
     </>

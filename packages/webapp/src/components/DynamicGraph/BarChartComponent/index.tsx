@@ -9,11 +9,12 @@ import {
   Legend,
   ReferenceLine,
 } from 'recharts';
+import { GraphTab } from '..';
 import SmartDate from '../../SmartDate';
 
 interface BarChartProps {
   graphData: any[];
-  graphType: number;
+  graphTab: GraphTab;
 }
 
 // // https://recharts.org/en-US/examples/CustomizedLabelLineChart
@@ -29,15 +30,10 @@ const DateTick: React.FC<any> = (props) => {
   );
 };
 
-const DynamicBarChart: React.FC<BarChartProps> = (BarChartProps) => {
-  if (BarChartProps.graphType == 0) {
+const DynamicBarChart: React.FC<BarChartProps> = ({ graphData, graphTab }) => {
+  if (graphTab === GraphTab.code) {
     return (
-      <BarChart
-        width={1000}
-        height={500}
-        stackOffset='sign'
-        data={BarChartProps.graphData}
-      >
+      <BarChart width={1000} height={500} stackOffset='sign' data={graphData}>
         <XAxis dataKey='date' tick={DateTick} />
         <YAxis tickFormatter={(value) => Math.abs(value).toString()} />
         <ReferenceLine y={0} stroke='#000' />
@@ -57,24 +53,21 @@ const DynamicBarChart: React.FC<BarChartProps> = (BarChartProps) => {
         />
       </BarChart>
     );
-  } else if (BarChartProps.graphType == 1) {
+  } else if (graphTab === GraphTab.scores) {
     return (
-      <BarChart
-        width={1000}
-        height={500}
-        stackOffset='sign'
-        data={BarChartProps.graphData}
-      >
+      <BarChart width={1000} height={500} stackOffset='sign' data={graphData}>
         <XAxis dataKey='date' tick={DateTick} />
         <YAxis
           tickFormatter={(value) => Math.round(Math.abs(value)).toString()}
         />
+        <ReferenceLine y={0} stroke='#000' />
         <Tooltip
           labelFormatter={(value) =>
             DateTime.fromISO(value).toFormat('LLL dd yyyy')
           }
           formatter={(value) => Math.abs(value).toFixed(1)}
         />
+        <Legend layout='vertical' align='right' verticalAlign='top' />
         <Bar dataKey='commitScore' name='Commits' stackId='a' fill='#0A4D63' />
         <Bar
           dataKey='mergeRequestScore'
@@ -86,7 +79,7 @@ const DynamicBarChart: React.FC<BarChartProps> = (BarChartProps) => {
     );
   } else {
     return (
-      <BarChart width={1000} height={500} data={BarChartProps.graphData}>
+      <BarChart width={1000} height={500} data={graphData}>
         <XAxis dataKey='date' />
         <YAxis />
         <Tooltip />
