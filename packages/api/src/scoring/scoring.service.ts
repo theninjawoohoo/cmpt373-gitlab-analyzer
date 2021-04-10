@@ -5,7 +5,7 @@ import { CommitService } from '../gitlab/repository/commit/commit.service';
 import { ScoringConfig } from './scoring-config/scoring-config.entity';
 import { Repository } from '../gitlab/repository/repository.entity';
 import { DiffService } from '../gitlab/repository/diff/diff.service';
-import { StagedScoreOverride } from '@ceres/types';
+import { GlobWeight, StagedScoreOverride } from '@ceres/types';
 
 @Injectable()
 export class ScoringService {
@@ -19,19 +19,25 @@ export class ScoringService {
   async updateRepositoryScores(
     repository: Repository,
     scoringConfig?: ScoringConfig,
+    weightOverrides?: GlobWeight[],
   ) {
+    const combinedWeights = [
+      ...(scoringConfig?.resource?.weights || []),
+      ...(weightOverrides || []),
+    ];
     await Promise.all([
       this.mergeRequestService.updateMergeRequestScoreByRepository(
         repository.id,
-        scoringConfig?.resource?.weights,
+        combinedWeights,
       ),
       this.commitService.updateCommitScoreByRepository(
         repository.id,
-        scoringConfig?.resource?.weights,
+        combinedWeights,
       ),
     ]);
     await this.repositoryService.updateScoringConfig(repository, {
       config: scoringConfig?.resource,
+      overrides: weightOverrides,
       id: scoringConfig?.id,
       lastRan: new Date().toISOString(),
     });

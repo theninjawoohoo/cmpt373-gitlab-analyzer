@@ -15,6 +15,7 @@ import { useAuthContext } from '../../contexts/AuthContext';
 import CommitsPage from '../../pages/Commits';
 import RepoSetupPage from '../../pages/RepositorySetup';
 import ScoreRubricPage from '../../pages/ScoreRubric';
+import { RepositoryScoringContextProvider } from '../../pages/RepositorySetup/RepositoryScoringContext';
 
 export function Router() {
   const { user } = useAuthContext();
@@ -31,7 +32,9 @@ export function Router() {
           <RepositoryPage />
         </Route>
         <Route path='/setup/:id' exact>
-          <RepoSetupPage />
+          <RepositoryScoringContextProvider>
+            <RepoSetupPage />
+          </RepositoryScoringContextProvider>
         </Route>
         <Route path='/setup/:id/rubric' exact>
           <ScoreRubricPage />

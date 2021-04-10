@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpService, Injectable } from '@nestjs/common';
 import { ScoringConfig as ScoringConfigEntity } from './scoring-config.entity';
 import { ScoringConfig } from '@ceres/types';
 import { BaseService } from '../../common/base.service';
@@ -16,8 +16,9 @@ export class ScoringConfigService extends BaseService<
   constructor(
     @InjectRepository(ScoringConfigEntity)
     serviceRepository: Repository<ScoringConfigEntity>,
+    readonly httpService: HttpService,
   ) {
-    super(serviceRepository, 'scoring_config');
+    super(serviceRepository, 'scoring_config', httpService);
   }
 
   buildFilters(

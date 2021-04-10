@@ -21,12 +21,12 @@ export class RepositoryService extends BaseService<
   WithUser<RepositoryQueryDto>
 > {
   constructor(
-    private readonly httpService: HttpService,
     private readonly repositoryMemberService: RepositoryMemberService,
     @InjectRepository(RepositoryEntity)
     repository: TypeORMRepository<RepositoryEntity>,
+    readonly httpService: HttpService,
   ) {
-    super(repository, 'repository');
+    super(repository, 'repository', httpService);
   }
 
   buildFilters(
@@ -180,18 +180,13 @@ export class RepositoryService extends BaseService<
     token: string,
     page: number,
   ): Promise<Repository[]> {
-    const axiosResponse = await this.httpService
-      .get<Repository[]>('/projects', {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          membership: true,
-          per_page: 10,
-          page,
-        },
-      })
-      .toPromise();
+    const url = '/projects';
+    const params = { page: page, per_page: 10, membership: true };
+    const axiosResponse = await this.fetchWithRetries<Repository>(
+      token,
+      url,
+      params,
+    );
     return axiosResponse.data;
   }
 }

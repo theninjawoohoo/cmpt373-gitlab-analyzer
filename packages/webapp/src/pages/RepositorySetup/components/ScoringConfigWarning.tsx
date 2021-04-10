@@ -11,7 +11,7 @@ const ScoringConfigWarning: React.FC<ScoringConfigWarningProps> = ({
   repository,
 }) => {
   if (!repository || repository?.extensions?.scoringConfig?.id) {
-    return <div />;
+    return null;
   }
   return (
     <Alert severity='warning'>

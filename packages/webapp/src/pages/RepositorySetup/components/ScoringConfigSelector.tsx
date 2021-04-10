@@ -1,21 +1,26 @@
-import { Repository, ScoringConfig } from '@ceres/types';
+import { GlobWeight, Repository, ScoringConfig } from '@ceres/types';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
+import MuiLink from '@material-ui/core/Link';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiResource, SearchResults } from '../../../api/base';
 import { useSearchScoringConfigs } from '../../../api/scoringConfig';
 import SmartDate from '../../../components/SmartDate';
+import { useRepositoryScoringContext } from '../RepositoryScoringContext';
 
 interface ScoringConfigSelectorProps {
   isLoading?: boolean;
   onChange?: (config?: ApiResource<ScoringConfig>) => void;
-  onSubmit?: (config?: ApiResource<ScoringConfig>) => void;
+  onSubmit?: (
+    config?: ApiResource<ScoringConfig>,
+    overrides?: GlobWeight[],
+  ) => void;
   repository?: Repository;
 }
 
@@ -32,9 +37,25 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
   const [selectedScoringConfig, setSelectedScoringConfig] = useState(
     repository?.extensions?.scoringConfig?.id || 'None',
   );
+  const {
+    setShowDrawer,
+    setOverrides,
+    setShowCurrentConfig,
+    overrides,
+  } = useRepositoryScoringContext();
+
+  const repositoryOverrides = repository?.extensions?.scoringConfig?.overrides;
+  useEffect(() => {
+    setOverrides(repositoryOverrides);
+  }, [repositoryOverrides?.length]);
 
   const handleSubmit = () => {
-    onSubmit(findConfigById(selectedScoringConfig, data));
+    onSubmit(findConfigById(selectedScoringConfig, data), overrides || []);
+  };
+
+  const handleShowCurrentConfig = () => {
+    setShowCurrentConfig(true);
+    return false;
   };
 
   return (
@@ -49,9 +70,15 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
               </SmartDate>
             </strong>{' '}
             with config:{' '}
-            <strong>
-              {repository.extensions.scoringConfig?.config?.name || 'None'}
-            </strong>
+            <MuiLink
+              underline='always'
+              href='#'
+              onClick={handleShowCurrentConfig}
+            >
+              <strong>
+                {repository.extensions.scoringConfig?.config?.name || 'None'}
+              </strong>
+            </MuiLink>
           </Typography>
         </Grid>
       ) : (
@@ -81,14 +108,27 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
         </FormControl>
       </Grid>
       <Grid item>
-        <Button
-          color='primary'
-          variant='contained'
-          onClick={handleSubmit}
-          disabled={isLoading}
-        >
-          Evaluate
-        </Button>
+        <Grid container direction='row' spacing={2}>
+          <Grid item>
+            <Button
+              color='secondary'
+              variant='contained'
+              onClick={() => setShowDrawer(true)}
+            >
+              Overrides
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              color='primary'
+              variant='contained'
+              onClick={handleSubmit}
+              disabled={isLoading}
+            >
+              Evaluate
+            </Button>
+          </Grid>
+        </Grid>
       </Grid>
       <Grid item>
         <Typography>
