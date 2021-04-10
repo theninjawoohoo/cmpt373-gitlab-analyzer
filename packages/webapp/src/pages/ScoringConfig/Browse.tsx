@@ -11,7 +11,6 @@ import ScoringLayout from './components/ScoringLayout';
 
 const BrowseScoringConfigsPage: React.FC = () => {
   const { data } = useSearchScoringConfigs();
-  console.log(data);
   return (
     <ScoringLayout showCreateButton showBackButton>
       <Box mx={2}>
