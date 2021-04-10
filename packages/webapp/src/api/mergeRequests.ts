@@ -17,6 +17,7 @@ interface MergeRequestSearchParams {
   author_email?: string[];
   merged_start_date?: string;
   merged_end_date?: string;
+  note_id?: string;
 }
 
 export function useGetMergeRequests(
@@ -29,6 +30,16 @@ export function useGetMergeRequests(
     params,
     page,
     pageSize,
+  );
+}
+
+export function useGetMergeRequestById(mergeRequestId) {
+  return useApiQuery<MergeRequest>(`/merge_request/${mergeRequestId}`);
+}
+
+export function useGetMergeRequestByNoteId(params: MergeRequestSearchParams) {
+  return useApiQuery<SearchResults<MergeRequest>>(
+    `/merge_request?repository=${params.repository}&note_id=${params.note_id}`,
   );
 }
 
