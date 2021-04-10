@@ -114,7 +114,6 @@ const DynamicGraph: React.FC = () => {
     merged_start_date: startDate,
     merged_end_date: endDate,
   });
-  console.log(merges);
 
   const [graphType, setGraphType] = useState(0); // 0 = code, 1 = score, 2 = comments
   const [graphData, setGraphData] = useState([]);
@@ -186,7 +185,7 @@ const DynamicGraph: React.FC = () => {
             <Tab label='Comments' />
           </Tabs>
         </Box>
-        <Grid justify='center' container>
+        <Grid container alignItems='center' justify='center'>
           <DynamicBarChart graphData={graphData} graphType={graphType} />
         </Grid>
       </Container>
