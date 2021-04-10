@@ -1,7 +1,7 @@
 import { Extensions, Note } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SelectQueryBuilder } from 'typeorm';
+import { Brackets, SelectQueryBuilder } from 'typeorm';
 import { Note as NoteEntity } from './note.entity';
 import { MergeRequest as MergeRequestEntity } from '../../merge-request/merge-request.entity';
 import { Issue as IssueEntity } from '../issue/issue.entity';
@@ -57,16 +57,19 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
 
     if (filters.repository_id) {
       query.andWhere(
-        'note.merge_request_id in (select id from merge_request where repository_id = :repository_id)',
-        {
-          repository_id: filters.repository_id,
-        },
-      );
-      query.orWhere(
-        'note.issue_id in (select id from issue where repository_id = :repository_id)',
-        {
-          repository_id: filters.repository_id,
-        },
+        new Brackets((qb) => {
+          qb.where(
+            'note.merge_request_id in (select id from merge_request where repository_id = :repository_id)',
+            {
+              repository_id: filters.repository_id,
+            },
+          ).orWhere(
+            'note.issue_id in (select id from issue where repository_id = :repository_id)',
+            {
+              repository_id: filters.repository_id,
+            },
+          );
+        }),
       );
     }
 
