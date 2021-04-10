@@ -29,6 +29,7 @@ import AccordionMenu from './components/AccordionMenu';
 import Members from '../Members';
 import ScoringConfigOverrides from './components/ScoringConfigOverrides';
 import ScoringConfigOverrideWarning from './components/ScoringConfigOverrideWarning';
+import ScoringConfigDialog from './components/ScoringConfigDialog';
 
 const MainContainer = styled.div`
   display: grid;
@@ -157,6 +158,7 @@ const RepoSetupPage: React.FC = () => {
           </AccordionMenu>
         </MainContainer>
         {data && <ScoringConfigOverrides />}
+        {data && <ScoringConfigDialog repository={data} />}
       </Container>
     </DefaultPageLayout>
   );

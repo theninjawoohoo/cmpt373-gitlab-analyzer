@@ -6,12 +6,15 @@ interface RepositoryScoringState {
   setShowDrawer: (showDrawer: boolean) => void;
   overrides?: GlobWeight[];
   setOverrides: (weights: GlobWeight[]) => void;
+  showCurrentConfig?: boolean;
+  setShowCurrentConfig: (showCurrentConfig: boolean) => void;
 }
 
 const repositoryScoringDefaultState: RepositoryScoringState = {
   overrides: [],
   setShowDrawer: () => null,
   setOverrides: () => null,
+  setShowCurrentConfig: () => null,
 };
 
 const RepositoryScoringContext = React.createContext<RepositoryScoringState>(
@@ -21,12 +24,15 @@ const RepositoryScoringContext = React.createContext<RepositoryScoringState>(
 function useRepositoryScoringState(): RepositoryScoringState {
   const [overrides, setOverrides] = useState<GlobWeight[]>([]);
   const [showDrawer, setShowDrawer] = useState<boolean>(false);
+  const [showCurrentConfig, setShowCurrentConfig] = useState<boolean>(false);
 
   return {
     overrides,
     setOverrides,
     showDrawer,
     setShowDrawer,
+    showCurrentConfig,
+    setShowCurrentConfig,
   };
 }
 

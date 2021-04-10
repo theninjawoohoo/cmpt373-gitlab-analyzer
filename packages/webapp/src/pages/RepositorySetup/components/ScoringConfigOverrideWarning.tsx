@@ -1,5 +1,6 @@
 import { Repository } from '@ceres/types';
 import Alert from '@material-ui/lab/Alert';
+import { isEqual } from 'lodash';
 import React from 'react';
 import { useRepositoryScoringContext } from '../RepositoryScoringContext';
 
@@ -13,7 +14,7 @@ const ScoringConfigOverrideWarning: React.FC<ScoringConfigOverrideWarningProps> 
   const { overrides } = useRepositoryScoringContext();
   if (
     !repository ||
-    repository?.extensions?.scoringConfig?.overrides === overrides
+    isEqual(repository?.extensions?.scoringConfig?.overrides, overrides)
   ) {
     return null;
   }
