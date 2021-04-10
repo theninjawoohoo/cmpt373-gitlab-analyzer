@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
+import MuiLink from '@material-ui/core/Link';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography';
@@ -39,6 +40,7 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
   const {
     setShowDrawer,
     setOverrides,
+    setShowCurrentConfig,
     overrides,
   } = useRepositoryScoringContext();
 
@@ -49,6 +51,11 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
 
   const handleSubmit = () => {
     onSubmit(findConfigById(selectedScoringConfig, data), overrides || []);
+  };
+
+  const handleShowCurrentConfig = () => {
+    setShowCurrentConfig(true);
+    return false;
   };
 
   return (
@@ -63,9 +70,15 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
               </SmartDate>
             </strong>{' '}
             with config:{' '}
-            <strong>
-              {repository.extensions.scoringConfig?.config?.name || 'None'}
-            </strong>
+            <MuiLink
+              underline='always'
+              href='#'
+              onClick={handleShowCurrentConfig}
+            >
+              <strong>
+                {repository.extensions.scoringConfig?.config?.name || 'None'}
+              </strong>
+            </MuiLink>
           </Typography>
         </Grid>
       ) : (
