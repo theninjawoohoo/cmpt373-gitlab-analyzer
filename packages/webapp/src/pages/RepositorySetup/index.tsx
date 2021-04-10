@@ -22,11 +22,13 @@ import ScoringConfigWarning from '../RepositorySetup/components/ScoringConfigWar
 import ScoringConfigSelector from './components/ScoringConfigSelector';
 import { useUpdateScoring } from '../../api/scoring';
 import { ApiResource } from '../../api/base';
-import { ScoringConfig } from '@ceres/types';
+import { GlobWeight, ScoringConfig } from '@ceres/types';
 import RepoFilter from '../../components/RepositoryFilter';
 import styled from 'styled-components';
 import AccordionMenu from './components/AccordionMenu';
 import Members from '../Members';
+import ScoringConfigOverrides from './components/ScoringConfigOverrides';
+import ScoringConfigOverrideWarning from './components/ScoringConfigOverrideWarning';
 
 const MainContainer = styled.div`
   display: grid;
@@ -49,11 +51,15 @@ const RepoSetupPage: React.FC = () => {
   const isOwner = user?.id === data?.extensions?.owner?.id;
   const collaborators = data?.extensions?.collaborators || [];
 
-  const handleUpdateScore = (scoringConfig: ApiResource<ScoringConfig>) => {
+  const handleUpdateScore = (
+    scoringConfig: ApiResource<ScoringConfig>,
+    overrides: GlobWeight[],
+  ) => {
     updateScoring(
       {
         repositoryId: id,
         scoringConfigId: scoringConfig?.meta?.id,
+        overrides,
       },
       {
         onSuccess: () => {
@@ -116,6 +122,7 @@ const RepoSetupPage: React.FC = () => {
         <MainContainer>
           <MembersWarning repositoryId={id} />
           <ScoringConfigWarning repository={data} repositoryId={id} />
+          <ScoringConfigOverrideWarning repository={data} />
           <AccordionMenu title='Filter Config' color='#e4f5ba'>
             <Grid item xs={12}>
               <RepoFilter />
@@ -149,6 +156,7 @@ const RepoSetupPage: React.FC = () => {
             )}
           </AccordionMenu>
         </MainContainer>
+        {data && <ScoringConfigOverrides />}
       </Container>
     </DefaultPageLayout>
   );

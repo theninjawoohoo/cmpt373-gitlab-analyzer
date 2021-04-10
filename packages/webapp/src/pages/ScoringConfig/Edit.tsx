@@ -1,5 +1,5 @@
 import React from 'react';
-import Form from './components/Form';
+import ScoringConfigForm from '../../components/ScoringConfigForm';
 import ScoringLayout from './components/ScoringLayout';
 import { useHistory, useLocation } from 'react-router-dom';
 import { parse } from 'querystring';
@@ -28,7 +28,9 @@ const PreloadedForm: React.FC<PreloadedFormProps> = ({ id }) => {
     });
   };
   if (data) {
-    return <Form onSubmit={onSubmit} defaultValues={data} />;
+    return (
+      <ScoringConfigForm onSubmit={onSubmit} defaultValues={data} requireName />
+    );
   }
   return <div>Loading...</div>;
 };
@@ -52,7 +54,7 @@ const EditScoringConfigPage: React.FC = () => {
       {query.id ? (
         <PreloadedForm id={query.id as string} />
       ) : (
-        <Form onSubmit={onSubmit} />
+        <ScoringConfigForm onSubmit={onSubmit} requireName />
       )}
     </ScoringLayout>
   );
