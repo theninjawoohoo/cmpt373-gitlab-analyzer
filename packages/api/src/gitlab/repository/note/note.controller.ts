@@ -1,36 +1,16 @@
-import {
-  BadRequestException,
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import { NoteService } from './note.service';
 import { IdParam } from '../../../common/id-param';
 import { RepositoryService } from '../repository.service';
 import { MergeRequestService } from '../../merge-request/merge-request.service';
-import { paginatedToResponse } from '../../../common/pagination';
-import { NoteQueryDto } from './note-query.dto';
 
-@Controller('note')
+@Controller('notes')
 export class NoteController {
   constructor(
     private readonly noteService: NoteService,
     private readonly repositoryService: RepositoryService,
     private readonly mergeRequestService: MergeRequestService,
   ) {}
-
-  @Get()
-  search(@Query() query: NoteQueryDto) {
-    const { issue, merge_request, repository_id } = query;
-    if (!issue && !merge_request && !repository_id) {
-      throw new BadRequestException(
-        'merge request or issue or repository id must be provided',
-      );
-    }
-    return paginatedToResponse(this.noteService.search(query));
-  }
 
   @Get('/merge_request/:id')
   async findAllForMergeRequest(@Param() { id }: IdParam) {

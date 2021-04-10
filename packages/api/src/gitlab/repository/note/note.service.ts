@@ -1,96 +1,58 @@
-import { Extensions, Note } from '@ceres/types';
+import { Note } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, SelectQueryBuilder } from 'typeorm';
+import { Repository as TypeORMNote } from 'typeorm';
 import { Note as NoteEntity } from './note.entity';
 import { MergeRequest as MergeRequestEntity } from '../../merge-request/merge-request.entity';
 import { Issue as IssueEntity } from '../issue/issue.entity';
+import { paginate, withDefaults } from '../../../common/query-dto';
 import alwaysArray from '../../../common/alwaysArray';
 import { NoteQueryDto } from './note-query.dto';
-import { BaseService } from '../../../common/base.service';
-import { Repository as TypeORMRepository } from 'typeorm/repository/Repository';
 
 @Injectable()
-export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
+export class NoteService {
   constructor(
     private readonly httpService: HttpService,
     @InjectRepository(NoteEntity)
-    serviceRepository: TypeORMRepository<NoteEntity>,
-  ) {
-    super(serviceRepository, 'note');
-  }
+    private readonly noteRepository: TypeORMNote<NoteEntity>,
+  ) {}
 
-  buildFilters(
-    query: SelectQueryBuilder<NoteEntity>,
-    filters: NoteQueryDto,
-  ): SelectQueryBuilder<NoteEntity> {
-    query.andWhere("note.resource #>> '{system}' <> 'true'");
+  async search(filters: NoteQueryDto) {
+    filters = withDefaults(filters);
+    const query = this.noteRepository.createQueryBuilder('note');
 
     if (filters.merge_request) {
-      query.andWhere('note.merge_request_id = :merge_request', {
+      query.where('merge_request.id = :merge_request', {
         merge_request: filters.merge_request,
       });
     }
+
     if (filters.issue) {
-      query.andWhere('note.issue_id = :issue', {
+      query.andWhere('issue.id = :issue', {
         issue: filters.issue,
       });
     }
-    if (filters.author_names) {
-      query.andWhere(
-        "note.resource #> '{author}'->>'name' IN (:...authorNames)",
-        {
-          authorNames: alwaysArray(filters.author_names),
-        },
-      );
-    }
-    if (filters.created_start_date) {
-      query.andWhere("(note.resource #>> '{created_at}') >= (:startDate)", {
-        startDate: filters.created_start_date,
-      });
-    }
-    if (filters.created_end_date) {
-      query.andWhere("(note.resource #>> '{created_at}') <= (:endDate)", {
-        endDate: filters.created_end_date,
+
+    if (filters.author_email) {
+      query.andWhere("note.resource #>> '{author_email}' IN (:...author)", {
+        author_email: alwaysArray(filters.author_email),
       });
     }
 
-    if (filters.repository_id) {
-      query.andWhere(
-        new Brackets((qb) => {
-          qb.where(
-            'note.merge_request_id in (select id from merge_request where repository_id = :repository_id)',
-            {
-              repository_id: filters.repository_id,
-            },
-          ).orWhere(
-            'note.issue_id in (select id from issue where repository_id = :repository_id)',
-            {
-              repository_id: filters.repository_id,
-            },
-          );
-        }),
-      );
-    }
-
-    return query;
+    query.orderBy("note.resource #>> '{authored_date}'", 'DESC');
+    paginate(query, filters);
+    return query.getManyAndCount();
   }
 
-  buildSort(
-    query: SelectQueryBuilder<NoteEntity>,
-  ): SelectQueryBuilder<NoteEntity> {
-    return query.orderBy("note.resource #>> '{created_at}'", 'DESC');
-  }
-
-  async findAllForMergeRequest(mergeRequest: MergeRequestEntity) {
-    return this.serviceRepository.find({
-      where: { mergeRequest: mergeRequest },
+  async findOne(id: string) {
+    return this.noteRepository.findOne({
+      where: { id },
     });
   }
 
-  async findAllForIssue(issue: IssueEntity) {
-    return this.serviceRepository.find({
-      where: { issue: issue },
+  async findAllForMergeRequest(mergeRequest: MergeRequestEntity) {
+    return this.noteRepository.find({
+      where: { mergeRequest: mergeRequest },
     });
   }
 
@@ -140,8 +102,7 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
         return this.createOrUpdateMergeRequestNote(mergeRequest, note);
       }),
     );
-    await this.serviceRepository.save(entities);
-    await this.updateWordCount({ merge_request: mergeRequest.id });
+    return this.noteRepository.save(entities);
   }
 
   async saveIssueNote(issue: IssueEntity, notes: Note[]) {
@@ -150,8 +111,7 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
         return this.createOrUpdateIssueNote(issue, note);
       }),
     );
-    await this.serviceRepository.save(entities);
-    await this.updateWordCount({ issue: issue.id });
+    return this.noteRepository.save(entities);
   }
 
   private async createOrUpdateMergeRequestNote(
@@ -181,7 +141,7 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
     mergeRequest: MergeRequestEntity,
     note: Note,
   ) {
-    return this.serviceRepository
+    return this.noteRepository
       .createQueryBuilder()
       .where('resource @> :resource', {
         resource: {
@@ -195,7 +155,7 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
   }
 
   private queryNoteForIssue(issue: IssueEntity, note: Note) {
-    return this.serviceRepository
+    return this.noteRepository
       .createQueryBuilder()
       .where('resource @> :resource', {
         resource: {
@@ -212,38 +172,16 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
     mergeRequest: MergeRequestEntity,
     note: Note,
   ) {
-    return this.serviceRepository.create({
+    return this.noteRepository.create({
       mergeRequest: mergeRequest,
       resource: note,
     });
   }
 
   private createNoteForIssue(issue: IssueEntity, note: Note) {
-    return this.serviceRepository.create({
+    return this.noteRepository.create({
       issue: issue,
       resource: note,
     });
-  }
-
-  async updateWordCount(filters: NoteQueryDto) {
-    const [notes] = await this.search(filters);
-    const updatedNotes = notes.map((note) => {
-      const wordCount = this.countWords(note.resource.body);
-      note.resource = Extensions.updateExtensions(note.resource, {
-        wordCount: wordCount,
-      });
-      return note;
-    });
-    return this.serviceRepository.save(updatedNotes);
-  }
-
-  private countWords(noteBody: string) {
-    const contentByRepoMember = this.excludeContentGeneratedBySystem(noteBody);
-    const words = contentByRepoMember.trim().split(/\s+/);
-    return words.length;
-  }
-
-  private excludeContentGeneratedBySystem(noteBody: string) {
-    return noteBody.replace(/\*([^*]+)\*$/g, '');
   }
 }

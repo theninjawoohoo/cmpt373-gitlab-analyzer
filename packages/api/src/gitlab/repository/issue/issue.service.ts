@@ -6,51 +6,24 @@ import { Repository } from '../repository.entity';
 import { Issue } from '@ceres/types';
 import { AxiosResponse } from 'axios';
 import { NoteService } from '../note/note.service';
-import { IssueQueryDto } from './issue-query.dto';
-import { SelectQueryBuilder } from 'typeorm';
-import { BaseService } from '../../../common/base.service';
 
 @Injectable()
-export class IssueService extends BaseService<
-  Issue,
-  IssueEntity,
-  IssueQueryDto
-> {
+export class IssueService {
   constructor(
     private readonly httpService: HttpService,
     @InjectRepository(IssueEntity)
-    serviceRepository: TypeORMRepository<IssueEntity>,
+    private readonly repository: TypeORMRepository<IssueEntity>,
     private readonly noteService: NoteService,
-  ) {
-    super(serviceRepository, 'issue');
-  }
-
-  buildFilters(
-    query: SelectQueryBuilder<IssueEntity>,
-    filters: IssueQueryDto,
-  ): SelectQueryBuilder<IssueEntity> {
-    const { repository } = filters;
-    query.andWhere('issue.repository_id = :repository', { repository });
-
-    if (filters.note_id) {
-      query.andWhere(
-        'issue.id in (select issue_id from note where id = :note_id)',
-        {
-          note_id: filters.note_id,
-        },
-      );
-    }
-    return query;
-  }
-
-  buildSort(
-    query: SelectQueryBuilder<IssueEntity>,
-  ): SelectQueryBuilder<IssueEntity> {
-    return query.orderBy("issue.resource #>> '{created_at}'", 'DESC');
-  }
+  ) {}
 
   async findAllForRepository(repository: Repository) {
-    return this.serviceRepository.find({ where: { repository } });
+    return this.repository.find({ where: { repository } });
+  }
+
+  async findOne(id: string) {
+    return this.repository.findOne({
+      where: { id },
+    });
   }
 
   async fetchForRepository(repository: Repository, token: string) {
@@ -113,7 +86,7 @@ export class IssueService extends BaseService<
       existing: entities
         .filter(({ created }) => !created)
         .map(({ issue }) => issue),
-      created: await this.serviceRepository.save(
+      created: await this.repository.save(
         entities.filter(({ created }) => created).map(({ issue }) => issue),
       ),
     };
@@ -131,7 +104,7 @@ export class IssueService extends BaseService<
   }
 
   private queryIssueFromRepository(repository: Repository, issue: Issue) {
-    return this.serviceRepository
+    return this.repository
       .createQueryBuilder()
       .where('resource @> :resource', {
         resource: {
@@ -145,7 +118,7 @@ export class IssueService extends BaseService<
   }
 
   private createNewIssue(repository: Repository, issue: Issue) {
-    return this.serviceRepository.create({
+    return this.repository.create({
       repository: repository,
       resource: issue,
     });
