@@ -10,11 +10,11 @@ import SfuVerify from '../../pages/SfuVerify';
 import Graph from '../../pages/Graph';
 import ListMergeRequestPage from '../../pages/ListMergeRequestPage';
 import ApiSettingPage from '../../pages/ApiSetting';
-import SettingsPage from '../../pages/Settings';
+import SettingsPage from '../../pages/GlobalSettings';
 import { useAuthContext } from '../../contexts/AuthContext';
 import CommitsPage from '../../pages/Commits';
-import Members from '../../pages/Members';
-import RepositoryHomePage from '../../pages/RepositoryHomePage';
+import RepoSetupPage from '../../pages/RepositorySetup';
+import ScoreRubricPage from '../../pages/ScoreRubric';
 import CommentPage from '../../pages/Comment';
 
 export function Router() {
@@ -28,14 +28,14 @@ export function Router() {
         <Route path='/sfu' exact>
           <SfuVerify />
         </Route>
-        <Route path='/repository/:id/members' exact>
-          <Members />
-        </Route>
         <Route path='/repository' exact>
           <RepositoryPage />
         </Route>
-        <Route path='/repository/:id' exact>
-          <RepositoryHomePage />
+        <Route path='/setup/:id' exact>
+          <RepoSetupPage />
+        </Route>
+        <Route path='/setup/:id/rubric' exact>
+          <ScoreRubricPage />
         </Route>
         <Route path='/graph/:id' exact>
           <Graph />

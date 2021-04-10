@@ -15,7 +15,7 @@ import { IssueQueryDto } from './issue-query.dto';
 @Controller('issue')
 export class IssueController {
   constructor(
-    private readonly IssueService: IssueService,
+    private readonly issueService: IssueService,
     private readonly repositoryService: RepositoryService,
     private readonly noteService: NoteService,
   ) {}
@@ -24,7 +24,7 @@ export class IssueController {
   async findAllForRepository(@Param() { id }: IdParam) {
     const repository = await this.repositoryService.findOne(id);
     if (repository) {
-      return this.IssueService.findAllForRepository(repository);
+      return this.issueService.findAllForRepository(repository);
     }
     throw new NotFoundException(
       `Could not find any issues for repository with id: ${id}`,
@@ -32,7 +32,7 @@ export class IssueController {
   }
   @Get(':id')
   async findOne(@Param() { id }: IdParam) {
-    const issue = await this.IssueService.findOne(id);
+    const issue = await this.issueService.findOne(id);
     if (issue) {
       return issue;
     }
@@ -41,7 +41,7 @@ export class IssueController {
 
   @Get(':id/note')
   async getAllIssueNotes(@Param() { id }: IdParam) {
-    const issue = await this.IssueService.findOne(id);
+    const issue = await this.issueService.findOne(id);
     if (issue) {
       return await this.noteService.findAllForIssue(issue);
     }
@@ -50,6 +50,6 @@ export class IssueController {
 
   @Get()
   search(@Query() query: IssueQueryDto) {
-    return paginatedToResponse(this.IssueService.search(query));
+    return paginatedToResponse(this.issueService.search(query));
   }
 }

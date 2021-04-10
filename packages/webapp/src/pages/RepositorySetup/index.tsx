@@ -1,6 +1,5 @@
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import { useSnackbar } from 'notistack';
 import React from 'react';
@@ -15,19 +14,19 @@ import {
 import DefaultPageLayout from '../../components/DefaultPageLayout';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
 import SmartDate from '../../components/SmartDate';
-import CancelIcon from '@material-ui/icons/Cancel';
 import { useAuthContext } from '../../contexts/AuthContext';
-import Collaborators from './components/Collaborators';
-import LeaveRepository from './components/LeaveRepository';
-import LinkGrid from './components/LinkGrid';
-import MembersWarning from './components/MembersWarning';
-import ScoringConfigWarning from './components/ScoringConfigWarning';
+import Collaborators from '../RepositorySetup/components/Collaborators';
+import LeaveRepository from '../RepositorySetup/components/LeaveRepository';
+import MembersWarning from '../RepositorySetup/components/MembersWarning';
+import ScoringConfigWarning from '../RepositorySetup/components/ScoringConfigWarning';
 import ScoringConfigSelector from './components/ScoringConfigSelector';
 import { useUpdateScoring } from '../../api/scoring';
 import { ApiResource } from '../../api/base';
 import { ScoringConfig } from '@ceres/types';
 import RepoFilter from '../../components/RepositoryFilter';
 import styled from 'styled-components';
+import AccordionMenu from './components/AccordionMenu';
+import Members from '../Members';
 
 const MainContainer = styled.div`
   display: grid;
@@ -35,7 +34,7 @@ const MainContainer = styled.div`
   grid-gap: 1rem;
 `;
 
-const RepositoryPage: React.FC = () => {
+const RepoSetupPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { push } = useHistory();
   const {
@@ -48,6 +47,7 @@ const RepositoryPage: React.FC = () => {
   const { mutate: removeCollaborator } = useRemoveCollaborator(id);
   const { enqueueSnackbar } = useSnackbar();
   const isOwner = user?.id === data?.extensions?.owner?.id;
+  const collaborators = data?.extensions?.collaborators || [];
 
   const handleUpdateScore = (scoringConfig: ApiResource<ScoringConfig>) => {
     updateScoring(
@@ -98,11 +98,6 @@ const RepositoryPage: React.FC = () => {
               {data?.name_with_namespace}
             </DefaultPageTitleFormat>
           </Grid>
-          <Grid item>
-            <IconButton onClick={() => push('/repository')}>
-              <CancelIcon fontSize='large' />
-            </IconButton>
-          </Grid>
         </Grid>
         <Grid container spacing={2}>
           <Grid item xs={6}>
@@ -120,32 +115,43 @@ const RepositoryPage: React.FC = () => {
         </Grid>
         <MainContainer>
           <MembersWarning repositoryId={id} />
-          <ScoringConfigWarning repository={data} />
-          {data && !isOwner && (
-            <LeaveRepository repository={data} onLeave={handleLeave} />
-          )}
-          {data && isOwner && (
-            <Collaborators
-              repository={data}
-              onAddCollaborator={handleAddCollaborator}
-              onRemoveCollaborator={handleRemoveCollaborator}
-            />
-          )}
-          {data && isOwner && (
-            <ScoringConfigSelector
-              isLoading={updateScoreLoading}
-              onSubmit={handleUpdateScore}
-              repository={data}
-            />
-          )}
-          <Grid item xs={12}>
-            <RepoFilter />
-          </Grid>
-          <LinkGrid repositoryId={id} />
+          <ScoringConfigWarning repository={data} repositoryId={id} />
+          <AccordionMenu title='Filter Config' color='#e4f5ba'>
+            <Grid item xs={12}>
+              <RepoFilter />
+            </Grid>
+          </AccordionMenu>
+          <AccordionMenu title='Members' color='#ffd9cf'>
+            <Members id={id} />
+          </AccordionMenu>
+          <AccordionMenu title='Scoring Rubric' color='#cff4fc'>
+            {data && isOwner && (
+              <ScoringConfigSelector
+                isLoading={updateScoreLoading}
+                onSubmit={handleUpdateScore}
+                repository={data}
+              />
+            )}
+          </AccordionMenu>
+          <AccordionMenu
+            title={`Sharing · ${collaborators.length} Collaborator(s)`}
+            color='#e6d9ff'
+          >
+            {data && isOwner && (
+              <Collaborators
+                repository={data}
+                onAddCollaborator={handleAddCollaborator}
+                onRemoveCollaborator={handleRemoveCollaborator}
+              />
+            )}
+            {data && !isOwner && (
+              <LeaveRepository repository={data} onLeave={handleLeave} />
+            )}
+          </AccordionMenu>
         </MainContainer>
       </Container>
     </DefaultPageLayout>
   );
 };
 
-export default RepositoryPage;
+export default RepoSetupPage;

@@ -109,7 +109,7 @@ const RepositoryList: React.FC = () => {
     <Container>
       <Grid container justify='space-between' alignItems='center'>
         <Grid item>
-          <DefaultPageTitleFormat>Projects</DefaultPageTitleFormat>
+          <DefaultPageTitleFormat>Repositories</DefaultPageTitleFormat>
         </Grid>
         <Grid item>
           <Box position='relative'>
