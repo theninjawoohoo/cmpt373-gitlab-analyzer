@@ -6,7 +6,6 @@ import { Repository } from '../repository.entity';
 import { Issue } from '@ceres/types';
 import { AxiosResponse } from 'axios';
 import { NoteService } from '../note/note.service';
-import { Fetch } from '../../../common/fetchWithRetry';
 import { IssueQueryDto } from './issue-query.dto';
 import { SelectQueryBuilder } from 'typeorm';
 import { BaseService } from '../../../common/base.service';

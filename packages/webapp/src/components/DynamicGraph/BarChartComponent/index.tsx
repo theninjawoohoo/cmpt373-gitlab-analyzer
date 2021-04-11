@@ -8,6 +8,7 @@ import {
   Tooltip,
   Legend,
   ReferenceLine,
+  ResponsiveContainer,
 } from 'recharts';
 import { GraphTab } from '..';
 import SmartDate from '../../SmartDate';
@@ -33,58 +34,89 @@ const DateTick: React.FC<any> = (props) => {
 const DynamicBarChart: React.FC<BarChartProps> = ({ graphData, graphTab }) => {
   if (graphTab === GraphTab.code) {
     return (
-      <BarChart width={1000} height={500} stackOffset='sign' data={graphData}>
-        <XAxis dataKey='date' tick={DateTick} />
-        <YAxis tickFormatter={(value) => Math.abs(value).toString()} />
-        <ReferenceLine y={0} stroke='#000' />
-        <Tooltip
-          labelFormatter={(value) =>
-            DateTime.fromISO(value).toFormat('LLL dd yyyy')
-          }
-          formatter={(value) => Math.abs(value).toString()}
-        />
-        <Legend layout='vertical' align='right' verticalAlign='top' />
-        <Bar dataKey='commitCount' name='Commits' stackId='a' fill='#0A4D63' />
-        <Bar
-          dataKey='mergeRequestCount'
-          name='Merge Requests'
-          stackId='a'
-          fill='#e37500'
-        />
-      </BarChart>
+      <ResponsiveContainer width={1200} height={600}>
+        <BarChart stackOffset='sign' data={graphData}>
+          <XAxis dataKey='date' tick={DateTick} />
+          <YAxis
+            tickFormatter={(value) => Math.abs(value).toString()}
+            label={{ value: 'Count', angle: -90, position: 'insideLeft' }}
+          />
+          <ReferenceLine y={0} stroke='#000' />
+          <Tooltip
+            labelFormatter={(value) =>
+              DateTime.fromISO(value).toFormat('LLL dd yyyy')
+            }
+            formatter={(value) => Math.abs(value).toString()}
+          />
+          <Legend layout='vertical' align='right' verticalAlign='top' />
+          <Bar dataKey='commitCount' name='Commit' stackId='a' fill='#0A4D63' />
+          <Bar
+            dataKey='mergeRequestCount'
+            name='Merge Request'
+            stackId='a'
+            fill='#e37500'
+          />
+        </BarChart>
+      </ResponsiveContainer>
     );
   } else if (graphTab === GraphTab.scores) {
     return (
-      <BarChart width={1000} height={500} stackOffset='sign' data={graphData}>
-        <XAxis dataKey='date' tick={DateTick} />
-        <YAxis
-          tickFormatter={(value) => Math.round(Math.abs(value)).toString()}
-        />
-        <ReferenceLine y={0} stroke='#000' />
-        <Tooltip
-          labelFormatter={(value) =>
-            DateTime.fromISO(value).toFormat('LLL dd yyyy')
-          }
-          formatter={(value) => Math.abs(value).toFixed(1)}
-        />
-        <Legend layout='vertical' align='right' verticalAlign='top' />
-        <Bar dataKey='commitScore' name='Commits' stackId='a' fill='#0A4D63' />
-        <Bar
-          dataKey='mergeRequestScore'
-          name='Merge Requests'
-          stackId='a'
-          fill='#e37500'
-        />
-      </BarChart>
+      <ResponsiveContainer width={1200} height={600}>
+        <BarChart stackOffset='sign' data={graphData}>
+          <XAxis dataKey='date' tick={DateTick} />
+          <YAxis
+            tickFormatter={(value) => Math.round(Math.abs(value)).toString()}
+            label={{ value: 'Point', angle: -90, position: 'insideLeft' }}
+          />
+          <ReferenceLine y={0} stroke='#000' />
+          <Tooltip
+            labelFormatter={(value) =>
+              DateTime.fromISO(value).toFormat('LLL dd yyyy')
+            }
+            formatter={(value) => Math.abs(value).toFixed(1)}
+          />
+          <Legend layout='vertical' align='right' verticalAlign='top' />
+          <Bar dataKey='commitScore' name='Commit' stackId='a' fill='#0A4D63' />
+          <Bar
+            dataKey='mergeRequestScore'
+            name='Merge Request'
+            stackId='a'
+            fill='#e37500'
+          />
+        </BarChart>
+      </ResponsiveContainer>
     );
   } else {
     return (
-      <BarChart width={1000} height={500} data={graphData}>
-        <XAxis dataKey='date' />
-        <YAxis />
-        <Tooltip />
-        <Bar dataKey='wordCount' name='Word Counts' fill='#0A4D63' />
-      </BarChart>
+      <ResponsiveContainer width={1200} height={600}>
+        <BarChart stackOffset='sign' data={graphData}>
+          <XAxis dataKey='date' tick={DateTick} />
+          <YAxis
+            tickFormatter={(value) => Math.abs(value).toString()}
+            label={{ value: 'Word Count', angle: -90, position: 'insideLeft' }}
+          />
+          <ReferenceLine y={0} stroke='#000' />
+          <Tooltip
+            labelFormatter={(value) =>
+              DateTime.fromISO(value).toFormat('LLL dd yyyy')
+            }
+            formatter={(value) => Math.abs(value).toString()}
+          />
+          <Legend layout='vertical' align='right' verticalAlign='top' />
+          <Bar
+            dataKey='mergeRequestWordCount'
+            name='Merge Request'
+            stackId='a'
+            fill='#0A4D63'
+          />
+          <Bar
+            dataKey='issueWordCount'
+            name='Issue'
+            stackId='a'
+            fill='#e37500'
+          />
+        </BarChart>
+      </ResponsiveContainer>
     );
   }
 };

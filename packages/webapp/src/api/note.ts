@@ -6,6 +6,7 @@ interface NoteSearchParams {
   author_id?: number[];
   created_start_date?: string;
   created_end_date?: string;
+  type?: Note.Type;
 }
 
 export function useGetMergeRequestNotes(mergeRequestId: string) {
@@ -27,4 +28,8 @@ export function useGetNotesByRepository(
   pageSize?: number,
 ) {
   return usePaginatedQuery<Note>('/note', params, page, pageSize);
+}
+
+export function useGetWordCount(params: NoteSearchParams) {
+  return useApiQuery<Note.DailyCount[]>('/note/count', params);
 }
