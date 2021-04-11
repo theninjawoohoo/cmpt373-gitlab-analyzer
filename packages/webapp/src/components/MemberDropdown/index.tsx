@@ -8,7 +8,6 @@ import { useRepositoryAuthors } from '../../api/author';
 import { ApiResource } from '../../api/base';
 import { useRepositoryMembers } from '../../api/repo_members';
 import { useFilterContext } from '../../contexts/FilterContext';
-import { makeStyles } from '@material-ui/core/styles';
 
 function findEmailsForMember(
   memberId: string,
@@ -24,20 +23,12 @@ interface MemberDropdownProps {
   repositoryId: string;
 }
 
-const useStyles = makeStyles(() => ({
-  gridDimensions: {
-    padding: '0px',
-  },
-}));
-
 const MemberDropdown: React.FC<MemberDropdownProps> = ({ repositoryId }) => {
   const { author, setAuthor, setEmail } = useFilterContext();
   const [value, setValue] = useState(author);
 
   const { data: members } = useRepositoryMembers(repositoryId);
   const { data: authors } = useRepositoryAuthors(repositoryId);
-
-  const styles = useStyles();
 
   const handleChangeAuthor = (author) => {
     setAuthor(author);
@@ -59,7 +50,7 @@ const MemberDropdown: React.FC<MemberDropdownProps> = ({ repositoryId }) => {
   }, [value]);
 
   return (
-    <FormControl variant='filled' className={styles.gridDimensions}>
+    <FormControl variant='filled'>
       <InputLabel>Show results for:</InputLabel>
       <Select
         style={{ minWidth: '14rem' }}

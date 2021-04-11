@@ -13,15 +13,8 @@ import { Box, Typography, Paper } from '@material-ui/core';
 import { DateTime } from 'luxon';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
-import { makeStyles } from '@material-ui/core/styles';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
-
-const useStyles = makeStyles(() => ({
-  gridDimensions: {
-    padding: '0px',
-  },
-}));
 
 const RepoFilter: React.FC = () => {
   const { repositoryId } = useRepositoryContext();
@@ -35,7 +28,6 @@ const RepoFilter: React.FC = () => {
     setEndDate,
     setIteration,
   } = useFilterContext();
-  const styles = useStyles();
 
   const handleStartDateChange = (date: DateTime) => {
     setStartDate(date.startOf('second').toISO());
@@ -57,7 +49,6 @@ const RepoFilter: React.FC = () => {
           <Grid container spacing={1}>
             <Grid item xs={3}>
               <KeyboardDateTimePicker
-                className={styles.gridDimensions}
                 variant='inline'
                 format='MM/dd/yyyy hh:mm a'
                 ampm={true}
@@ -73,7 +64,6 @@ const RepoFilter: React.FC = () => {
             </Grid>
             <Grid item xs={3}>
               <KeyboardDateTimePicker
-                className={styles.gridDimensions}
                 variant='inline'
                 format='MM/dd/yyyy hh:mm a'
                 ampm={true}
@@ -91,7 +81,7 @@ const RepoFilter: React.FC = () => {
               <MemberDropdown repositoryId={repositoryId} />
             </Grid>
             <Grid item xs={3}>
-              <FormControl variant='filled' className={styles.gridDimensions}>
+              <FormControl variant='filled'>
                 <InputLabel>Iteration:</InputLabel>
                 <Select
                   style={{ minWidth: '14rem' }}
