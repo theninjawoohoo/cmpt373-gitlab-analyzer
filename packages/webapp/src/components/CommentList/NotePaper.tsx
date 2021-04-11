@@ -4,7 +4,6 @@ import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import { Paper } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-// import AutoAwesome from '@material-ui/icons/';
 import FilterVintageIcon from '@material-ui/icons/FilterVintage';
 import EmojiNatureIcon from '@material-ui/icons/EmojiNature';
 import { ApiResource } from '../../api/base';
@@ -76,6 +75,7 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
     mergeRequest?.results.length != 0 &&
     NoteProps.noteData.author.id ===
       mergeRequest?.results.find((element) => element).author.id;
+
   const onMyOwnIssue =
     issue?.results.length != 0 &&
     NoteProps.noteData.author.id ===
@@ -118,16 +118,14 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
           )}
         </Grid>
         <Grid item>
-          {((isMergeRequestNote && onMyOwnMergeRequest) ||
-            (!isMergeRequestNote && onMyOwnIssue)) && (
+          {(onMyOwnMergeRequest || onMyOwnIssue) && (
             <FilterVintageIcon
               style={{
                 color: '#f3bfb3',
               }}
             />
           )}
-          {((isMergeRequestNote && !onMyOwnMergeRequest) ||
-            (!isMergeRequestNote && !onMyOwnIssue)) && (
+          {!onMyOwnMergeRequest && !onMyOwnIssue && (
             <EmojiNatureIcon
               style={{
                 color: '#57838d',
