@@ -34,6 +34,7 @@ export class DiffService extends BaseService<Diff, DiffEntity, DiffQueryDto> {
   ): SelectQueryBuilder<DiffEntity> {
     throw new Error('Method not implemented.');
   }
+
   buildSort(
     query: SelectQueryBuilder<DiffEntity>,
     sortKey?: string,
@@ -41,6 +42,7 @@ export class DiffService extends BaseService<Diff, DiffEntity, DiffQueryDto> {
   ): SelectQueryBuilder<DiffEntity> {
     throw new Error('Method not implemented.');
   }
+
   constructor(
     readonly httpService: HttpService,
     @InjectRepository(DiffEntity)

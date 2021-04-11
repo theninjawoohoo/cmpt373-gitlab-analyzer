@@ -1,29 +1,43 @@
 import { Extensions, Note } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository as TypeORMNote } from 'typeorm';
+import { Repository as TypeORMNote, SelectQueryBuilder } from 'typeorm';
 import { Note as NoteEntity } from './note.entity';
 import { MergeRequest as MergeRequestEntity } from '../../merge-request/merge-request.entity';
 import { Issue as IssueEntity } from '../issue/issue.entity';
 import { paginate, withDefaults } from '../../../common/query-dto';
 import alwaysArray from '../../../common/alwaysArray';
 import { NoteQueryDto } from './note-query.dto';
-import { Fetch } from '../../../common/fetchWithRetry';
+import { BaseService } from '../../../common/base.service';
 
 @Injectable()
-export class NoteService extends Fetch {
+export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
+  buildFilters(
+    query: SelectQueryBuilder<NoteEntity>,
+    filters: NoteQueryDto,
+  ): SelectQueryBuilder<NoteEntity> {
+    throw new Error('Method not implemented.');
+  }
+
+  buildSort(
+    query: SelectQueryBuilder<NoteEntity>,
+    sortKey?: string,
+    order?: 'ASC' | 'DESC',
+  ): SelectQueryBuilder<NoteEntity> {
+    throw new Error('Method not implemented.');
+  }
+
   constructor(
     readonly httpService: HttpService,
     @InjectRepository(NoteEntity)
     private readonly noteRepository: TypeORMNote<NoteEntity>,
   ) {
-    super(httpService);
+    super(noteRepository, 'note', httpService);
   }
 
   async search(filters: NoteQueryDto) {
     filters = withDefaults(filters);
     const query = this.noteRepository.createQueryBuilder('note');
-
     if (filters.merge_request) {
       query.where('note.merge_request_id = :merge_request', {
         merge_request: filters.merge_request,
