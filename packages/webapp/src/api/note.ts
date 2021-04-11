@@ -28,3 +28,7 @@ export function useGetNotesByRepository(
 ) {
   return usePaginatedQuery<Note>('/note', params, page, pageSize);
 }
+
+export function useGetWordCount(params: NoteSearchParams) {
+  return useApiQuery<Note.DailyCount[]>('/note/count', params);
+}

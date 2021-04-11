@@ -95,20 +95,26 @@ const DynamicBarChart: React.FC<BarChartProps> = ({ graphData, graphTab }) => {
   } else {
     return (
       <ResponsiveContainer width={1200} height={600}>
-        <BarChart data={graphData}>
+        <BarChart stackOffset='sign' data={graphData}>
           <XAxis dataKey='date' tick={DateTick} />
-          <YAxis />
-          <Tooltip />
+          <YAxis tickFormatter={(value) => Math.abs(value).toString()} />
+          <ReferenceLine y={0} stroke='#000' />
+          <Tooltip
+            labelFormatter={(value) =>
+              DateTime.fromISO(value).toFormat('LLL dd yyyy')
+            }
+            formatter={(value) => Math.abs(value).toString()}
+          />
           <Legend layout='vertical' align='right' verticalAlign='top' />
           <Bar
-            dataKey='mergeRequestWordCount'
-            name='Merge Request'
+            dataKey='issueWordCount'
+            name='Issue'
             stackId='a'
             fill='#0A4D63'
           />
           <Bar
-            dataKey='issueWordCount'
-            name='Issue'
+            dataKey='mergeRequestWordCount'
+            name='Merge Request'
             stackId='a'
             fill='#e37500'
           />
