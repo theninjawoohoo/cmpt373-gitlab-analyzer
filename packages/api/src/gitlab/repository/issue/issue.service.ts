@@ -6,6 +6,7 @@ import { Repository } from '../repository.entity';
 import { Issue } from '@ceres/types';
 import { AxiosResponse } from 'axios';
 import { NoteService } from '../note/note.service';
+import { Fetch } from '../../../common/fetchWithRetry';
 import { IssueQueryDto } from './issue-query.dto';
 import { SelectQueryBuilder } from 'typeorm';
 import { BaseService } from '../../../common/base.service';
@@ -17,7 +18,7 @@ export class IssueService extends BaseService<
   IssueQueryDto
 > {
   constructor(
-    private readonly httpService: HttpService,
+    readonly httpService: HttpService,
     @InjectRepository(IssueEntity)
     serviceRepository: TypeORMRepository<IssueEntity>,
     private readonly noteService: NoteService,
@@ -90,17 +91,9 @@ export class IssueService extends BaseService<
     page: number,
     pageSize = 10,
   ): Promise<AxiosResponse<Issue[]>> {
-    return await this.httpService
-      .get<Issue[]>(`projects/${repo.resource.id}/issues`, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: pageSize,
-          page,
-        },
-      })
-      .toPromise();
+    const url = `projects/${repo.resource.id}/issues`;
+    const params = { per_page: pageSize, page: page };
+    return await this.fetchWithRetries<Issue>(token, url, params, 5);
   }
 
   private async createAndSaveIssues(repository: Repository, issues: Issue[]) {

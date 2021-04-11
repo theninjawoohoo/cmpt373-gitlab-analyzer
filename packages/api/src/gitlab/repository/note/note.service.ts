@@ -13,7 +13,7 @@ import { Repository as TypeORMRepository } from 'typeorm/repository/Repository';
 @Injectable()
 export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
   constructor(
-    private readonly httpService: HttpService,
+    readonly httpService: HttpService,
     @InjectRepository(NoteEntity)
     serviceRepository: TypeORMRepository<NoteEntity>,
   ) {
@@ -31,6 +31,7 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
         merge_request: filters.merge_request,
       });
     }
+
     if (filters.issue) {
       query.andWhere('note.issue_id = :issue', {
         issue: filters.issue,
@@ -106,31 +107,25 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
 
   async fetchForMergeRequest(mergeRequest: MergeRequestEntity, token: string) {
     const url = `/projects/${mergeRequest.resource.project_id}/merge_requests/${mergeRequest.resource.iid}/notes`;
-    const axiosResponse = await this.httpService
-      .get<Note[]>(url, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: 50,
-        },
-      })
-      .toPromise();
+    const params = { per_page: 50 };
+    const axiosResponse = await this.fetchWithRetries<Note>(
+      token,
+      url,
+      params,
+      5,
+    );
     return axiosResponse.data;
   }
 
   async fetchForIssue(issue: IssueEntity, token: string) {
     const url = `/projects/${issue.resource.project_id}/issues/${issue.resource.iid}/notes`;
-    const axiosResponse = await this.httpService
-      .get<Note[]>(url, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: 50,
-        },
-      })
-      .toPromise();
+    const params = { per_page: 50 };
+    const axiosResponse = await this.fetchWithRetries<Note>(
+      token,
+      url,
+      params,
+      5,
+    );
     return axiosResponse.data;
   }
 

@@ -12,9 +12,9 @@ import ListMergeRequestPage from '../../pages/ListMergeRequestPage';
 import ApiSettingPage from '../../pages/ApiSetting';
 import SettingsPage from '../../pages/GlobalSettings';
 import { useAuthContext } from '../../contexts/AuthContext';
-import CommitsPage from '../../pages/Commits';
 import RepoSetupPage from '../../pages/RepositorySetup';
 import ScoreRubricPage from '../../pages/ScoreRubric';
+import { RepositoryScoringContextProvider } from '../../pages/RepositorySetup/RepositoryScoringContext';
 import CommentPage from '../../pages/Comment';
 
 export function Router() {
@@ -32,7 +32,9 @@ export function Router() {
           <RepositoryPage />
         </Route>
         <Route path='/setup/:id' exact>
-          <RepoSetupPage />
+          <RepositoryScoringContextProvider>
+            <RepoSetupPage />
+          </RepositoryScoringContextProvider>
         </Route>
         <Route path='/setup/:id/rubric' exact>
           <ScoreRubricPage />
@@ -51,9 +53,6 @@ export function Router() {
         </Route>
         <Route path='/settings/scoring' exact>
           <BrowseScoringConfigsPage />
-        </Route>
-        <Route path='/commits' exact>
-          <CommitsPage />
         </Route>
         <Route path='/merge/:id' exact>
           <ListMergeRequestPage />

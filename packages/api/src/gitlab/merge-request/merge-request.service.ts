@@ -1,4 +1,4 @@
-import { Commit, Extensions, GlobWeight, MergeRequest } from '@ceres/types';
+import { Extensions, GlobWeight, MergeRequest } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
@@ -13,6 +13,7 @@ import { MergeRequest as MergeRequestEntity } from './merge-request.entity';
 import { NoteService } from '../repository/note/note.service';
 import { BaseService } from 'src/common/base.service';
 import { groupBy, mapValues } from 'lodash';
+import { Commit } from '../repository/commit/commit.entity';
 
 @Injectable()
 export class MergeRequestService extends BaseService<
@@ -21,15 +22,15 @@ export class MergeRequestService extends BaseService<
   MergeRequestQueryDto
 > {
   constructor(
-    private readonly httpService: HttpService,
     @InjectRepository(MergeRequestEntity)
     serviceRepository: TypeORMRepository<MergeRequestEntity>,
     private readonly diffService: DiffService,
     private readonly commitService: CommitService,
     private readonly participantService: MergeRequestParticipantService,
     private readonly noteService: NoteService,
+    readonly httpService: HttpService,
   ) {
-    super(serviceRepository, 'merge_request');
+    super(serviceRepository, 'merge_request', httpService);
   }
 
   buildFilters(
@@ -267,17 +268,13 @@ export class MergeRequestService extends BaseService<
     token: string,
     repository: Repository,
     mergeRequest: MergeRequest,
-  ) {
-    const axiosResponse = await this.httpService
-      .get<Commit[]>(
-        `projects/${repository.resource.id}/merge_requests/${mergeRequest.iid}/commits`,
-        {
-          headers: {
-            'PRIVATE-TOKEN': token,
-          },
-        },
-      )
-      .toPromise();
+  ): Promise<Commit[]> {
+    const url = `projects/${repository.resource.id}/merge_requests/${mergeRequest.iid}/commits`;
+    const axiosResponse = await this.fetchWithRetries<Commit>(
+      token,
+      url,
+      undefined,
+    );
     return axiosResponse.data;
   }
 
@@ -287,19 +284,14 @@ export class MergeRequestService extends BaseService<
     page: number,
     pageSize = 10,
   ): Promise<AxiosResponse<MergeRequest[]>> {
-    return await this.httpService
-      .get<MergeRequest[]>(`projects/${repo.resource.id}/merge_requests`, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          state: 'merged',
-          target_branch: 'master',
-          per_page: pageSize,
-          page,
-        },
-      })
-      .toPromise();
+    const url = `projects/${repo.resource.id}/merge_requests`;
+    const params = {
+      page: page,
+      per_page: pageSize,
+      state: 'merged',
+      target_branch: 'master',
+    };
+    return this.fetchWithRetries(token, url, params);
   }
 
   public async getSumScoreForMergeRequest(

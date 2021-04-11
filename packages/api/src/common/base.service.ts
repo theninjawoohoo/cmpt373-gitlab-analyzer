@@ -2,16 +2,21 @@ import { DeepPartial, Repository, SelectQueryBuilder } from 'typeorm';
 import alwaysArray from './alwaysArray';
 import { BaseEntity } from './base-entity';
 import { paginate, QueryDto, withDefaults } from './query-dto';
+import { HttpService } from '@nestjs/common';
+import { Fetch } from './fetchWithRetry';
 
 export abstract class BaseService<
   TResource,
   TEntity extends BaseEntity<TResource>,
   TFilters extends QueryDto
-> {
-  constructor(
+> extends Fetch {
+  protected constructor(
     protected readonly serviceRepository: Repository<TEntity>,
     protected readonly tableName: string,
-  ) {}
+    readonly httpService: HttpService,
+  ) {
+    super(httpService);
+  }
 
   search(filters: TFilters, isPaginated = true) {
     filters = withDefaults(filters);

@@ -1,4 +1,4 @@
-import { MergeRequest } from '@ceres/types';
+import { MergeRequest, Commit } from '@ceres/types';
 import { useTheme } from '@material-ui/core';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
@@ -13,8 +13,9 @@ import ScoringChip from '../../../components/ScoringChip';
 import SmartDate from '../../../components/SmartDate';
 import { useFilterContext } from '../../../contexts/FilterContext';
 
-interface MergeRequestRendererProps {
-  mergeRequest: ApiResource<MergeRequest>;
+interface CommitOrMergeRequestRendererProps {
+  mergeRequest?: ApiResource<MergeRequest>;
+  commit?: ApiResource<Commit>;
   active?: boolean;
   onClickSummary?: () => void;
   shrink?: boolean;
@@ -46,22 +47,37 @@ function getSumAndHasOverride(
   };
 }
 
-const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
+const CommitOrMergeRequestRenderer: React.FC<CommitOrMergeRequestRendererProps> = ({
   active,
   mergeRequest,
+  commit,
   onClickSummary,
   children,
   shrink,
 }) => {
   const theme = useTheme();
+  const title = mergeRequest?.title || commit?.title;
+  const author = mergeRequest?.author.name || commit?.committer_name;
+
+  const date = mergeRequest?.merged_at || commit?.created_at;
+  const diffHasOverride =
+    mergeRequest?.extensions?.diffHasOverride ||
+    commit?.extensions?.diffHasOverride;
+
+  const diffScoreSum =
+    mergeRequest?.extensions?.diffScore.toFixed(1) ||
+    commit?.extensions?.score.toFixed(1);
+
+  const accordionColor = mergeRequest ? '' : '#f7ebef';
   const { emails } = useFilterContext();
   const {
     hasOverride: commitHasOverride,
     score: commitScoreSum,
   } = getSumAndHasOverride(
     emails || [],
-    mergeRequest.extensions?.commitScoreSums || {},
+    mergeRequest?.extensions?.commitScoreSums || {},
   );
+
   return (
     <Accordion
       expanded={active}
@@ -70,19 +86,21 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
       <AccordionSummary
         expandIcon={<ExpandMore />}
         onClick={onClickSummary}
-        style={{ background: active ? theme.palette.primary.light : '' }}
+        style={{
+          background: active ? theme.palette.primary.light : accordionColor,
+        }}
       >
         <Grid container>
           <Grid item xs={shrink ? 8 : 6}>
-            <Typography>{shortenTitle(mergeRequest.title, shrink)}</Typography>
+            <Typography>{shortenTitle(title, shrink)}</Typography>
             {shrink && (
               <Grid container justify='space-between'>
                 <Typography variant='body2' color='textSecondary'>
-                  {mergeRequest.author.name}
+                  {author}
                 </Typography>
                 <Box pr={4}>
                   <Typography variant='body2' color='textSecondary'>
-                    <SmartDate>{mergeRequest.merged_at}</SmartDate>
+                    <SmartDate>{date}</SmartDate>
                   </Typography>
                 </Box>
               </Grid>
@@ -92,17 +110,15 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
             <>
               <Grid item xs={2}>
                 <Typography align='right'>
-                  <ScoringChip
-                    hasOverride={mergeRequest?.extensions?.diffHasOverride}
-                  >
-                    {mergeRequest.extensions?.diffScore?.toFixed(1)}
+                  <ScoringChip hasOverride={diffHasOverride}>
+                    {diffScoreSum}
                   </ScoringChip>
                 </Typography>
               </Grid>
               <Grid item xs={2}>
                 <Typography align='right'>
                   <ScoringChip hasOverride={commitHasOverride}>
-                    {commitScoreSum?.toFixed(1)}
+                    {mergeRequest ? commitScoreSum?.toFixed(1) : null}
                   </ScoringChip>
                 </Typography>
               </Grid>
@@ -110,26 +126,24 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
           ) : (
             <>
               <Grid item xs={2}>
-                <Typography>{mergeRequest.author.name}</Typography>
+                <Typography>{author}</Typography>
               </Grid>
               <Grid item xs={2}>
                 <Typography>
-                  <SmartDate>{mergeRequest.merged_at}</SmartDate>
+                  <SmartDate>{date}</SmartDate>
                 </Typography>
               </Grid>
               <Grid item xs={1}>
                 <Typography align='right'>
-                  <ScoringChip
-                    hasOverride={mergeRequest?.extensions?.diffHasOverride}
-                  >
-                    {mergeRequest.extensions?.diffScore?.toFixed(1)}
+                  <ScoringChip hasOverride={diffHasOverride}>
+                    {diffScoreSum}
                   </ScoringChip>
                 </Typography>
               </Grid>
               <Grid item xs={1}>
                 <Typography align='right'>
                   <ScoringChip hasOverride={commitHasOverride}>
-                    {commitScoreSum?.toFixed(1)}
+                    {mergeRequest ? commitScoreSum?.toFixed(1) : null}
                   </ScoringChip>
                 </Typography>
               </Grid>
@@ -144,4 +158,4 @@ const MergeRequestRenderer: React.FC<MergeRequestRendererProps> = ({
   );
 };
 
-export default MergeRequestRenderer;
+export default CommitOrMergeRequestRenderer;

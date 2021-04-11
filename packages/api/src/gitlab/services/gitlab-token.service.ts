@@ -2,6 +2,7 @@ import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GitlabToken } from '../entities/gitlab-token.entity';
 import { Repository } from 'typeorm';
+import { AxiosResponse } from 'axios';
 
 @Injectable()
 export class GitlabTokenService {
@@ -20,19 +21,25 @@ export class GitlabTokenService {
   }
 
   async validate({ token }: GitlabToken) {
-    try {
-      const res = await this.httpService
-        .get('/projects', {
-          headers: {
-            'PRIVATE-TOKEN': token,
-          },
-          params: {
-            per_page: 1,
-          },
-        })
-        .toPromise();
-      return res.status === 200;
-    } catch (e) {}
+    let axiosResponse: AxiosResponse;
+    let attemptsCount = 0;
+    while (!axiosResponse && attemptsCount < 5) {
+      try {
+        axiosResponse = await this.httpService
+          .get('/projects', {
+            headers: {
+              'PRIVATE-TOKEN': token,
+            },
+            params: {
+              per_page: 1,
+            },
+          })
+          .toPromise();
+        return axiosResponse.status === 200;
+      } catch (e) {}
+      attemptsCount++;
+    }
+
     return false;
   }
 

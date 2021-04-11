@@ -28,7 +28,11 @@ export class ScoringController {
         config.scoringConfigId,
       );
     }
-    await this.scoringService.updateRepositoryScores(repository, scoringConfig);
+    await this.scoringService.updateRepositoryScores(
+      repository,
+      scoringConfig,
+      config.overrides,
+    );
   }
 
   @Post('override')
@@ -45,7 +49,13 @@ export class ScoringController {
     const scoringConfig = await this.scoringConfigService.findOne(
       repository?.resource?.extensions?.scoringConfig?.id,
     );
+    const scoringConfigOverrides =
+      repository?.resource?.extensions?.scoringConfig?.overrides;
     await this.scoringService.updateOverrides(config.overrides);
-    await this.scoringService.updateRepositoryScores(repository, scoringConfig);
+    await this.scoringService.updateRepositoryScores(
+      repository,
+      scoringConfig,
+      scoringConfigOverrides,
+    );
   }
 }

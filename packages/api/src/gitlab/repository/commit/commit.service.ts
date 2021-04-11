@@ -17,12 +17,12 @@ export class CommitService extends BaseService<
   CommitQueryDto
 > {
   constructor(
-    private readonly httpService: HttpService,
     @InjectRepository(CommitEntity)
     serviceRepository: TypeORMCommit<CommitEntity>,
     private readonly diffService: DiffService,
+    readonly httpService: HttpService,
   ) {
-    super(serviceRepository, 'commit');
+    super(serviceRepository, 'commit', httpService);
   }
 
   buildFilters(
@@ -67,6 +67,15 @@ export class CommitService extends BaseService<
         endDate: filters.end_date,
       });
     }
+
+    if (filters.not_associated_with_any_mr && filters.repository) {
+      query.andWhere(`commit.repository_id = :repository_id`, {
+        repository_id: filters.repository,
+      });
+      query.andWhere(
+        `commit.id NOT IN (SELECT "commitId" FROM merge_request_commits_commit)`,
+      );
+    }
     return query;
   }
 
@@ -82,31 +91,26 @@ export class CommitService extends BaseService<
     return query;
   }
 
+  async buildDailyCounts(
+    filters: CommitQueryDto,
+  ): Promise<Commit.DailyCount[]> {
+    let query = this.serviceRepository.createQueryBuilder('commit');
+    query = this.buildFilters(query, filters);
+    query.select("DATE(commit.resource #>>'{authored_date}')", 'date');
+    query.addSelect('count(*)::integer', 'count');
+    query.addSelect(
+      "sum((commit.resource #>> '{extensions,score}')::float)",
+      'score',
+    );
+    query.groupBy('date');
+    query.orderBy('date', 'ASC');
+    return query.getRawMany<Commit.DailyCount>();
+  }
+
   async findAllForRepository(repository: Repository) {
     return this.serviceRepository.find({
       where: { repository: repository },
     });
-  }
-
-  async createDailyCache(repository: Repository): Promise<Commit.DailyCount[]> {
-    const rows = await this.serviceRepository
-      .createQueryBuilder('commit')
-      .select("commit.resource #>>'{author_email}'", 'author_email')
-      .addSelect("DATE(commit.resource #>>'{created_at}')", 'date')
-      .addSelect("commit.resource #>>'{author_name}'", 'author_name')
-      .addSelect('count(*)', 'count')
-      .addSelect(
-        "sum((commit.resource #>> '{extensions,score}')::float)",
-        'total_score',
-      )
-      .where('commit.repository_id = :repositoryId', {
-        repositoryId: repository.id,
-      })
-      .groupBy('author_email')
-      .addGroupBy('author_name')
-      .addGroupBy('date')
-      .getRawMany();
-    return rows.map((row) => ({ ...row, count: parseInt(row.count) }));
   }
 
   async getDistinctAuthors(repository: Repository) {
@@ -174,18 +178,9 @@ export class CommitService extends BaseService<
     page: number,
     pageSize = 10,
   ): Promise<AxiosResponse<Commit[]>> {
-    return await this.httpService
-      .get<Commit[]>(`projects/${repo.resource.id}/repository/commits`, {
-        headers: {
-          'PRIVATE-TOKEN': token,
-        },
-        params: {
-          per_page: pageSize,
-          page,
-          ref_name: 'master',
-        },
-      })
-      .toPromise();
+    const url = `projects/${repo.resource.id}/repository/commits`;
+    const params = { page: page, per_page: pageSize, target_branch: 'master' };
+    return await this.fetchWithRetries<Commit>(token, url, params);
   }
 
   private async createIfNotExists(repository: Repository, commits: Commit[]) {

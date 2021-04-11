@@ -33,6 +33,10 @@ export function useGetMergeRequests(
   );
 }
 
+export function useGetCountMergeRequests(params: MergeRequestSearchParams) {
+  return useApiQuery<MergeRequest.DailyCount[]>('/merge_request/count', params);
+}
+
 export function useGetMergeRequestById(mergeRequestId) {
   return useApiQuery<MergeRequest>(`/merge_request/${mergeRequestId}`);
 }

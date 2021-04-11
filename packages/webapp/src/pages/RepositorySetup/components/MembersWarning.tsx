@@ -15,7 +15,7 @@ const MembersWarning: React.FC<MembersWarningProps> = ({ repositoryId }) => {
   const { data } = useRepositoryAuthors(repositoryId);
   const orphanCount = countOrphanAuthors(data || []);
   if (orphanCount === 0) {
-    return <div />;
+    return null;
   }
   return (
     <Alert severity='warning'>

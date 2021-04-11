@@ -10,7 +10,7 @@ import Container from '@material-ui/core/Container';
 import LoadMore from '../../components/LoadMore';
 import CodeView from './components/CodeView';
 import CommitList from './components/CommitList';
-import MergeRequestRenderer from './components/MergeRequestRenderer';
+import CommitOrMergeRequestRenderer from './components/CommitOrMergeRequestRenderer.tsx';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import DefaultPageTitleFormat from '../../components/DefaultPageTitleFormat';
@@ -18,6 +18,8 @@ import styled from 'styled-components';
 import { useFilterContext } from '../../contexts/FilterContext';
 import { ScoreOverrideQueueProvider } from './contexts/ScoreOverrideQueue';
 import ScoreOverrideQueueInfo from './components/ScoreOverrideQueueInfo';
+import { useInfiniteCommit } from '../../api/commit';
+import { DateTime } from 'luxon';
 
 const IndependentScrollGrid = styled(Grid)`
   height: 100vh;
@@ -99,10 +101,22 @@ const ListMergeRequestPage = () => {
     merged_start_date: startDate.toString(),
     merged_end_date: endDate.toString(),
   });
+  const {
+    data: commits,
+    fetchNextPage: fetchNextPageCommit,
+    hasNextPage: hasNextPageCommit,
+  } = useInfiniteCommit({
+    repository: id,
+    author_email: emails,
+    start_date: startDate.toString(),
+    end_date: endDate.toString(),
+    not_associated_with_any_mr: true,
+  });
 
   useEffect(() => {
     if (loadMoreInView) {
       void fetchNextPage();
+      void fetchNextPageCommit();
     }
   }, [emails, loadMoreInView]);
 
@@ -111,6 +125,29 @@ const ListMergeRequestPage = () => {
       (accumulated, current) => [...accumulated, ...current.results],
       [],
     ) || [];
+
+  const reducedCommits =
+    commits?.pages?.reduce(
+      (accumulated, current) => [...accumulated, ...current.results],
+      [],
+    ) || [];
+
+  const commitsAndMergeRequests = reducedCommits.concat(reducedMergeRequests);
+
+  commitsAndMergeRequests.sort((a, b) => {
+    if (a.meta.resourceType == 'MergeRequest') {
+      a = DateTime.fromISO(a.merged_at);
+    } else {
+      a = DateTime.fromISO(a.committed_date);
+    }
+    if (b.meta.resourceType == 'MergeRequest') {
+      b = DateTime.fromISO(b.merged_at);
+    } else {
+      b = DateTime.fromISO(b.committed_date);
+    }
+    return b - a;
+  });
+
   const GridComponent = activeMergeRequest ? IndependentScrollGrid : Grid;
   return (
     <>
@@ -130,37 +167,58 @@ const ListMergeRequestPage = () => {
                 ) : (
                   <CompactTableHeaders />
                 )}
-                {reducedMergeRequests.map((mergeRequest) => {
+                {commitsAndMergeRequests.map((commitOrMergeRequest) => {
                   const active =
-                    mergeRequest.meta.id === activeMergeRequest?.meta.id;
-                  return (
-                    <MergeRequestRenderer
-                      key={mergeRequest.meta.id}
-                      mergeRequest={mergeRequest}
-                      active={active}
-                      shrink={!!activeMergeRequest}
-                      onClickSummary={() => {
-                        setActiveCommit(undefined);
-                        setActiveMergeRequest(
-                          active ? undefined : mergeRequest,
-                        );
-                      }}
-                    >
-                      {active && (
-                        <CommitList
-                          mergeRequest={mergeRequest}
-                          activeCommit={activeCommit}
-                          setActiveCommit={setActiveCommit}
-                          authorEmails={emails}
-                        />
-                      )}
-                    </MergeRequestRenderer>
-                  );
+                    commitOrMergeRequest.meta.id ===
+                    activeMergeRequest?.meta.id;
+                  if (
+                    commitOrMergeRequest.meta.resourceType == 'MergeRequest'
+                  ) {
+                    return (
+                      <CommitOrMergeRequestRenderer
+                        key={commitOrMergeRequest.meta.id}
+                        mergeRequest={commitOrMergeRequest}
+                        active={active}
+                        shrink={!!activeMergeRequest}
+                        onClickSummary={() => {
+                          setActiveCommit(undefined);
+                          setActiveMergeRequest(
+                            active ? undefined : commitOrMergeRequest,
+                          );
+                        }}
+                      >
+                        {active && (
+                          <CommitList
+                            mergeRequest={commitOrMergeRequest}
+                            activeCommit={activeCommit}
+                            setActiveCommit={setActiveCommit}
+                            authorEmails={emails}
+                          />
+                        )}
+                      </CommitOrMergeRequestRenderer>
+                    );
+                  } else {
+                    return (
+                      <CommitOrMergeRequestRenderer
+                        key={commitOrMergeRequest.meta.id}
+                        commit={commitOrMergeRequest}
+                        active={active}
+                        shrink={!!activeMergeRequest}
+                        onClickSummary={() => {
+                          setActiveCommit(commitOrMergeRequest);
+                          setActiveMergeRequest(
+                            active ? undefined : commitOrMergeRequest,
+                          );
+                        }}
+                      />
+                    );
+                  }
                 })}
-                {hasNextPage && (
+                {hasNextPage && hasNextPageCommit && (
                   <LoadMore
                     onClick={() => {
                       void fetchNextPage();
+                      void fetchNextPageCommit();
                     }}
                     ref={loadMoreRef}
                   />
