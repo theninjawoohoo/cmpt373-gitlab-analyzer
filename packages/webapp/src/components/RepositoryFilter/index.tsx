@@ -19,14 +19,22 @@ import Select from '@material-ui/core/Select';
 
 const useStyles = makeStyles(() => ({
   gridDimensions: {
-    padding: '0 0 0 160px',
+    padding: '20px',
   },
 }));
 
 const RepoFilter: React.FC = () => {
   const { repositoryId } = useRepositoryContext();
   const { data: iterationData } = useGetIterations({ repo_id: repositoryId });
-  const { startDate, endDate, setStartDate, setEndDate } = useFilterContext();
+  console.log(iterationData);
+  const {
+    startDate,
+    endDate,
+    iteration,
+    setStartDate,
+    setEndDate,
+    setIteration,
+  } = useFilterContext();
   const styles = useStyles();
 
   const handleStartDateChange = (date: DateTime) => {
@@ -37,6 +45,10 @@ const RepoFilter: React.FC = () => {
     setEndDate(date.startOf('second').toISO());
   };
 
+  const handleIterationChange = (iteration: string) => {
+    setIteration(iteration);
+  };
+
   return (
     <Paper>
       <Box p={2}>
@@ -45,6 +57,7 @@ const RepoFilter: React.FC = () => {
           <Grid container spacing={1}>
             <Grid item xs={3}>
               <KeyboardDateTimePicker
+                className={styles.gridDimensions}
                 variant='inline'
                 format='MM/dd/yyyy hh:mm a'
                 ampm={true}
@@ -60,6 +73,7 @@ const RepoFilter: React.FC = () => {
             </Grid>
             <Grid item xs={3}>
               <KeyboardDateTimePicker
+                className={styles.gridDimensions}
                 variant='inline'
                 format='MM/dd/yyyy hh:mm a'
                 ampm={true}
@@ -73,26 +87,29 @@ const RepoFilter: React.FC = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={1}>
+            <Grid item xs={3}>
               <MemberDropdown repositoryId={repositoryId} />
             </Grid>
-            <Grid item xs={1} className={styles.gridDimensions}>
-              <FormControl variant='filled'>
+            <Grid item xs={3}>
+              <FormControl variant='filled' className={styles.gridDimensions}>
                 <InputLabel>Show results for:</InputLabel>
                 <Select
                   style={{ minWidth: '14rem' }}
-                  value={'None'}
+                  value={iteration}
                   onChange={(e) => {
                     e.preventDefault();
-                    //setValue(e.target.value as string);
+                    //Fix this.
+                    handleIterationChange(iteration);
+                    // handleStartDateChange();
+                    // handleEndDateChange();
                   }}
                 >
-                  <MenuItem value='None'>No Iteration</MenuItem>
-                  {(iterationData.results || [])?.map((m) => (
+                  <MenuItem value='none'>No Iteration</MenuItem>
+                  {/* {(iterationData.results || [])?.map((m) => (
                     <MenuItem key={m.meta.id} value={m.meta.id}>
                       {m.name}
                     </MenuItem>
-                  ))}
+                  ))} */}
                 </Select>
               </FormControl>
             </Grid>
