@@ -1,4 +1,4 @@
-import { MergeRequest, Commit } from '@ceres/types';
+import { MergeRequest, Commit, ScoreOverride } from '@ceres/types';
 import { useTheme } from '@material-ui/core';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
@@ -12,6 +12,7 @@ import { ApiResource } from '../../../api/base';
 import ScoringChip from '../../../components/ScoringChip';
 import SmartDate from '../../../components/SmartDate';
 import { useFilterContext } from '../../../contexts/FilterContext';
+import WarningIcon from '@material-ui/icons/Warning';
 
 interface CommitOrMergeRequestRendererProps {
   mergeRequest?: ApiResource<MergeRequest>;
@@ -58,15 +59,22 @@ const CommitOrMergeRequestRenderer: React.FC<CommitOrMergeRequestRendererProps> 
   const theme = useTheme();
   const title = mergeRequest?.title || commit?.title;
   const author = mergeRequest?.author.name || commit?.committer_name;
+  const extensions = (commit || mergeRequest).extensions;
+  const isExcluded = extensions?.override?.exclude;
+  const hasOverride = ScoreOverride.hasOverride(extensions?.override);
+  const fileNameTextDecoration = isExcluded ? 'line-through' : '';
 
   const date = mergeRequest?.merged_at || commit?.created_at;
+  // Check if merge request or commit, or one of it's diffs has an override
   const diffHasOverride =
     mergeRequest?.extensions?.diffHasOverride ||
-    commit?.extensions?.diffHasOverride;
+    commit?.extensions?.diffHasOverride ||
+    hasOverride;
 
-  const diffScoreSum =
-    mergeRequest?.extensions?.diffScore.toFixed(1) ||
-    commit?.extensions?.score.toFixed(1);
+  const diffScoreSum = ScoreOverride.computeScore(
+    extensions?.override,
+    mergeRequest?.extensions?.diffScore || commit?.extensions?.score,
+  ).toFixed(1);
 
   const accordionColor = mergeRequest ? '' : '#f7ebef';
   const { emails } = useFilterContext();
@@ -92,7 +100,22 @@ const CommitOrMergeRequestRenderer: React.FC<CommitOrMergeRequestRendererProps> 
       >
         <Grid container>
           <Grid item xs={shrink ? 8 : 6}>
-            <Typography>{shortenTitle(title, shrink)}</Typography>
+            <Grid container alignItems='center' spacing={2}>
+              {hasOverride && (
+                <Grid item>
+                  <WarningIcon />
+                </Grid>
+              )}
+              <Grid item>
+                <Typography
+                  style={{
+                    textDecoration: fileNameTextDecoration,
+                  }}
+                >
+                  {shortenTitle(title, shrink)}
+                </Typography>
+              </Grid>
+            </Grid>
             {shrink && (
               <Grid container justify='space-between'>
                 <Typography variant='body2' color='textSecondary'>
@@ -151,9 +174,11 @@ const CommitOrMergeRequestRenderer: React.FC<CommitOrMergeRequestRendererProps> 
           )}
         </Grid>
       </AccordionSummary>
-      <Box component={AccordionDetails} display='block'>
-        {children}
-      </Box>
+      {mergeRequest && (
+        <Box component={AccordionDetails} display='block'>
+          {children}
+        </Box>
+      )}
     </Accordion>
   );
 };
