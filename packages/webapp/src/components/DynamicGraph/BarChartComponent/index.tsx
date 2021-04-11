@@ -34,7 +34,7 @@ const DateTick: React.FC<any> = (props) => {
 const DynamicBarChart: React.FC<BarChartProps> = ({ graphData, graphTab }) => {
   if (graphTab === GraphTab.code) {
     return (
-      <ResponsiveContainer width={1200} height={500}>
+      <ResponsiveContainer width={1200} height={600}>
         <BarChart stackOffset='sign' data={graphData}>
           <XAxis dataKey='date' tick={DateTick} />
           <YAxis tickFormatter={(value) => Math.abs(value).toString()} />
@@ -63,7 +63,7 @@ const DynamicBarChart: React.FC<BarChartProps> = ({ graphData, graphTab }) => {
     );
   } else if (graphTab === GraphTab.scores) {
     return (
-      <ResponsiveContainer width={1200} height={500}>
+      <ResponsiveContainer width={1200} height={600}>
         <BarChart stackOffset='sign' data={graphData}>
           <XAxis dataKey='date' tick={DateTick} />
           <YAxis
@@ -94,12 +94,24 @@ const DynamicBarChart: React.FC<BarChartProps> = ({ graphData, graphTab }) => {
     );
   } else {
     return (
-      <ResponsiveContainer width={1200} height={500}>
+      <ResponsiveContainer width={1200} height={600}>
         <BarChart data={graphData}>
-          <XAxis dataKey='date' />
+          <XAxis dataKey='date' tick={DateTick} />
           <YAxis />
           <Tooltip />
-          <Bar dataKey='wordCount' name='Word Counts' fill='#0A4D63' />
+          <Legend layout='vertical' align='right' verticalAlign='top' />
+          <Bar
+            dataKey='mergeRequestWordCount'
+            name='Merge Request'
+            stackId='a'
+            fill='#0A4D63'
+          />
+          <Bar
+            dataKey='issueWordCount'
+            name='Issue'
+            stackId='a'
+            fill='#e37500'
+          />
         </BarChart>
       </ResponsiveContainer>
     );

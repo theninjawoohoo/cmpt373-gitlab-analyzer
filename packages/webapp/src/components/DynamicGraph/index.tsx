@@ -10,16 +10,21 @@ import Box from '@material-ui/core/Box';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
 import { useGetCountMergeRequests } from '../../api/mergeRequests';
 import { useGetCountCommits } from '../../api/commit';
-import { Commit, MergeRequest } from '@ceres/types';
+import { Commit, MergeRequest, Note, RepositoryMember } from '@ceres/types';
 import { uniq } from 'lodash';
 import { DateTime } from 'luxon';
 import { isSameDay } from 'date-fns';
+import { useGetNotesByRepository } from '../../api/note';
+import { useRepositoryMembers } from '../../api/repo_members';
+import { ApiResource } from '../../api/base';
 
 function combineData(
   startDate: string,
   endDate: string,
   commitCounts: Commit.DailyCount[] = [],
   mergeRequestCounts: MergeRequest.DailyCount[] = [],
+  mergeRequestWordCounts: any[],
+  issueWordCounts: any[],
 ) {
   const allDates = uniq([
     ...commitCounts.map((count) => count.date),
@@ -53,6 +58,13 @@ function combineData(
     mergeRequestScore:
       -mergeRequestCounts.find((count) => isSameDay(date, new Date(count.date)))
         ?.score || 0,
+    mergeRequestWordCount:
+      mergeRequestWordCounts.find((count) =>
+        isSameDay(date, new Date(count.date)),
+      )?.count || 0,
+    issueWordCount:
+      issueWordCounts.find((count) => isSameDay(date, new Date(count.date)))
+        ?.count || 0,
   }));
 }
 
@@ -62,9 +74,28 @@ export enum GraphTab {
   comments = 'comments',
 }
 
+function findRepoNameForMember(
+  filtered_id: string,
+  members: ApiResource<RepositoryMember>[],
+) {
+  const filtered = (members || []).filter(
+    (member) => member.meta.id === filtered_id,
+  );
+  return filtered.map((member) => member.name);
+}
+
+function getWordCount(notes: ApiResource<Note>[]) {
+  return notes?.map((note) => ({
+    date: note.created_at,
+    count: note.extensions?.wordCount,
+  }));
+}
+
 const DynamicGraph: React.FC = () => {
-  const { startDate, endDate, emails } = useFilterContext();
+  const { startDate, endDate, emails, author } = useFilterContext();
   const { repositoryId } = useRepositoryContext();
+  const { data: members } = useRepositoryMembers(repositoryId);
+  const names = findRepoNameForMember(author, members);
   const { data: commitCounts } = useGetCountCommits({
     repository: repositoryId,
     author_email: emails,
@@ -78,12 +109,34 @@ const DynamicGraph: React.FC = () => {
     merged_start_date: startDate,
     merged_end_date: endDate,
   });
+  const { data: notes } = useGetNotesByRepository(
+    {
+      repository_id: repositoryId,
+      created_start_date: startDate,
+      created_end_date: endDate,
+      author_names: names,
+    },
+    0,
+    9000,
+  );
+  const mergeRequestNotes = notes?.results.filter(
+    (comment) => comment.noteable_type == 'MergeRequest',
+  );
+  const mergeRequestWordCounts = getWordCount(mergeRequestNotes);
+
+  const issueNotes = notes?.results.filter(
+    (comment) => comment.noteable_type == 'Issue',
+  );
+  const issueWordCounts = getWordCount(issueNotes);
+
   const [graphTab, setGraphTab] = useState(GraphTab.code);
   const graphData = combineData(
     startDate,
     endDate,
     commitCounts || [],
     mergeRequestCounts || [],
+    mergeRequestWordCounts || [],
+    issueWordCounts || [],
   );
 
   const handleTabs = (event: React.ChangeEvent<unknown>, newTab: GraphTab) => {
