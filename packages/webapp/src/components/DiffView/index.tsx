@@ -15,9 +15,9 @@ import ScorePopover from './components/ScorePopper';
 import EditIcon from '@material-ui/icons/Edit';
 import ScoreOverrideForm from '../../pages/ListMergeRequestPage/components/ScoreOverrideForm';
 import { useScoreOverrideQueue } from '../../pages/ListMergeRequestPage/contexts/ScoreOverrideQueue';
-import WarningIcon from '@material-ui/icons/Warning';
 import LineComparison from './components/LineComparison';
 import { makeStyles } from '@material-ui/core/styles';
+import OverridePopper from '../OverridePopper';
 
 const StyledAccordionSummary = styled(AccordionSummary)`
   &.MuiAccordionSummary-root.Mui-focused {
@@ -123,7 +123,7 @@ const DiffView: React.FC<DiffViewProps> = ({
                 <Grid container alignItems='center' spacing={2}>
                   {hasOverride && (
                     <Grid item>
-                      <WarningIcon />
+                      <OverridePopper override={extensions.override} />
                     </Grid>
                   )}
                   <Grid item>
