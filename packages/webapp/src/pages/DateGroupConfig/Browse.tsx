@@ -10,7 +10,7 @@ import SmartDate from '../../components/SmartDate';
 import GroupLayout from './components/GroupLayout';
 
 const BrowseGroupConfigPage: React.FC = () => {
-  const { data } = useSearchGroupConfigs();
+  const { data } = useSearchGroupConfigs({}, 0, 1000);
   return (
     <GroupLayout showCreateButton showBackButton>
       <Box mx={2}>

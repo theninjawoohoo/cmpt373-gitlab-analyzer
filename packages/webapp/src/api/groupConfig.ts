@@ -15,8 +15,12 @@ export function useGetIterations(params: GroupSearchParams) {
   return useApiQuery<SearchResults<GroupConfig>>('/group', params);
 }
 
-export function useSearchGroupConfigs(page?: number, pageSize?: number) {
-  return usePaginatedQuery<GroupConfig>('/group', {}, page, pageSize);
+export function useSearchGroupConfigs(
+  params: GroupSearchParams,
+  page?: number,
+  pageSize?: number,
+) {
+  return usePaginatedQuery<GroupConfig>('/group', params, page, pageSize);
 }
 
 export function useGetGroupConfig(id: string) {

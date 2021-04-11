@@ -8,18 +8,30 @@ import {
   KeyboardDateTimePicker,
 } from '@material-ui/pickers';
 import MemberDropdown from '../../components/MemberDropdown';
-import { useGetIterations } from '../../api/groupConfig';
-import { Box, Typography, Paper } from '@material-ui/core';
 import { DateTime } from 'luxon';
+import Box from '@material-ui/core/Box';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
+import { useSearchGroupConfigs } from '../../api/groupConfig';
+import { flatten } from 'lodash';
 
 const RepoFilter: React.FC = () => {
   const { repositoryId } = useRepositoryContext();
-  const { data: iterationData } = useGetIterations({ repo_id: repositoryId });
-  console.log(iterationData);
+  const { data: groupConfigs } = useSearchGroupConfigs({
+    repo_id: repositoryId,
+  });
+  const iterations = flatten(
+    (groupConfigs?.results || []).map((gc) => {
+      return (gc.iteration || []).map((i) => ({
+        id: `${gc.name}/${i.name}`,
+        display: `${i.name} (${gc.name})`,
+        start: i.start,
+        end: i.end,
+      }));
+    }),
+  );
   const {
     startDate,
     endDate,
@@ -31,82 +43,84 @@ const RepoFilter: React.FC = () => {
 
   const handleStartDateChange = (date: DateTime) => {
     setStartDate(date.startOf('second').toISO());
+    setIteration('none');
   };
 
   const handleEndDateChange = (date: DateTime) => {
     setEndDate(date.startOf('second').toISO());
+    setIteration('none');
   };
 
-  const handleIterationChange = (iteration: string) => {
-    setIteration(iteration);
+  const handleIterationChange = (iterationId: string) => {
+    setIteration(iterationId);
+    if (iterationId !== 'none') {
+      const iteration = iterations.find((i) => i.id === iterationId);
+      if (iteration) {
+        setStartDate(iteration.start);
+        setEndDate(iteration.end);
+      }
+    }
   };
 
   return (
-    <Paper>
-      <Box p={2}>
-        <Typography variant='h2'>Date Filter Config</Typography>
-        <MuiPickersUtilsProvider utils={LuxonUtils}>
-          <Grid container spacing={1}>
-            <Grid item xs={3}>
-              <KeyboardDateTimePicker
-                variant='inline'
-                format='MM/dd/yyyy hh:mm a'
-                ampm={true}
-                margin='normal'
-                id='date-picker-inline'
-                label='Start Date'
-                value={startDate.toString()}
-                onChange={handleStartDateChange}
-                KeyboardButtonProps={{
-                  'aria-label': 'change date',
-                }}
-              />
-            </Grid>
-            <Grid item xs={3}>
-              <KeyboardDateTimePicker
-                variant='inline'
-                format='MM/dd/yyyy hh:mm a'
-                ampm={true}
-                margin='normal'
-                id='date-picker-inline'
-                label='End Date'
-                value={endDate.toString()}
-                onChange={handleEndDateChange}
-                KeyboardButtonProps={{
-                  'aria-label': 'change date',
-                }}
-              />
-            </Grid>
-            <Grid item xs={3}>
-              <MemberDropdown repositoryId={repositoryId} />
-            </Grid>
-            <Grid item xs={3}>
-              <FormControl variant='filled'>
-                <InputLabel>Iteration:</InputLabel>
-                <Select
-                  style={{ minWidth: '14rem' }}
-                  value={iteration}
-                  onChange={(e) => {
-                    e.preventDefault();
-                    //Fix this.
-                    handleIterationChange(iteration);
-                    // handleStartDateChange();
-                    // handleEndDateChange();
-                  }}
-                >
-                  <MenuItem value='none'>No Iteration</MenuItem>
-                  {(iterationData?.results || []).map((m) => (
-                    <MenuItem key={m.meta.id} value={m.meta.id}>
-                      {m.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+    <Box p={2}>
+      <MuiPickersUtilsProvider utils={LuxonUtils}>
+        <Grid container spacing={1}>
+          <Grid item xs={3}>
+            <KeyboardDateTimePicker
+              variant='inline'
+              inputVariant='filled'
+              format='MM/dd/yyyy hh:mm a'
+              ampm={true}
+              id='date-picker-inline'
+              label='Start Date'
+              value={startDate.toString()}
+              onChange={handleStartDateChange}
+              KeyboardButtonProps={{
+                'aria-label': 'change date',
+              }}
+            />
           </Grid>
-        </MuiPickersUtilsProvider>
-      </Box>
-    </Paper>
+          <Grid item xs={3}>
+            <KeyboardDateTimePicker
+              variant='inline'
+              inputVariant='filled'
+              format='MM/dd/yyyy hh:mm a'
+              ampm={true}
+              id='date-picker-inline'
+              label='End Date'
+              value={endDate.toString()}
+              onChange={handleEndDateChange}
+              KeyboardButtonProps={{
+                'aria-label': 'change date',
+              }}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <MemberDropdown repositoryId={repositoryId} />
+          </Grid>
+          <Grid item xs={3}>
+            <FormControl variant='filled' fullWidth>
+              <InputLabel>Iteration:</InputLabel>
+              <Select
+                value={iteration}
+                onChange={(e) => {
+                  e.preventDefault();
+                  handleIterationChange(e.target.value as string);
+                }}
+              >
+                <MenuItem value='none'>No Iteration</MenuItem>
+                {iterations.map((i) => (
+                  <MenuItem key={i.id} value={i.id}>
+                    {i.display}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+      </MuiPickersUtilsProvider>
+    </Box>
   );
 };
 
