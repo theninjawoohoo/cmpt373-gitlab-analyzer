@@ -5,12 +5,10 @@ import { Repository as TypeORMNote, SelectQueryBuilder } from 'typeorm';
 import { Note as NoteEntity } from './note.entity';
 import { MergeRequest as MergeRequestEntity } from '../../merge-request/merge-request.entity';
 import { Issue as IssueEntity } from '../issue/issue.entity';
-import { paginate, withDefaults } from '../../../common/query-dto';
+import { paginate } from '../../../common/query-dto';
 import alwaysArray from '../../../common/alwaysArray';
 import { NoteQueryDto } from './note-query.dto';
 import { BaseService } from '../../../common/base.service';
-import { Diff as DiffEntity } from '../diff/diff.entity';
-import { DiffQueryDto } from '../diff/diff-query.dto';
 
 @Injectable()
 export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
