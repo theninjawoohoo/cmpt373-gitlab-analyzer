@@ -30,7 +30,6 @@ export default class DiffInterpreter {
     let commentFlag = false;
     let deletedLineIndex = 0;
     let addedLineIndex = 0;
-    let result: (number | boolean)[] = [];
     while (currentLine < hunk.lines.length) {
       const line = hunk.lines[currentLine];
       const lineType = this.determineLineType(line);
@@ -66,7 +65,8 @@ export default class DiffInterpreter {
         currentLine++;
       } else if (lineType == Line.Type.delete) {
         deletedLineIndex++;
-        result = this.checkDeleteLineType(
+        let deletedLine: (number | boolean)[] = [];
+        deletedLine = this.checkDeleteLineType(
           line,
           hunkLines,
           hunk,
@@ -76,12 +76,12 @@ export default class DiffInterpreter {
           commentFlag,
           deletedLineIndex,
         );
-        if (<number>result[0] - rightLineNumber === 1) {
-          rightLineNumber = <number>result[0];
+        if (<number>deletedLine[0] - rightLineNumber === 1) {
+          rightLineNumber = <number>deletedLine[0];
           addedLineIndex++;
         }
-        currentLine = <number>result[1];
-        commentFlag = <boolean>result[2];
+        currentLine = <number>deletedLine[1];
+        commentFlag = <boolean>deletedLine[2];
         leftLineNumber++;
         currentLine++;
       }
@@ -95,15 +95,15 @@ export default class DiffInterpreter {
     LineNumber: number,
     commentFlag: boolean,
   ) {
-    const result = this.createBlankCommentAndSyntax(
+    const createdLine = this.createBlankCommentAndSyntax(
       line,
       hunkLines,
       LineNumber,
       commentFlag,
       true,
     );
-    const pushed = result[0];
-    commentFlag = result[1];
+    const pushed = createdLine[0];
+    commentFlag = createdLine[1];
     if (!pushed) {
       hunkLines.push(this.createAdd(line, LineNumber));
     }
@@ -120,15 +120,15 @@ export default class DiffInterpreter {
     commentFlag: boolean,
     deletedLineIndex: number,
   ) {
-    const result = this.createBlankCommentAndSyntax(
+    const createdLine = this.createBlankCommentAndSyntax(
       line,
       hunkLines,
       leftLineNumber,
       commentFlag,
       false,
     );
-    const pushed = result[0];
-    commentFlag = result[1];
+    const pushed = createdLine[0];
+    commentFlag = createdLine[1];
     if (!pushed) {
       const { addedLine, deletedLine } = this.findGroupedChange(
         hunk.lines,
@@ -141,7 +141,6 @@ export default class DiffInterpreter {
       if (addedLine) {
         rightLineNumber += 1;
       }
-      // currentLine += 1;
     }
 
     return [rightLineNumber, currentLine, commentFlag];
@@ -160,15 +159,15 @@ export default class DiffInterpreter {
       pushed = true;
     }
     if (!pushed) {
-      const result = this.createComment(
+      const comment = this.createComment(
         line,
         hunkLines,
         LineNumber,
         commentFlag,
         added,
       );
-      pushed = result[0];
-      commentFlag = result[1];
+      pushed = comment[0];
+      commentFlag = comment[1];
     }
     if (!pushed && !line.match('[a-zA-Z1-9]')) {
       hunkLines.push(
