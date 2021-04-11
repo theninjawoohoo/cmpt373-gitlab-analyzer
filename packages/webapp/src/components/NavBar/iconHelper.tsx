@@ -14,7 +14,6 @@ import ScoreIcon from '@material-ui/icons/Score';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import TuneIcon from '@material-ui/icons/Tune';
 import ListAltIcon from '@material-ui/icons/ListAlt';
-import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
 export default function Icon(props: any) {
   switch (props.icon) {

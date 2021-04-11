@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpService, Injectable } from '@nestjs/common';
 import { BaseService } from '../common/base.service';
 import { GroupDto } from './group.dto';
 import { GroupConfig } from '@ceres/types';
@@ -16,8 +16,9 @@ export class GroupService extends BaseService<
   constructor(
     @InjectRepository(GroupConfigEntity)
     serviceRepository: Repository<GroupConfigEntity>,
+    readonly httpService: HttpService,
   ) {
-    super(serviceRepository, 'group_config');
+    super(serviceRepository, 'group_config', httpService);
   }
 
   buildFilters(
