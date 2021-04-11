@@ -37,19 +37,19 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
         issue: filters.issue,
       });
     }
-    if (filters.author_names) {
-      query.andWhere(
-        "note.resource #> '{author}'->>'name' IN (:...authorNames)",
-        {
-          authorNames: alwaysArray(filters.author_names),
-        },
-      );
+
+    if (filters.author_id) {
+      query.andWhere("note.resource #> '{author}'->>'id' IN (:...authorIds)", {
+        authorIds: alwaysArray(filters.author_id),
+      });
     }
+
     if (filters.created_start_date) {
       query.andWhere("(note.resource #>> '{created_at}') >= (:startDate)", {
         startDate: filters.created_start_date,
       });
     }
+
     if (filters.created_end_date) {
       query.andWhere("(note.resource #>> '{created_at}') <= (:endDate)", {
         endDate: filters.created_end_date,

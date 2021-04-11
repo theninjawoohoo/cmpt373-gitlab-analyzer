@@ -3,7 +3,7 @@ import { Note } from '@ceres/types';
 
 interface NoteSearchParams {
   repository_id?: string;
-  author_names?: string[];
+  author_id?: number[];
   created_start_date?: string;
   created_end_date?: string;
 }

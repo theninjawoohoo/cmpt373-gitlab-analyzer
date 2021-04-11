@@ -57,10 +57,6 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
     note_id: NoteProps.noteData.meta.id,
   });
 
-  if (mergeRequest) {
-    console.log(mergeRequest?.results.find((element) => element));
-  }
-
   const { data: issue } = useGetIssueByNoteId({
     repository: repositoryId,
     note_id: NoteProps.noteData.meta.id,
