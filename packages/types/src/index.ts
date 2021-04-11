@@ -5,7 +5,6 @@ export * from './Issue'
 export * from './Line';
 export * from './MergeRequest';
 export * from './MergeRequestParticipant';
-export * from './MergeRequestParticipant';
 export * from './Note'
 export * from './Operation';
 export * from './Profile';
