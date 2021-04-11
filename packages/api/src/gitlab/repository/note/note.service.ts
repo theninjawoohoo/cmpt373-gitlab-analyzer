@@ -9,14 +9,55 @@ import { paginate, withDefaults } from '../../../common/query-dto';
 import alwaysArray from '../../../common/alwaysArray';
 import { NoteQueryDto } from './note-query.dto';
 import { BaseService } from '../../../common/base.service';
+import { Diff as DiffEntity } from '../diff/diff.entity';
+import { DiffQueryDto } from '../diff/diff-query.dto';
 
 @Injectable()
 export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
+  constructor(
+    readonly httpService: HttpService,
+    @InjectRepository(NoteEntity)
+    private readonly noteRepository: TypeORMNote<NoteEntity>,
+  ) {
+    super(noteRepository, 'note', httpService);
+  }
+
   buildFilters(
     query: SelectQueryBuilder<NoteEntity>,
     filters: NoteQueryDto,
   ): SelectQueryBuilder<NoteEntity> {
-    throw new Error('Method not implemented.');
+    if (filters.merge_request) {
+      query.where('note.merge_request_id = :merge_request', {
+        merge_request: filters.merge_request,
+      });
+    }
+
+    if (filters.issue) {
+      query.andWhere('note.issue_id = :issue', {
+        issue: filters.issue,
+      });
+    }
+
+    if (filters.author_email) {
+      query.andWhere("note.resource #>> '{author_email}' IN (:...author)", {
+        author_email: alwaysArray(filters.author_email),
+      });
+    }
+
+    if (filters.start_date) {
+      query.andWhere("(note.resource #>> '{created_at}') >= (:startDate)", {
+        startDate: filters.start_date,
+      });
+    }
+
+    if (filters.end_date) {
+      query.andWhere("(note.resource #>> '{created_at}') <= (:endDate)", {
+        endDate: filters.end_date,
+      });
+    }
+
+    paginate(query, filters);
+    return query;
   }
 
   buildSort(
@@ -24,15 +65,7 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
     sortKey?: string,
     order?: 'ASC' | 'DESC',
   ): SelectQueryBuilder<NoteEntity> {
-    throw new Error('Method not implemented.');
-  }
-
-  constructor(
-    readonly httpService: HttpService,
-    @InjectRepository(NoteEntity)
-    private readonly noteRepository: TypeORMNote<NoteEntity>,
-  ) {
-    super(noteRepository, 'note', httpService);
+    return query.orderBy("note.resource #>> '{created_at}'", 'DESC');
   }
 
   async findAllForMergeRequest(mergeRequest: MergeRequestEntity) {
