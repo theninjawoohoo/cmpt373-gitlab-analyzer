@@ -23,9 +23,11 @@ export class NoteController {
 
   @Get()
   search(@Query() query: NoteQueryDto) {
-    const { issue, merge_request } = query;
-    if (!issue && !merge_request) {
-      throw new BadRequestException('merge request or issue must be provided');
+    const { issue, merge_request, repository_id } = query;
+    if (!issue && !merge_request && !repository_id) {
+      throw new BadRequestException(
+        'merge request or issue or repository id must be provided',
+      );
     }
     return paginatedToResponse(this.noteService.search(query));
   }

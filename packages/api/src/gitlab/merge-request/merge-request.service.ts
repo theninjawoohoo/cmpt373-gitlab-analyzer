@@ -78,6 +78,14 @@ export class MergeRequestService extends BaseService<
         },
       );
     }
+    if (filters.note_id) {
+      query.andWhere(
+        'merge_request.id in (select merge_request_id from note where id = :note_id)',
+        {
+          note_id: filters.note_id,
+        },
+      );
+    }
     return query;
   }
 
