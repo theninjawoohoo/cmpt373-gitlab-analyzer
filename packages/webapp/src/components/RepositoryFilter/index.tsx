@@ -95,11 +95,11 @@ const RepoFilter: React.FC = () => {
                   }}
                 >
                   <MenuItem value='none'>No Iteration</MenuItem>
-                  {/* {(iterationData.results || [])?.map((m) => (
+                  {(iterationData?.results || []).map((m) => (
                     <MenuItem key={m.meta.id} value={m.meta.id}>
                       {m.name}
                     </MenuItem>
-                  ))} */}
+                  ))}
                 </Select>
               </FormControl>
             </Grid>

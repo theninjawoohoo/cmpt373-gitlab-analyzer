@@ -14,7 +14,7 @@ export class GroupController {
   constructor(private readonly groupService: GroupService) {}
   @Get()
   search(@Auth() { user }: VerifiedUser, @Query() query: GroupQueryDto) {
-    return this.groupService.search({ ...query, user });
+    return paginatedToResponse(this.groupService.search({ ...query, user }));
   }
 
   @Get(':id')
