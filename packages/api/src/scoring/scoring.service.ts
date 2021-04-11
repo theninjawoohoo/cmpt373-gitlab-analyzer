@@ -45,11 +45,23 @@ export class ScoringService {
 
   async updateOverrides(overrides: StagedScoreOverride[]) {
     const diffOverrides = StagedScoreOverride.getDiffOverrides(overrides);
-    await Promise.all(
-      diffOverrides.map((override) => {
-        const { id } = StagedScoreOverride.parseEntityId(override.id);
-        this.diffService.updateOverride(id, override.override);
-      }),
+    const commitOverrides = StagedScoreOverride.getCommitOverrides(overrides);
+    const mergeRequestOverrides = StagedScoreOverride.getMergeRequestOverrides(
+      overrides,
     );
+    await Promise.all([
+      ...diffOverrides.map(async (override) => {
+        const { id } = StagedScoreOverride.parseEntityId(override.id);
+        await this.diffService.updateOverride(id, override.override);
+      }),
+      ...commitOverrides.map(async (override) => {
+        const { id } = StagedScoreOverride.parseEntityId(override.id);
+        await this.commitService.updateOverride(id, override.override);
+      }),
+      ...mergeRequestOverrides.map(async (override) => {
+        const { id } = StagedScoreOverride.parseEntityId(override.id);
+        await this.mergeRequestService.updateOverride(id, override.override);
+      }),
+    ]);
   }
 }

@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { NoteService } from './note.service';
 import { IdParam } from '../../../common/id-param';
-import { RepositoryService } from '../repository.service';
 import { MergeRequestService } from '../../merge-request/merge-request.service';
 import { paginatedToResponse } from '../../../common/pagination';
 import { NoteQueryDto } from './note-query.dto';
@@ -17,17 +16,23 @@ import { NoteQueryDto } from './note-query.dto';
 export class NoteController {
   constructor(
     private readonly noteService: NoteService,
-    private readonly repositoryService: RepositoryService,
     private readonly mergeRequestService: MergeRequestService,
   ) {}
 
   @Get()
   search(@Query() query: NoteQueryDto) {
-    const { issue, merge_request } = query;
-    if (!issue && !merge_request) {
-      throw new BadRequestException('merge request or issue must be provided');
+    const { issue, merge_request, repository_id } = query;
+    if (!issue && !merge_request && !repository_id) {
+      throw new BadRequestException(
+        'merge request or issue or repository id must be provided',
+      );
     }
     return paginatedToResponse(this.noteService.search(query));
+  }
+
+  @Get('count')
+  dailyCounts(@Query() query: NoteQueryDto) {
+    return this.noteService.buildDailyCounts(query);
   }
 
   @Get('/merge_request/:id')
