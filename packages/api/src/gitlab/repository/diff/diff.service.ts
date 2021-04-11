@@ -5,7 +5,11 @@ import { MergeRequest } from '../../merge-request/merge-request.entity';
 import { Commit } from '../commit/commit.entity';
 import { DiffQueryDto } from './diff-query.dto';
 import { Diff as DiffEntity } from './diff.entity';
-import { DeepPartial, Repository as TypeORMRepository } from 'typeorm';
+import {
+  DeepPartial,
+  Repository as TypeORMRepository,
+  SelectQueryBuilder,
+} from 'typeorm';
 import {
   Diff,
   Extensions,
@@ -18,24 +22,24 @@ import {
 import { parsePatch } from 'diff';
 import DiffInterpreter from './helpers/DiffInterpreter';
 import { isMatch } from 'picomatch';
-import { Fetch } from '../../../common/fetchWithRetry';
+import { BaseService } from '../../../common/base.service';
 
 type GitlabDiff = Omit<Diff, 'hunks' | 'lines'>;
 
 @Injectable()
-export class DiffService extends Fetch {
+export class DiffService extends BaseService<Diff, DiffEntity, DiffQueryDto> {
   constructor(
     readonly httpService: HttpService,
     @InjectRepository(DiffEntity)
     private readonly diffRepository: TypeORMRepository<DiffEntity>,
   ) {
-    super(httpService);
+    super(diffRepository, 'diff', httpService);
   }
 
-  search(filters: DiffQueryDto) {
-    filters = withDefaults(filters);
-    const query = this.diffRepository.createQueryBuilder('diff');
-
+  buildFilters(
+    query: SelectQueryBuilder<DiffEntity>,
+    filters: DiffQueryDto,
+  ): SelectQueryBuilder<DiffEntity> {
     if (filters.commit) {
       query.andWhere('diff.commit_id = :commit', { commit: filters.commit });
     }
@@ -47,7 +51,15 @@ export class DiffService extends Fetch {
     }
 
     paginate(query, filters);
-    return query.getManyAndCount();
+    return query;
+  }
+
+  buildSort(
+    query: SelectQueryBuilder<DiffEntity>,
+    sortKey?: string,
+    order?: 'ASC' | 'DESC',
+  ): SelectQueryBuilder<DiffEntity> {
+    return query.orderBy("diff.resource #>> '{new_path}'", order);
   }
 
   async updateOverride(id: string, override: ScoreOverride) {
