@@ -148,13 +148,14 @@ const ListMergeRequestPage = () => {
     return b - a;
   });
 
-  const GridComponent = activeMergeRequest ? IndependentScrollGrid : Grid;
+  const showSpiltView = activeMergeRequest || activeCommit;
+  const GridComponent = showSpiltView ? IndependentScrollGrid : Grid;
   return (
     <>
       <DefaultPageLayout>
         <ScoreOverrideQueueProvider>
-          <GridComponent container spacing={activeMergeRequest ? 3 : 0}>
-            <Grid item xs={activeMergeRequest ? 5 : 12}>
+          <GridComponent container spacing={showSpiltView ? 3 : 0}>
+            <Grid item xs={showSpiltView ? 5 : 12}>
               <Container>
                 <ScoreOverrideQueueInfo />
                 <Box my={2}>
@@ -162,7 +163,7 @@ const ListMergeRequestPage = () => {
                     Merge Requests
                   </DefaultPageTitleFormat>
                 </Box>
-                {!activeMergeRequest ? (
+                {!showSpiltView ? (
                   <RegularTableHeaders />
                 ) : (
                   <CompactTableHeaders />
@@ -170,7 +171,7 @@ const ListMergeRequestPage = () => {
                 {commitsAndMergeRequests.map((commitOrMergeRequest) => {
                   const active =
                     commitOrMergeRequest.meta.id ===
-                    activeMergeRequest?.meta.id;
+                    (activeMergeRequest || activeCommit)?.meta.id;
                   if (
                     commitOrMergeRequest.meta.resourceType == 'MergeRequest'
                   ) {
@@ -179,7 +180,7 @@ const ListMergeRequestPage = () => {
                         key={commitOrMergeRequest.meta.id}
                         mergeRequest={commitOrMergeRequest}
                         active={active}
-                        shrink={!!activeMergeRequest}
+                        shrink={!!showSpiltView}
                         onClickSummary={() => {
                           setActiveCommit(undefined);
                           setActiveMergeRequest(
@@ -205,10 +206,10 @@ const ListMergeRequestPage = () => {
                         active={active}
                         shrink={!!activeMergeRequest}
                         onClickSummary={() => {
-                          setActiveCommit(commitOrMergeRequest);
-                          setActiveMergeRequest(
+                          setActiveCommit(
                             active ? undefined : commitOrMergeRequest,
                           );
+                          setActiveMergeRequest(undefined);
                         }}
                       />
                     );
@@ -225,7 +226,7 @@ const ListMergeRequestPage = () => {
                 )}
               </Container>
             </Grid>
-            {activeMergeRequest && (
+            {showSpiltView && (
               <Grid item xs={7}>
                 <CodeView
                   mergeRequest={activeMergeRequest}
