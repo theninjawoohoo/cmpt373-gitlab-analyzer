@@ -1,4 +1,5 @@
-import { IsDateString, IsOptional, IsUUID } from 'class-validator';
+import { Note } from '@ceres/types';
+import { IsDateString, IsEnum, IsOptional, IsUUID } from 'class-validator';
 import { QueryDto } from '../../../common/query-dto';
 
 export class NoteQueryDto extends QueryDto {
@@ -24,4 +25,8 @@ export class NoteQueryDto extends QueryDto {
   @IsOptional()
   @IsUUID()
   repository_id?: string;
+
+  @IsOptional()
+  @IsEnum(Note.Type)
+  type?: Note.Type;
 }
