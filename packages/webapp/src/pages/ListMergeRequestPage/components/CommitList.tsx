@@ -8,7 +8,7 @@ import { ApiResource } from '../../../api/base';
 import { useGetCommits } from '../../../api/commit';
 import ScoringChip from '../../../components/ScoringChip';
 import SmartDate from '../../../components/SmartDate';
-import WarningIcon from '@material-ui/icons/Warning';
+import OverridePopper from '../../../components/OverridePopper';
 
 interface CommitListProps {
   mergeRequest: ApiResource<MergeRequest>;
@@ -67,7 +67,7 @@ const CommitList: React.FC<CommitListProps> = ({
                 <Grid container alignItems='center' spacing={2}>
                   {hasOverride && (
                     <Grid item>
-                      <WarningIcon />
+                      <OverridePopper override={extensions.override} />
                     </Grid>
                   )}
                   <Grid item>
