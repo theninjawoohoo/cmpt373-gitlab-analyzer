@@ -13,6 +13,8 @@ import { useFilterContext } from '../../contexts/FilterContext';
 import { ApiResource } from '../../api/base';
 import { RepositoryMember } from '@ceres/types';
 import { useRepositoryMembers } from '../../api/repo_members';
+import DifferentiatingIcon from './DifferentiatingIcon';
+import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -111,7 +113,7 @@ const CommentList: React.FC = () => {
     <>
       <Container>
         <DefaultPageTitleFormat>Comments</DefaultPageTitleFormat>
-        <Box my={2} className={classes.root}>
+        <Box my={1} className={classes.root}>
           <Tabs value={tab} onChange={handleTabs} textColor='primary' centered>
             <Tab
               value={TabOption.codeReview}
@@ -132,9 +134,71 @@ const CommentList: React.FC = () => {
               }
             />
           </Tabs>
+          <Grid
+            container
+            direction={'row'}
+            alignItems={'center'}
+            style={{ marginTop: 15 }}
+          >
+            {tab === TabOption.codeReview ? (
+              <>
+                <Grid
+                  container
+                  item
+                  xs={6}
+                  alignItems={'center'}
+                  direction={'row'}
+                >
+                  <DifferentiatingIcon isMine={true} />
+                  <Typography style={{ marginLeft: 10, marginRight: 10 }}>
+                    Notes on my own merge request(s)
+                  </Typography>
+                </Grid>
+                <Grid
+                  container
+                  item
+                  xs={6}
+                  alignItems={'center'}
+                  direction={'row'}
+                >
+                  <DifferentiatingIcon isMine={false} />
+                  <Typography style={{ marginLeft: 10, marginRight: 10 }}>
+                    Notes on other members&apos; merge request(s)
+                  </Typography>
+                </Grid>
+              </>
+            ) : (
+              <>
+                <Grid
+                  container
+                  item
+                  xs={6}
+                  alignItems={'center'}
+                  direction={'row'}
+                >
+                  <DifferentiatingIcon isMine={true} />
+                  <Typography style={{ marginLeft: 10, marginRight: 10 }}>
+                    Notes on my own issue(s)
+                  </Typography>
+                </Grid>
+                <Grid
+                  container
+                  item
+                  xs={6}
+                  alignItems={'center'}
+                  direction={'row'}
+                >
+                  <DifferentiatingIcon isMine={false} />
+                  <Typography style={{ marginLeft: 10, marginRight: 10 }}>
+                    Notes on other members&apos; issue(s)
+                  </Typography>
+                </Grid>
+              </>
+            )}
+          </Grid>
         </Box>
         <Grid
-          justify='center'
+          justify={'center'}
           container
           direction={'column'}
           alignItems={'stretch'}

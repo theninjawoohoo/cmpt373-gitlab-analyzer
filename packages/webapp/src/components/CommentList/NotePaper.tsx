@@ -4,14 +4,13 @@ import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import { Paper } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import FilterVintageIcon from '@material-ui/icons/FilterVintage';
-import EmojiNatureIcon from '@material-ui/icons/EmojiNature';
 import { ApiResource } from '../../api/base';
 import { /*Issue,*/ /*MergeRequest*/ Note } from '@ceres/types';
 import SmartDate from '../SmartDate';
 import { useGetMergeRequestByNoteId } from '../../api/mergeRequests';
 import { useGetIssueByNoteId } from '../../api/issue';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
+import DifferentiatingIcon from './DifferentiatingIcon';
 
 interface NoteProps {
   noteData: ApiResource<Note>;
@@ -41,17 +40,6 @@ const extractNoteContent = (noteBody: string) => {
   return noteBody.replace(/\*([^*]+)\*$/g, '').trim();
 };
 
-// const onMyOwnMergeRequest = (
-//   noteAuthorId: number,
-//   mergeRequest: ApiResource<MergeRequest>,
-// ) => {
-//   return noteAuthorId === mergeRequest?.author.id;
-// };
-
-// const onMyOwnIssue = (noteAuthorId: number, issue: ApiResource<Issue>) => {
-//   return noteAuthorId === issue.author.id;
-// };
-
 const NotePaper: React.FC<NoteProps> = (NoteProps) => {
   const { repositoryId } = useRepositoryContext();
   const classes = useStyles();
@@ -60,9 +48,11 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
     repository: repositoryId,
     note_id: NoteProps.noteData.meta.id,
   });
+
   if (mergeRequest) {
     console.log(mergeRequest?.results.find((element) => element));
   }
+
   const { data: issue } = useGetIssueByNoteId({
     repository: repositoryId,
     note_id: NoteProps.noteData.meta.id,
@@ -118,20 +108,7 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
           )}
         </Grid>
         <Grid item>
-          {(onMyOwnMergeRequest || onMyOwnIssue) && (
-            <FilterVintageIcon
-              style={{
-                color: '#f3bfb3',
-              }}
-            />
-          )}
-          {!onMyOwnMergeRequest && !onMyOwnIssue && (
-            <EmojiNatureIcon
-              style={{
-                color: '#57838d',
-              }}
-            />
-          )}
+          <DifferentiatingIcon isMine={onMyOwnMergeRequest || onMyOwnIssue} />
         </Grid>
       </Grid>
 
