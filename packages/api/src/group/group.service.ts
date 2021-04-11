@@ -40,6 +40,4 @@ export class GroupService extends BaseService<
     query = query.orderBy(`${this.tableName}.updated_at`, 'DESC');
     return query;
   }
-
-  async findAllIterationsForRepository(repositoryId: string) {}
 }
