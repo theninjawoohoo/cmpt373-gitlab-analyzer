@@ -1,17 +1,17 @@
 import { HttpService, Injectable } from '@nestjs/common';
 import { BaseService } from '../common/base.service';
-import { GroupDto } from './group.dto';
 import { GroupConfig } from '@ceres/types';
 import { GroupConfig as GroupConfigEntity } from './group.entity';
-import { WithUser } from 'src/common/query-dto';
+import { GroupQueryDto } from './group-query.dto';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { WithUser } from 'src/common/query-dto';
 
 @Injectable()
 export class GroupService extends BaseService<
   GroupConfig,
   GroupConfigEntity,
-  WithUser<GroupDto>
+  WithUser<GroupQueryDto>
 > {
   constructor(
     @InjectRepository(GroupConfigEntity)
@@ -23,11 +23,14 @@ export class GroupService extends BaseService<
 
   buildFilters(
     query: SelectQueryBuilder<GroupConfigEntity>,
-    filters: WithUser<GroupDto>,
+    filters: WithUser<GroupQueryDto>,
   ): SelectQueryBuilder<GroupConfigEntity> {
-    query = query.andWhere(`${this.tableName}.user_id = :userId`, {
-      userId: filters.user.id,
-    });
+    if (filters.repo_id) {
+      query = query.andWhere(`${this.tableName}.resource @> :repository`, {
+        repository: { repositories: [{ id: filters.repo_id }] },
+      });
+    }
+
     return query;
   }
 
@@ -37,4 +40,6 @@ export class GroupService extends BaseService<
     query = query.orderBy(`${this.tableName}.updated_at`, 'DESC');
     return query;
   }
+
+  async findAllIterationsForRepository(repositoryId: string) {}
 }

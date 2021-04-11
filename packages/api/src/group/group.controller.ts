@@ -2,18 +2,19 @@ import { GroupConfig } from '@ceres/types';
 import { Controller, Get, Post, Put } from '@nestjs/common';
 import { Param } from '@nestjs/common';
 import { IdParam } from '../common/id-param';
-import { Body } from '@nestjs/common';
+import { Body, Query } from '@nestjs/common';
 import { VerifiedUser } from '../auth/types/VerifiedUser';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { GroupService } from './group.service';
+import { GroupQueryDto } from './group-query.dto';
 import { paginatedToResponse } from '../common/pagination';
 
 @Controller('group')
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
   @Get()
-  search(@Auth() { user }: VerifiedUser) {
-    return paginatedToResponse(this.groupService.search({ user }));
+  search(@Auth() { user }: VerifiedUser, @Query() query: GroupQueryDto) {
+    return this.groupService.search({ ...query, user });
   }
 
   @Get(':id')

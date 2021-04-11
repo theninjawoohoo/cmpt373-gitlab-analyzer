@@ -4,7 +4,16 @@ import {
   useApiMutation,
   useApiQuery,
   usePaginatedQuery,
+  SearchResults,
 } from './base';
+
+interface GroupSearchParams {
+  repo_id?: string;
+}
+
+export function useGetIterations(params: GroupSearchParams) {
+  return useApiQuery<SearchResults<GroupConfig>>('/group', params);
+}
 
 export function useSearchGroupConfigs(page?: number, pageSize?: number) {
   return usePaginatedQuery<GroupConfig>('/group', {}, page, pageSize);

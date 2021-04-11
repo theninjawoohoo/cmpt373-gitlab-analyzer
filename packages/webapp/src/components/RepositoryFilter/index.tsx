@@ -8,7 +8,7 @@ import {
   KeyboardDateTimePicker,
 } from '@material-ui/pickers';
 import MemberDropdown from '../../components/MemberDropdown';
-//import { useSearchGroupConfigs } from '../../api/groupConfig';
+import { useGetIterations } from '../../api/groupConfig';
 import { Box, Typography, Paper } from '@material-ui/core';
 import { DateTime } from 'luxon';
 import FormControl from '@material-ui/core/FormControl';
@@ -19,14 +19,13 @@ import Select from '@material-ui/core/Select';
 
 const useStyles = makeStyles(() => ({
   gridDimensions: {
-    padding: '0 0 0 50px',
+    padding: '0 0 0 160px',
   },
 }));
 
 const RepoFilter: React.FC = () => {
   const { repositoryId } = useRepositoryContext();
-  // const { data: data } = useSearchGroupConfigs();
-
+  const { data: iterationData } = useGetIterations({ repo_id: repositoryId });
   const { startDate, endDate, setStartDate, setEndDate } = useFilterContext();
   const styles = useStyles();
 
@@ -88,12 +87,12 @@ const RepoFilter: React.FC = () => {
                     //setValue(e.target.value as string);
                   }}
                 >
-                  <MenuItem value='all'>All </MenuItem>
-                  {/* {(data || [])?.map((m) => (
+                  <MenuItem value='None'>No Iteration</MenuItem>
+                  {(iterationData.results || [])?.map((m) => (
                     <MenuItem key={m.meta.id} value={m.meta.id}>
                       {m.name}
                     </MenuItem>
-                  ))} */}
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
