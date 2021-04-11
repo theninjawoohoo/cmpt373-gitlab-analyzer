@@ -13,6 +13,7 @@ import BuildIcon from '@material-ui/icons/Build';
 import ScoreIcon from '@material-ui/icons/Score';
 import TuneIcon from '@material-ui/icons/Tune';
 import ListAltIcon from '@material-ui/icons/ListAlt';
+import CommentIcon from '@material-ui/icons/Comment';
 
 export default function Icon(props: any) {
   switch (props.icon) {
@@ -44,6 +45,8 @@ export default function Icon(props: any) {
       return <TuneIcon fontSize={props.size} />;
     case 'rubric':
       return <ListAltIcon fontSize={props.size} />;
+    case 'comment':
+      return <CommentIcon />;
   }
   return <ErrorIcon />;
 }
