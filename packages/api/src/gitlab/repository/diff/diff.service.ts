@@ -59,7 +59,7 @@ export class DiffService extends BaseService<Diff, DiffEntity, DiffQueryDto> {
     sortKey?: string,
     order?: 'ASC' | 'DESC',
   ): SelectQueryBuilder<DiffEntity> {
-    return query.orderBy("diff.resource #>> '{new_path}'", 'DESC');
+    return query.orderBy("diff.resource #>> '{new_path}'", order);
   }
 
   async updateOverride(id: string, override: ScoreOverride) {
