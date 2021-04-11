@@ -51,24 +51,6 @@ export class DiffService extends BaseService<Diff, DiffEntity, DiffQueryDto> {
     super(diffRepository, 'diff', httpService);
   }
 
-  search(filters: DiffQueryDto) {
-    filters = withDefaults(filters);
-    const query = this.diffRepository.createQueryBuilder('diff');
-
-    if (filters.commit) {
-      query.andWhere('diff.commit_id = :commit', { commit: filters.commit });
-    }
-
-    if (filters.merge_request) {
-      query.andWhere('diff.merge_request_id = :mergeRequest', {
-        mergeRequest: filters.merge_request,
-      });
-    }
-
-    paginate(query, filters);
-    return query.getManyAndCount();
-  }
-
   async updateOverride(id: string, override: ScoreOverride) {
     const diff = await this.diffRepository.findOne({ id });
     diff.resource = Extensions.updateExtensions(diff.resource, {
