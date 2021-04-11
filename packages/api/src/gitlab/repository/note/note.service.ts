@@ -35,50 +35,6 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
     super(noteRepository, 'note', httpService);
   }
 
-  async search(filters: NoteQueryDto) {
-    filters = withDefaults(filters);
-    const query = this.noteRepository.createQueryBuilder('note');
-    if (filters.merge_request) {
-      query.where('note.merge_request_id = :merge_request', {
-        merge_request: filters.merge_request,
-      });
-    }
-
-    if (filters.issue) {
-      query.andWhere('note.issue_id = :issue', {
-        issue: filters.issue,
-      });
-    }
-
-    if (filters.author_email) {
-      query.andWhere("note.resource #>> '{author_email}' IN (:...author)", {
-        author_email: alwaysArray(filters.author_email),
-      });
-    }
-
-    if (filters.start_date) {
-      query.andWhere("(note.resource #>> '{created_at}') >= (:startDate)", {
-        startDate: filters.start_date,
-      });
-    }
-
-    if (filters.end_date) {
-      query.andWhere("(note.resource #>> '{created_at}') <= (:endDate)", {
-        endDate: filters.end_date,
-      });
-    }
-
-    query.orderBy("note.resource #>> '{created_at}'", 'DESC');
-    paginate(query, filters);
-    return query.getManyAndCount();
-  }
-
-  async findOne(id: string) {
-    return this.noteRepository.findOne({
-      where: { id },
-    });
-  }
-
   async findAllForMergeRequest(mergeRequest: MergeRequestEntity) {
     return this.noteRepository.find({
       where: { mergeRequest: mergeRequest },
