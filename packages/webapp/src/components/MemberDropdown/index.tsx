@@ -54,7 +54,7 @@ const MemberDropdown: React.FC<MemberDropdownProps> = ({ repositoryId }) => {
     <FormControl variant='filled'>
       <InputLabel>Show results for:</InputLabel>
       <Select
-        style={{ minWidth: '15rem' }}
+        style={{ minWidth: '14rem' }}
         value={value || 'None'}
         onChange={(e) => {
           e.preventDefault();
