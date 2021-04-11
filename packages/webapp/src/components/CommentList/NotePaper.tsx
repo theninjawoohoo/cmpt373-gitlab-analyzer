@@ -74,12 +74,10 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
 
   const onMyOwnMergeRequest =
     mergeRequest?.results.length != 0 &&
-    !issue &&
     NoteProps.noteData.author.id ===
       mergeRequest?.results.find((element) => element).author.id;
   const onMyOwnIssue =
     issue?.results.length != 0 &&
-    !mergeRequest &&
     NoteProps.noteData.author.id ===
       issue?.results.find((element) => element).author.id;
 
