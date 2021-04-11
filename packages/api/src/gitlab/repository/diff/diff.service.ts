@@ -28,11 +28,30 @@ type GitlabDiff = Omit<Diff, 'hunks' | 'lines'>;
 
 @Injectable()
 export class DiffService extends BaseService<Diff, DiffEntity, DiffQueryDto> {
+  constructor(
+    readonly httpService: HttpService,
+    @InjectRepository(DiffEntity)
+    private readonly diffRepository: TypeORMRepository<DiffEntity>,
+  ) {
+    super(diffRepository, 'diff', httpService);
+  }
+
   buildFilters(
     query: SelectQueryBuilder<DiffEntity>,
     filters: DiffQueryDto,
   ): SelectQueryBuilder<DiffEntity> {
-    throw new Error('Method not implemented.');
+    if (filters.commit) {
+      query.andWhere('diff.commit_id = :commit', { commit: filters.commit });
+    }
+
+    if (filters.merge_request) {
+      query.andWhere('diff.merge_request_id = :mergeRequest', {
+        mergeRequest: filters.merge_request,
+      });
+    }
+
+    paginate(query, filters);
+    return query;
   }
 
   buildSort(
@@ -40,15 +59,7 @@ export class DiffService extends BaseService<Diff, DiffEntity, DiffQueryDto> {
     sortKey?: string,
     order?: 'ASC' | 'DESC',
   ): SelectQueryBuilder<DiffEntity> {
-    throw new Error('Method not implemented.');
-  }
-
-  constructor(
-    readonly httpService: HttpService,
-    @InjectRepository(DiffEntity)
-    private readonly diffRepository: TypeORMRepository<DiffEntity>,
-  ) {
-    super(diffRepository, 'diff', httpService);
+    return query.orderBy("diff.resource #>> '{new_path}'", 'DESC');
   }
 
   async updateOverride(id: string, override: ScoreOverride) {
