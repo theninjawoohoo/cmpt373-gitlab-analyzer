@@ -1,4 +1,9 @@
-import { Extensions, GlobWeight, MergeRequest } from '@ceres/types';
+import {
+  Extensions,
+  GlobWeight,
+  MergeRequest,
+  ScoreOverride,
+} from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
@@ -104,6 +109,14 @@ export class MergeRequestService extends BaseService<
     query.groupBy('date');
     query.orderBy('date', 'ASC');
     return query.getRawMany<MergeRequest.DailyCount>();
+  }
+
+  async updateOverride(id: string, override: ScoreOverride) {
+    const mergeRequest = await this.serviceRepository.findOne({ id });
+    mergeRequest.resource = Extensions.updateExtensions(mergeRequest.resource, {
+      override: override,
+    });
+    return this.serviceRepository.save(mergeRequest);
   }
 
   async fetchAllParticipantsForRepository(
@@ -250,11 +263,6 @@ export class MergeRequestService extends BaseService<
     };
   }
 
-  async getTotalForRepository(token: string, repository: Repository) {
-    const axiosResponse = await this.fetchFromGitlab(token, repository, 0, 1);
-    return parseInt(axiosResponse.headers['X-Total']);
-  }
-
   async fetchByPage(
     token: string,
     repo: Repository,
@@ -312,6 +320,10 @@ export class MergeRequestService extends BaseService<
           },
           weights,
         );
+        const override = commit.resource?.extensions?.override;
+        score.score = ScoreOverride.computeScore(override, score.score);
+        score.hasOverride =
+          ScoreOverride.hasOverride(override) || score.hasOverride;
         return {
           authorEmail: commit.resource.author_email,
           ...score,

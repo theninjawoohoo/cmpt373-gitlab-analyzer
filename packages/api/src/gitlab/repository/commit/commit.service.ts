@@ -1,4 +1,4 @@
-import { Commit, Extensions, GlobWeight } from '@ceres/types';
+import { Commit, Extensions, GlobWeight, ScoreOverride } from '@ceres/types';
 import { HttpService, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
@@ -105,6 +105,14 @@ export class CommitService extends BaseService<
     query.groupBy('date');
     query.orderBy('date', 'ASC');
     return query.getRawMany<Commit.DailyCount>();
+  }
+
+  async updateOverride(id: string, override: ScoreOverride) {
+    const commit = await this.serviceRepository.findOne({ id });
+    commit.resource = Extensions.updateExtensions(commit.resource, {
+      override: override,
+    });
+    return this.serviceRepository.save(commit);
   }
 
   async findAllForRepository(repository: Repository) {
