@@ -28,7 +28,7 @@ export default class DiffInterpreter {
 
     const hunkLines: Line[] = [];
     let commentFlag = false;
-    let result : (number|boolean)[] = [];
+    let result: (number | boolean)[] = [];
     while (currentLine < hunk.lines.length) {
       const line = hunk.lines[currentLine];
       const lineType = this.determineLineType(line);
@@ -104,7 +104,7 @@ export default class DiffInterpreter {
     currentLine: number,
     commentFlag: boolean,
   ) {
-    let result = this.createBlankCommentAndSyntax(
+    const result = this.createBlankCommentAndSyntax(
       line,
       hunkLines,
       leftLineNumber,
@@ -141,7 +141,7 @@ export default class DiffInterpreter {
       pushed = true;
     }
     if (!pushed) {
-      let result = this.createComment(
+      const result = this.createComment(
         line,
         hunkLines,
         LineNumber,
@@ -319,12 +319,12 @@ export default class DiffInterpreter {
     lines: string[],
     currentLine: number,
   ) {
-    let line = lines[currentLine];
-      const addedLines: LineContent = {
-        number: rightLineNumber,
-        content: line,
-      };
-      return addedLines;
+    const line = lines[currentLine];
+    const addedLines: LineContent = {
+      number: rightLineNumber,
+      content: line,
+    };
+    return addedLines;
   }
 
   private createAdd(
