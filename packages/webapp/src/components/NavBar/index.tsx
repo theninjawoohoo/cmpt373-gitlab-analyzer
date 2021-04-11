@@ -42,14 +42,8 @@ const NavBar: React.FC<UserNameProps> = (UserNameProps) => {
           />
           <ItemBox
             icon='merge'
-            primary={'Merge Requests'}
+            primary={'Code'}
             url={`/merge/${repositoryId}`}
-            repositoryDependent
-          />
-          <ItemBox
-            icon='commit'
-            primary={'Commits'}
-            url={`/commits?repository=${repositoryId}`}
             repositoryDependent
           />
           <ItemBox
