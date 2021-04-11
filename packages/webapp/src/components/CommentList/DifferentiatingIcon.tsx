@@ -13,7 +13,7 @@ const DifferentiatingIcon: React.FC<DifferentiatingIconProps> = (
     return (
       <FilterVintageIcon
         style={{
-          color: '#f3bfb3',
+          color: '#f49a8d',
         }}
       />
     );
@@ -21,7 +21,7 @@ const DifferentiatingIcon: React.FC<DifferentiatingIconProps> = (
     return (
       <EmojiNatureIcon
         style={{
-          color: '#57838d',
+          color: '#78a2cc',
         }}
       />
     );

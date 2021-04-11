@@ -23,7 +23,7 @@ const useStyles = makeStyles(() =>
       marginLeft: 5,
       marginTop: 5,
       marginBottom: 5,
-      fontColor: 'primary',
+      color: '#25476d',
     },
     merge_request_note_header_row: {
       backgroundColor: '#e8f4ea',
@@ -32,6 +32,14 @@ const useStyles = makeStyles(() =>
     issue_note_header_row: {
       backgroundColor: '#f3eef8',
       padding: 10,
+    },
+    clickable_text_hyperlink: {
+      color: '#0f4c81',
+      textDecoration: 'underline',
+      letterSpacing: 0.5,
+      cursor: 'pointer',
+      textUnderlineOffset: '15%',
+      textUnderlinePosition: 'under',
     },
   }),
 );
@@ -91,7 +99,17 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
               <Box fontSize={18}>
                 On merge request{' '}
                 <Box fontWeight='fontWeightBold' display='inline'>
-                  {mergeRequest?.results.find((element) => element).title}
+                  <a
+                    className={classes.clickable_text_hyperlink}
+                    onClick={() => {
+                      window.open(
+                        mergeRequest?.results.find((element) => element)
+                          .web_url,
+                      );
+                    }}
+                  >
+                    {mergeRequest?.results.find((element) => element).title}
+                  </a>
                 </Box>
               </Box>
             </Typography>
@@ -101,7 +119,16 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
               <Box fontSize={18}>
                 On issue{' '}
                 <Box fontWeight='fontWeightBold' display='inline'>
-                  {issue?.results.find((element) => element).title}
+                  <a
+                    className={classes.clickable_text_hyperlink}
+                    onClick={() => {
+                      window.open(
+                        issue?.results.find((element) => element).web_url,
+                      );
+                    }}
+                  >
+                    {issue?.results.find((element) => element).title}
+                  </a>
                 </Box>
               </Box>
             </Typography>

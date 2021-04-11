@@ -21,6 +21,7 @@ const useStyles = makeStyles(() =>
     root: {
       display: 'flex',
       flexWrap: 'wrap',
+      color: '#25476d',
     },
     active_code_review_tab: {
       backgroundColor: '#b8d8be',
