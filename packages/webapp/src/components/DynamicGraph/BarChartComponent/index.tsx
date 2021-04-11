@@ -37,7 +37,10 @@ const DynamicBarChart: React.FC<BarChartProps> = ({ graphData, graphTab }) => {
       <ResponsiveContainer width={1200} height={600}>
         <BarChart stackOffset='sign' data={graphData}>
           <XAxis dataKey='date' tick={DateTick} />
-          <YAxis tickFormatter={(value) => Math.abs(value).toString()} />
+          <YAxis
+            tickFormatter={(value) => Math.abs(value).toString()}
+            label={{ value: 'Count', angle: -90, position: 'insideLeft' }}
+          />
           <ReferenceLine y={0} stroke='#000' />
           <Tooltip
             labelFormatter={(value) =>
@@ -46,15 +49,10 @@ const DynamicBarChart: React.FC<BarChartProps> = ({ graphData, graphTab }) => {
             formatter={(value) => Math.abs(value).toString()}
           />
           <Legend layout='vertical' align='right' verticalAlign='top' />
-          <Bar
-            dataKey='commitCount'
-            name='Commits'
-            stackId='a'
-            fill='#0A4D63'
-          />
+          <Bar dataKey='commitCount' name='Commit' stackId='a' fill='#0A4D63' />
           <Bar
             dataKey='mergeRequestCount'
-            name='Merge Requests'
+            name='Merge Request'
             stackId='a'
             fill='#e37500'
           />
@@ -68,6 +66,7 @@ const DynamicBarChart: React.FC<BarChartProps> = ({ graphData, graphTab }) => {
           <XAxis dataKey='date' tick={DateTick} />
           <YAxis
             tickFormatter={(value) => Math.round(Math.abs(value)).toString()}
+            label={{ value: 'Point', angle: -90, position: 'insideLeft' }}
           />
           <ReferenceLine y={0} stroke='#000' />
           <Tooltip
@@ -77,15 +76,10 @@ const DynamicBarChart: React.FC<BarChartProps> = ({ graphData, graphTab }) => {
             formatter={(value) => Math.abs(value).toFixed(1)}
           />
           <Legend layout='vertical' align='right' verticalAlign='top' />
-          <Bar
-            dataKey='commitScore'
-            name='Commits'
-            stackId='a'
-            fill='#0A4D63'
-          />
+          <Bar dataKey='commitScore' name='Commit' stackId='a' fill='#0A4D63' />
           <Bar
             dataKey='mergeRequestScore'
-            name='Merge Requests'
+            name='Merge Request'
             stackId='a'
             fill='#e37500'
           />
@@ -97,7 +91,10 @@ const DynamicBarChart: React.FC<BarChartProps> = ({ graphData, graphTab }) => {
       <ResponsiveContainer width={1200} height={600}>
         <BarChart stackOffset='sign' data={graphData}>
           <XAxis dataKey='date' tick={DateTick} />
-          <YAxis tickFormatter={(value) => Math.abs(value).toString()} />
+          <YAxis
+            tickFormatter={(value) => Math.abs(value).toString()}
+            label={{ value: 'Word Count', angle: -90, position: 'insideLeft' }}
+          />
           <ReferenceLine y={0} stroke='#000' />
           <Tooltip
             labelFormatter={(value) =>
@@ -107,14 +104,14 @@ const DynamicBarChart: React.FC<BarChartProps> = ({ graphData, graphTab }) => {
           />
           <Legend layout='vertical' align='right' verticalAlign='top' />
           <Bar
-            dataKey='issueWordCount'
-            name='Issue'
+            dataKey='mergeRequestWordCount'
+            name='Merge Request'
             stackId='a'
             fill='#0A4D63'
           />
           <Bar
-            dataKey='mergeRequestWordCount'
-            name='Merge Request'
+            dataKey='issueWordCount'
+            name='Issue'
             stackId='a'
             fill='#e37500'
           />

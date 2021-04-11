@@ -61,10 +61,10 @@ function combineData(
       -mergeRequestCounts.find((count) => isSameDay(date, new Date(count.date)))
         ?.score || 0,
     issueWordCount:
-      issueWordCounts.find((count) => isSameDay(date, new Date(count.date)))
+      -issueWordCounts.find((count) => isSameDay(date, new Date(count.date)))
         ?.wordCount || 0,
     mergeRequestWordCount:
-      -mergeRequestWordCounts.find((count) =>
+      mergeRequestWordCounts.find((count) =>
         isSameDay(date, new Date(count.date)),
       )?.wordCount || 0,
   }));
