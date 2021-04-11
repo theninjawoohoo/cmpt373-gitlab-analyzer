@@ -23,7 +23,7 @@ const PreloadedForm: React.FC<PreloadedFormProps> = ({ id }) => {
     updateGroupConfig(values, {
       onSuccess: () => {
         void invalidate();
-        push('/settings/calendar');
+        push('/settings/group');
       },
     });
   };
@@ -42,7 +42,7 @@ const EditGroupConfigPage: React.FC = () => {
   const onSubmit = (values: GroupConfig) => {
     createScoringConfig(values, {
       onSuccess: () => {
-        push('/group');
+        push('/settings/group');
       },
     });
   };

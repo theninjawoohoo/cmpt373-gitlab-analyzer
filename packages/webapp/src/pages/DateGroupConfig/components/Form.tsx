@@ -5,28 +5,36 @@ import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import React, { useState, useEffect } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
-import LuxonUtils from '@date-io/luxon';
+import React from 'react';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
-import { useRepository } from '../../../api/repository';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { GroupConfig, Iteration, LinkedRepositories } from '@ceres/types';
 import {
-  MuiPickersUtilsProvider,
-  KeyboardDateTimePicker,
-} from '@material-ui/pickers';
+  GroupConfig,
+  Iteration,
+  LinkedRepositories,
+  Repository,
+} from '@ceres/types';
+import { KeyboardDateTimePicker } from '@material-ui/pickers';
 import { DateTime } from 'luxon';
-import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
+import RepositorySelector from './RepositorySelector';
+import { ApiResource } from '../../../api/base';
 
 const validationSchema = yup.object().shape({
   name: yup.string().required('A group config requires a name'),
+  repositories: yup
+    .array()
+    .required()
+    .of(
+      yup.object().shape({
+        id: yup.string().required(),
+        display: yup.string().required(),
+      }),
+    ),
   iteration: yup
     .array()
     .required()
@@ -34,6 +42,7 @@ const validationSchema = yup.object().shape({
       yup.object().shape({
         name: yup.string().required('Iteration Name is required'),
         start: yup.string().typeError('Something is wrong with Date field'),
+        end: yup.string().typeError('Something is wrong with Date field'),
       }),
     ),
 });
@@ -44,62 +53,23 @@ interface FormProps {
 }
 
 const Form: React.FC<FormProps> = ({ defaultValues, onSubmit }) => {
-  const {
-    control,
-    handleSubmit,
-    watch,
-    register,
-    setValue,
-    errors,
-  } = useForm<GroupConfig>({
+  const { control, handleSubmit, register, errors } = useForm<GroupConfig>({
     defaultValues: {
       name: defaultValues?.name || '',
-      iteration: defaultValues?.iteration || [{}],
-      repositories: defaultValues?.repositories || [{}],
+      iteration: defaultValues?.iteration || [],
+      repositories: defaultValues?.repositories || [],
     },
     resolver: yupResolver(validationSchema),
   });
-
-  const { data: data } = useRepository({
-    name: '',
-  });
-
-  const blankLinkedRepo = { id: 'N/A', display: '' };
-  const [repoState, setRepoState] = useState(blankLinkedRepo);
-  const [startDate, setStartDate] = useState<MaterialUiPickersDate>(null);
-  const [endDate, setEndDate] = useState<MaterialUiPickersDate>(null);
-
-  const startVal = watch('iteration.start') as DateTime;
-  const endVal = watch('iteration.end') as DateTime;
-
-  useEffect(() => {
-    register('iteration.start');
-    register('iteration.end');
-  }, [register]);
-
-  useEffect(() => {
-    setStartDate(startVal || null);
-    setEndDate(endVal || null);
-  }, [setStartDate, setEndDate, startVal, endVal]);
-
-  const handleRepoChange = (e) => {
-    const display = e.target.value as string;
-    const id = data.results.find((repo) => repo.name == display).id;
-    setRepoState((prevState) => ({
-      ...prevState,
-      [display]: id,
-    }));
-  };
 
   const {
     fields: repoFields,
     append: repoAppend,
     remove: repoRemove,
-    swap: repoSwap,
-    insert: repoInsert,
   } = useFieldArray<LinkedRepositories>({
     control,
-    name: 'repository',
+    name: 'repositories',
+    keyName: 'identifier' as any,
   });
 
   const {
@@ -112,6 +82,13 @@ const Form: React.FC<FormProps> = ({ defaultValues, onSubmit }) => {
     control,
     name: 'iteration',
   });
+
+  const onRepositoryAdd = (repository: ApiResource<Repository>) => {
+    repoAppend({
+      id: repository.meta.id,
+      display: repository.name_with_namespace,
+    });
+  };
 
   return (
     <Box marginY={2}>
@@ -134,156 +111,112 @@ const Form: React.FC<FormProps> = ({ defaultValues, onSubmit }) => {
 
         <Typography variant='h2'>Repository Selection</Typography>
         {repoFields.map((field, index) => (
+          <Box py={1} key={field.id}>
+            <input
+              type='hidden'
+              name={`repositories[${index}].id`}
+              ref={register()}
+              defaultValue={field?.id}
+            />
+            <input
+              type='hidden'
+              name={`repositories[${index}].display`}
+              ref={register()}
+              defaultValue={field?.display}
+            />
+            <Grid container spacing={2} alignItems='center'>
+              <Grid item>
+                <IconButton onClick={() => repoRemove(index)}>
+                  <DeleteIcon />
+                </IconButton>
+              </Grid>
+              <Grid item>
+                <Typography>{field.display}</Typography>
+              </Grid>
+            </Grid>
+          </Box>
+        ))}
+        <RepositorySelector
+          onRepositoryAdd={onRepositoryAdd}
+          repositoriesSelected={(repoFields || []).map((repo) => repo.id)}
+        />
+        <Typography variant='h2'>Iterations</Typography>
+        {iterFields.map((field, index) => (
           <div key={field.id}>
             <Box my={1} p={1}>
-              <Grid container spacing={1}>
-                <Grid item xs={7}>
+              <Grid container spacing={1} alignItems='center'>
+                <Grid item xs={3}>
                   <TextField
-                    label='Repository'
-                    name={`repositories[${index}].display`}
+                    label='Iteration Name'
+                    name={`iteration[${index}].name`}
                     variant='outlined'
                     inputRef={register()}
-                    select
-                    onChange={handleRepoChange}
-                    defaultValue={field?.display}
+                    error={!!errors?.iteration?.[index]?.name}
+                    helperText={errors?.iteration?.[index]?.name?.message}
+                    defaultValue={field?.name}
                     fullWidth
-                  >
-                    <InputLabel>Repo List:</InputLabel>
-                    <MenuItem value='none'>None</MenuItem>
-                    {(data.results || [])?.map((m) => (
-                      <MenuItem key={m.id} value={m.name}>
-                        {m.name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
+                  />
                 </Grid>
-                <Grid item xs={2}>
-                  <TextField
-                    label='ID'
-                    name={`repositories[${index}].id`}
-                    variant='outlined'
-                    inputRef={register()}
-                    value={repoState[field?.display]}
-                    fullWidth
-                    disabled
+                <Grid item xs={3}>
+                  <Controller
+                    render={({ ref, ...props }) => {
+                      return (
+                        <KeyboardDateTimePicker
+                          variant='inline'
+                          inputVariant='outlined'
+                          format='MM/dd/yyyy hh:mm a'
+                          ampm={true}
+                          label='Start Date'
+                          inputRef={ref}
+                          {...props}
+                        />
+                      );
+                    }}
+                    control={control}
+                    name={`iteration[${index}].start`}
+                    defaultValue={field?.start}
+                  />
+                </Grid>
+                <Grid item xs={3}>
+                  <Controller
+                    render={({ ref, ...props }) => {
+                      return (
+                        <KeyboardDateTimePicker
+                          variant='inline'
+                          inputVariant='outlined'
+                          format='MM/dd/yyyy hh:mm a'
+                          ampm={true}
+                          label='End Date'
+                          inputRef={ref}
+                          {...props}
+                        />
+                      );
+                    }}
+                    control={control}
+                    name={`iteration[${index}].end`}
+                    defaultValue={field?.end}
                   />
                 </Grid>
                 <Grid item xs={3}>
                   <Grid justify='flex-end' alignItems='center' container>
                     {index !== 0 && (
-                      <IconButton onClick={() => repoSwap(index - 1, index)}>
+                      <IconButton onClick={() => iterSwap(index - 1, index)}>
                         <ArrowUpwardIcon />
                       </IconButton>
                     )}
-                    {index !== repoFields.length - 1 && (
-                      <IconButton onClick={() => repoSwap(index, index + 1)}>
+                    {index !== iterFields.length - 1 && (
+                      <IconButton onClick={() => iterSwap(index, index + 1)}>
                         <ArrowDownwardIcon />
                       </IconButton>
                     )}
-                    <IconButton onClick={() => repoRemove(index)}>
+                    <IconButton onClick={() => iterRemove(index)}>
                       <DeleteIcon />
                     </IconButton>
                   </Grid>
                 </Grid>
               </Grid>
             </Box>
-            {index !== repoFields.length - 1 && (
-              <Box position='relative' py={2}>
-                <Divider variant='middle' />
-                <Box position='absolute' top={-5} left='50%'>
-                  <IconButton onClick={() => repoInsert(index + 1, {})}>
-                    <AddCircleIcon />
-                  </IconButton>
-                </Box>
-              </Box>
-            )}
-          </div>
-        ))}
-        <Grid container justify='center' alignItems='center'>
-          <Box mr={2}>
-            <Button
-              type='button'
-              variant='contained'
-              color='secondary'
-              onClick={() => {
-                repoAppend({});
-              }}
-            >
-              Add
-            </Button>
-          </Box>
-        </Grid>
-        <Typography variant='h2'>Iteration</Typography>
-        {iterFields.map((field, index) => (
-          <div key={field.id}>
-            <Box my={1} p={1}>
-              <Grid container spacing={1}>
-                <MuiPickersUtilsProvider utils={LuxonUtils}>
-                  <Grid item xs={5}>
-                    <TextField
-                      label='Iteration Name'
-                      name={`iteration[${index}].name`}
-                      variant='outlined'
-                      inputRef={register()}
-                      error={!!errors?.iteration?.[index]?.name}
-                      helperText={errors?.iteration?.[index]?.name?.message}
-                      defaultValue={field?.name}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={2}>
-                    <KeyboardDateTimePicker
-                      variant='inline'
-                      format='MM/dd/yyyy hh:mm a'
-                      ampm={true}
-                      margin='normal'
-                      id='date-picker-inline'
-                      label='Start Date'
-                      value={startDate}
-                      onChange={(startDate) =>
-                        setValue('iteration.start', startDate)
-                      }
-                      KeyboardButtonProps={{
-                        'aria-label': 'change date',
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={2}>
-                    <KeyboardDateTimePicker
-                      variant='inline'
-                      format='MM/dd/yyyy hh:mm a'
-                      ampm={true}
-                      margin='normal'
-                      id='date-picker-inline'
-                      label='End Date'
-                      value={endDate}
-                      onChange={(endDate) => setValue('iteration.end', endDate)}
-                      KeyboardButtonProps={{
-                        'aria-label': 'change date',
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Grid justify='flex-end' alignItems='center' container>
-                      {index !== 0 && (
-                        <IconButton onClick={() => iterSwap(index - 1, index)}>
-                          <ArrowUpwardIcon />
-                        </IconButton>
-                      )}
-                      {index !== repoFields.length - 1 && (
-                        <IconButton onClick={() => iterSwap(index, index + 1)}>
-                          <ArrowDownwardIcon />
-                        </IconButton>
-                      )}
-                      <IconButton onClick={() => iterRemove(index)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </Grid>
-                  </Grid>
-                </MuiPickersUtilsProvider>
-              </Grid>
-            </Box>
-            {index !== repoFields.length - 1 && (
+            {index !== iterFields.length - 1 && (
               <Box position='relative' py={2}>
                 <Divider variant='middle' />
                 <Box position='absolute' top={-5} left='50%'>
@@ -295,8 +228,14 @@ const Form: React.FC<FormProps> = ({ defaultValues, onSubmit }) => {
             )}
           </div>
         ))}
-        <Grid container justify='center' alignItems='center'>
-          <Box mr={2}>
+        <Grid
+          container
+          justify='center'
+          alignItems='center'
+          spacing={2}
+          direction='column'
+        >
+          <Grid item>
             <Button
               type='button'
               variant='contained'
@@ -305,16 +244,18 @@ const Form: React.FC<FormProps> = ({ defaultValues, onSubmit }) => {
                 iterAppend({
                   name: '',
                   start: DateTime.now().minus({ days: 7 }).toISO(),
-                  end: DateTime.now().toISO(),
+                  end: DateTime.now().minus({ days: 0 }).toISO(),
                 });
               }}
             >
-              Add
+              Add Iteration
             </Button>
+          </Grid>
+          <Grid item>
             <Button type='submit' variant='contained' color='primary'>
               Submit
             </Button>
-          </Box>
+          </Grid>
         </Grid>
       </form>
     </Box>
