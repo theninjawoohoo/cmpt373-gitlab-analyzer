@@ -37,19 +37,19 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
         issue: filters.issue,
       });
     }
-    if (filters.author_names) {
-      query.andWhere(
-        "note.resource #> '{author}'->>'name' IN (:...authorNames)",
-        {
-          authorNames: alwaysArray(filters.author_names),
-        },
-      );
+
+    if (filters.author_id) {
+      query.andWhere("note.resource #> '{author}'->>'id' IN (:...authorIds)", {
+        authorIds: alwaysArray(filters.author_id),
+      });
     }
+
     if (filters.created_start_date) {
       query.andWhere("(note.resource #>> '{created_at}') >= (:startDate)", {
         startDate: filters.created_start_date,
       });
     }
+
     if (filters.created_end_date) {
       query.andWhere("(note.resource #>> '{created_at}') <= (:endDate)", {
         endDate: filters.created_end_date,
@@ -74,6 +74,14 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
       );
     }
 
+    if (filters.type) {
+      if (filters.type === Note.Type.issueComment) {
+        query.andWhere('note.issue_id IS NOT NULL');
+      } else if (filters.type === Note.Type.mergeRequestComment) {
+        query.andWhere('note.merge_request_id IS NOT NULL');
+      }
+    }
+
     return query;
   }
 
@@ -81,6 +89,20 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
     query: SelectQueryBuilder<NoteEntity>,
   ): SelectQueryBuilder<NoteEntity> {
     return query.orderBy("note.resource #>> '{created_at}'", 'DESC');
+  }
+
+  async buildDailyCounts(filters: NoteQueryDto): Promise<Note.DailyCount[]> {
+    let query = this.serviceRepository.createQueryBuilder('note');
+    query = this.buildFilters(query, filters);
+    query.select("DATE(note.resource #>> '{created_at}')", 'date');
+    query.addSelect('count(*)::integer', 'count');
+    query.addSelect(
+      "sum((note.resource #>> '{extensions,wordCount}')::float)",
+      'wordCount',
+    );
+    query.groupBy('date');
+    query.orderBy('date', 'ASC');
+    return query.getRawMany<Note.DailyCount>();
   }
 
   async findAllForMergeRequest(mergeRequest: MergeRequestEntity) {

@@ -12,7 +12,7 @@ import { ApiResource } from '../../../api/base';
 import ScoringChip from '../../../components/ScoringChip';
 import SmartDate from '../../../components/SmartDate';
 import { useFilterContext } from '../../../contexts/FilterContext';
-import WarningIcon from '@material-ui/icons/Warning';
+import OverridePopper from '../../../components/OverridePopper';
 
 interface CommitOrMergeRequestRendererProps {
   mergeRequest?: ApiResource<MergeRequest>;
@@ -103,7 +103,7 @@ const CommitOrMergeRequestRenderer: React.FC<CommitOrMergeRequestRendererProps> 
             <Grid container alignItems='center' spacing={2}>
               {hasOverride && (
                 <Grid item>
-                  <WarningIcon />
+                  <OverridePopper override={extensions.override} />
                 </Grid>
               )}
               <Grid item>

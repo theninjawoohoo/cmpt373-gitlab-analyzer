@@ -13,12 +13,15 @@ import { useFilterContext } from '../../contexts/FilterContext';
 import { ApiResource } from '../../api/base';
 import { RepositoryMember } from '@ceres/types';
 import { useRepositoryMembers } from '../../api/repo_members';
+import DifferentiatingIcon from './DifferentiatingIcon';
+import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(() =>
   createStyles({
     root: {
       display: 'flex',
       flexWrap: 'wrap',
+      color: '#25476d',
     },
     active_code_review_tab: {
       backgroundColor: '#b8d8be',
@@ -52,52 +55,42 @@ enum TabOption {
   issueNotes = 'issue notes',
 }
 
-function findRepoNameForMember(
+function findRepoMemberId(
   filtered_id: string,
   members: ApiResource<RepositoryMember>[],
 ) {
   const filtered = (members || []).filter(
     (member) => member.meta.id === filtered_id,
   );
-  console.log(filtered);
-  return filtered.map((member) => member.name);
+
+  return filtered.map((member) => member.id);
 }
 
 const CommentList: React.FC = () => {
   const classes = useStyles();
 
   const { startDate, endDate, author } = useFilterContext();
-  console.log(author);
-  console.log(startDate);
-  console.log(endDate);
   const { repositoryId } = useRepositoryContext();
   const { data: members } = useRepositoryMembers(repositoryId);
-  console.log(members);
-  const names = findRepoNameForMember(author, members);
-  console.log(names);
+  const authorIds = findRepoMemberId(author, members);
   const { data: allNotes } = useGetNotesByRepository(
     {
       repository_id: repositoryId,
       created_start_date: startDate,
       created_end_date: endDate,
-      author_names: names,
+      author_id: authorIds,
     },
     0,
     9000,
   );
-  console.log(allNotes?.results || []);
-  console.log(allNotes?.results.length);
-  allNotes?.results.map((note) => {
-    console.log(note.author.name);
-  });
+
   const mergeRequestNotes = allNotes?.results.filter(
     (comment) => comment.noteable_type == 'MergeRequest',
   );
-  if (mergeRequestNotes) console.log(mergeRequestNotes.length);
+
   const issueNotes = allNotes?.results.filter(
     (comment) => comment.noteable_type == 'Issue',
   );
-  if (issueNotes) console.log(issueNotes.length);
 
   const [tab, setTab] = useState(TabOption.codeReview);
   const notes =
@@ -111,7 +104,7 @@ const CommentList: React.FC = () => {
     <>
       <Container>
         <DefaultPageTitleFormat>Comments</DefaultPageTitleFormat>
-        <Box my={2} className={classes.root}>
+        <Box my={1} className={classes.root}>
           <Tabs value={tab} onChange={handleTabs} textColor='primary' centered>
             <Tab
               value={TabOption.codeReview}
@@ -132,9 +125,71 @@ const CommentList: React.FC = () => {
               }
             />
           </Tabs>
+          <Grid
+            container
+            direction={'row'}
+            alignItems={'center'}
+            style={{ marginTop: 15 }}
+          >
+            {tab === TabOption.codeReview ? (
+              <>
+                <Grid
+                  container
+                  item
+                  xs={6}
+                  alignItems={'center'}
+                  direction={'row'}
+                >
+                  <DifferentiatingIcon isMine={true} />
+                  <Typography style={{ marginLeft: 10, marginRight: 10 }}>
+                    Notes on my own merge request(s)
+                  </Typography>
+                </Grid>
+                <Grid
+                  container
+                  item
+                  xs={6}
+                  alignItems={'center'}
+                  direction={'row'}
+                >
+                  <DifferentiatingIcon isMine={false} />
+                  <Typography style={{ marginLeft: 10, marginRight: 10 }}>
+                    Notes on other members&apos; merge request(s)
+                  </Typography>
+                </Grid>
+              </>
+            ) : (
+              <>
+                <Grid
+                  container
+                  item
+                  xs={6}
+                  alignItems={'center'}
+                  direction={'row'}
+                >
+                  <DifferentiatingIcon isMine={true} />
+                  <Typography style={{ marginLeft: 10, marginRight: 10 }}>
+                    Notes on my own issue(s)
+                  </Typography>
+                </Grid>
+                <Grid
+                  container
+                  item
+                  xs={6}
+                  alignItems={'center'}
+                  direction={'row'}
+                >
+                  <DifferentiatingIcon isMine={false} />
+                  <Typography style={{ marginLeft: 10, marginRight: 10 }}>
+                    Notes on other members&apos; issue(s)
+                  </Typography>
+                </Grid>
+              </>
+            )}
+          </Grid>
         </Box>
         <Grid
-          justify='center'
+          justify={'center'}
           container
           direction={'column'}
           alignItems={'stretch'}

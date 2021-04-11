@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { NoteService } from './note.service';
 import { IdParam } from '../../../common/id-param';
-import { RepositoryService } from '../repository.service';
 import { MergeRequestService } from '../../merge-request/merge-request.service';
 import { paginatedToResponse } from '../../../common/pagination';
 import { NoteQueryDto } from './note-query.dto';
@@ -17,7 +16,6 @@ import { NoteQueryDto } from './note-query.dto';
 export class NoteController {
   constructor(
     private readonly noteService: NoteService,
-    private readonly repositoryService: RepositoryService,
     private readonly mergeRequestService: MergeRequestService,
   ) {}
 
@@ -30,6 +28,11 @@ export class NoteController {
       );
     }
     return paginatedToResponse(this.noteService.search(query));
+  }
+
+  @Get('count')
+  dailyCounts(@Query() query: NoteQueryDto) {
+    return this.noteService.buildDailyCounts(query);
   }
 
   @Get('/merge_request/:id')

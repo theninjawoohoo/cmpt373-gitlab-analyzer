@@ -4,15 +4,13 @@ import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import { Paper } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-// import AutoAwesome from '@material-ui/icons/';
-import FilterVintageIcon from '@material-ui/icons/FilterVintage';
-import EmojiNatureIcon from '@material-ui/icons/EmojiNature';
 import { ApiResource } from '../../api/base';
 import { /*Issue,*/ /*MergeRequest*/ Note } from '@ceres/types';
 import SmartDate from '../SmartDate';
 import { useGetMergeRequestByNoteId } from '../../api/mergeRequests';
 import { useGetIssueByNoteId } from '../../api/issue';
 import { useRepositoryContext } from '../../contexts/RepositoryContext';
+import DifferentiatingIcon from './DifferentiatingIcon';
 
 interface NoteProps {
   noteData: ApiResource<Note>;
@@ -25,7 +23,7 @@ const useStyles = makeStyles(() =>
       marginLeft: 5,
       marginTop: 5,
       marginBottom: 5,
-      fontColor: 'primary',
+      color: '#25476d',
     },
     merge_request_note_header_row: {
       backgroundColor: '#e8f4ea',
@@ -35,23 +33,20 @@ const useStyles = makeStyles(() =>
       backgroundColor: '#f3eef8',
       padding: 10,
     },
+    clickable_text_hyperlink: {
+      color: '#0f4c81',
+      textDecoration: 'underline',
+      letterSpacing: 0.5,
+      cursor: 'pointer',
+      textUnderlineOffset: '15%',
+      textUnderlinePosition: 'under',
+    },
   }),
 );
 
 const extractNoteContent = (noteBody: string) => {
   return noteBody.replace(/\*([^*]+)\*$/g, '').trim();
 };
-
-// const onMyOwnMergeRequest = (
-//   noteAuthorId: number,
-//   mergeRequest: ApiResource<MergeRequest>,
-// ) => {
-//   return noteAuthorId === mergeRequest?.author.id;
-// };
-
-// const onMyOwnIssue = (noteAuthorId: number, issue: ApiResource<Issue>) => {
-//   return noteAuthorId === issue.author.id;
-// };
 
 const NotePaper: React.FC<NoteProps> = (NoteProps) => {
   const { repositoryId } = useRepositoryContext();
@@ -61,9 +56,7 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
     repository: repositoryId,
     note_id: NoteProps.noteData.meta.id,
   });
-  if (mergeRequest) {
-    console.log(mergeRequest?.results.find((element) => element));
-  }
+
   const { data: issue } = useGetIssueByNoteId({
     repository: repositoryId,
     note_id: NoteProps.noteData.meta.id,
@@ -74,12 +67,11 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
 
   const onMyOwnMergeRequest =
     mergeRequest?.results.length != 0 &&
-    !issue &&
     NoteProps.noteData.author.id ===
       mergeRequest?.results.find((element) => element).author.id;
+
   const onMyOwnIssue =
     issue?.results.length != 0 &&
-    !mergeRequest &&
     NoteProps.noteData.author.id ===
       issue?.results.find((element) => element).author.id;
 
@@ -103,7 +95,17 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
               <Box fontSize={18}>
                 On merge request{' '}
                 <Box fontWeight='fontWeightBold' display='inline'>
-                  {mergeRequest?.results.find((element) => element).title}
+                  <a
+                    className={classes.clickable_text_hyperlink}
+                    onClick={() => {
+                      window.open(
+                        mergeRequest?.results.find((element) => element)
+                          .web_url,
+                      );
+                    }}
+                  >
+                    {mergeRequest?.results.find((element) => element).title}
+                  </a>
                 </Box>
               </Box>
             </Typography>
@@ -113,29 +115,23 @@ const NotePaper: React.FC<NoteProps> = (NoteProps) => {
               <Box fontSize={18}>
                 On issue{' '}
                 <Box fontWeight='fontWeightBold' display='inline'>
-                  {issue?.results.find((element) => element).title}
+                  <a
+                    className={classes.clickable_text_hyperlink}
+                    onClick={() => {
+                      window.open(
+                        issue?.results.find((element) => element).web_url,
+                      );
+                    }}
+                  >
+                    {issue?.results.find((element) => element).title}
+                  </a>
                 </Box>
               </Box>
             </Typography>
           )}
         </Grid>
         <Grid item>
-          {((isMergeRequestNote && onMyOwnMergeRequest) ||
-            (!isMergeRequestNote && onMyOwnIssue)) && (
-            <FilterVintageIcon
-              style={{
-                color: '#f3bfb3',
-              }}
-            />
-          )}
-          {((isMergeRequestNote && !onMyOwnMergeRequest) ||
-            (!isMergeRequestNote && !onMyOwnIssue)) && (
-            <EmojiNatureIcon
-              style={{
-                color: '#57838d',
-              }}
-            />
-          )}
+          <DifferentiatingIcon isMine={onMyOwnMergeRequest || onMyOwnIssue} />
         </Grid>
       </Grid>
 
