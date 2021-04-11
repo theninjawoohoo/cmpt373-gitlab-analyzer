@@ -112,9 +112,33 @@ export class updateTimestampColumns1615603543107 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "merge_request_participant" ADD "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()`,
     );
+    await queryRunner.query(
+      `ALTER TABLE "commit_daily_count" DROP COLUMN "created_at"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "commit_daily_count" ADD "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "commit_daily_count" DROP COLUMN "updated_at"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "commit_daily_count" ADD "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()`,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `ALTER TABLE "commit_daily_count" DROP COLUMN "updated_at"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "commit_daily_count" ADD "updated_at" TIMESTAMP NOT NULL DEFAULT now()`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "commit_daily_count" DROP COLUMN "created_at"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "commit_daily_count" ADD "created_at" TIMESTAMP NOT NULL DEFAULT now()`,
+    );
     await queryRunner.query(
       `ALTER TABLE "merge_request_participant" DROP COLUMN "updated_at"`,
     );

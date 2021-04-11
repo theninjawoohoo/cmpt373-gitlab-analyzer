@@ -23,12 +23,14 @@ function combineData(
   endDate: string,
   commitCounts: Commit.DailyCount[] = [],
   mergeRequestCounts: MergeRequest.DailyCount[] = [],
-  wordCounts: Note.DailyCount[] = [],
+  issueWordCounts: Note.DailyCount[] = [],
+  mergeRequestWordCounts: Note.DailyCount[] = [],
 ) {
   const allDates = uniq([
     ...commitCounts.map((count) => count.date),
     ...mergeRequestCounts.map((count) => count.date),
-    ...wordCounts.map((count) => count.date),
+    ...issueWordCounts.map((count) => count.date),
+    ...mergeRequestWordCounts.map((count) => count.date),
   ]).sort((a, b) => a.localeCompare(b));
   const startDateRounded = DateTime.fromISO(startDate)
     .startOf('day')
@@ -59,15 +61,11 @@ function combineData(
       -mergeRequestCounts.find((count) => isSameDay(date, new Date(count.date)))
         ?.score || 0,
     issueWordCount:
-      wordCounts.find(
-        (count) =>
-          isSameDay(date, new Date(count.date)) && Note.Type.issueComment,
-      )?.wordCount || 0,
+      issueWordCounts.find((count) => isSameDay(date, new Date(count.date)))
+        ?.wordCount || 0,
     mergeRequestWordCount:
-      -wordCounts.find(
-        (count) =>
-          isSameDay(date, new Date(count.date)) &&
-          Note.Type.mergeRequestComment,
+      -mergeRequestWordCounts.find((count) =>
+        isSameDay(date, new Date(count.date)),
       )?.wordCount || 0,
   }));
 }
@@ -106,11 +104,19 @@ const DynamicGraph: React.FC = () => {
     merged_start_date: startDate,
     merged_end_date: endDate,
   });
-  const { data: wordCounts } = useGetWordCount({
+  const { data: issueWordCounts } = useGetWordCount({
     repository_id: repositoryId,
     created_start_date: startDate,
     created_end_date: endDate,
     author_id: authorIds,
+    type: Note.Type.issueComment,
+  });
+  const { data: mergeRequestWordCounts } = useGetWordCount({
+    repository_id: repositoryId,
+    created_start_date: startDate,
+    created_end_date: endDate,
+    author_id: authorIds,
+    type: Note.Type.mergeRequestComment,
   });
 
   const [graphTab, setGraphTab] = useState(GraphTab.code);
@@ -119,7 +125,8 @@ const DynamicGraph: React.FC = () => {
     endDate,
     commitCounts || [],
     mergeRequestCounts || [],
-    wordCounts || [],
+    issueWordCounts || [],
+    mergeRequestWordCounts || [],
   );
 
   const handleTabs = (event: React.ChangeEvent<unknown>, newTab: GraphTab) => {
