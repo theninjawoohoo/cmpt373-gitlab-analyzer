@@ -1,4 +1,4 @@
-import { Commit, MergeRequest } from '@ceres/types';
+import { Commit, MergeRequest, ScoreOverride } from '@ceres/types';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -8,6 +8,7 @@ import { ApiResource } from '../../../api/base';
 import { useGetCommits } from '../../../api/commit';
 import ScoringChip from '../../../components/ScoringChip';
 import SmartDate from '../../../components/SmartDate';
+import WarningIcon from '@material-ui/icons/Warning';
 
 interface CommitListProps {
   mergeRequest: ApiResource<MergeRequest>;
@@ -40,25 +41,41 @@ const CommitList: React.FC<CommitListProps> = ({
         const isActive =
           authorEmails.length === 0 ||
           authorEmails.includes(commit.author_email);
+        const extensions = commit.extensions;
+        const isExcluded = extensions?.override?.exclude;
+        const hasOverride = ScoreOverride.hasOverride(extensions?.override);
+        const nameTextDecoration = isExcluded ? 'line-through' : '';
+        const diffHasOverride =
+          commit?.extensions?.diffHasOverride || hasOverride;
+
+        const diffScoreSum = ScoreOverride.computeScore(
+          extensions?.override,
+          commit?.extensions?.score,
+        );
         return (
           <Root
             key={commit.meta.id}
             ml={5}
             pr={3}
             py={1}
-            onClick={
-              !isActive
-                ? () => {
-                    console.log('Invalid selection');
-                  }
-                : () => setActiveCommit(commit)
-            }
+            onClick={() => setActiveCommit(commit)}
             bgcolor={activeCommit?.meta.id === commit.meta.id ? '#D3D3D3' : ''}
             disabled={!isActive}
           >
             <Grid container>
               <Grid item xs={9}>
-                <Typography>{commit.title}</Typography>
+                <Grid container alignItems='center' spacing={2}>
+                  {hasOverride && (
+                    <Grid item>
+                      <WarningIcon />
+                    </Grid>
+                  )}
+                  <Grid item>
+                    <Typography style={{ textDecoration: nameTextDecoration }}>
+                      {commit.title}
+                    </Typography>
+                  </Grid>
+                </Grid>
                 <Grid container justify='space-between'>
                   <Typography variant='body2' color='textSecondary'>
                     {commit.author_name}
@@ -72,8 +89,8 @@ const CommitList: React.FC<CommitListProps> = ({
               </Grid>
               <Grid item xs={3}>
                 <Typography align='right'>
-                  <ScoringChip hasOverride={commit.extensions?.diffHasOverride}>
-                    {commit.extensions?.score?.toFixed(1)}
+                  <ScoringChip hasOverride={diffHasOverride}>
+                    {diffScoreSum?.toFixed(1)}
                   </ScoringChip>
                 </Typography>
               </Grid>

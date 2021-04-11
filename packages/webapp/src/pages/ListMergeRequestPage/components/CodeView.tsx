@@ -1,4 +1,4 @@
-import { Commit, Diff, MergeRequest } from '@ceres/types';
+import { Commit, Diff, MergeRequest, ScoreOverride } from '@ceres/types';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button/Button';
 import Container from '@material-ui/core/Container';
@@ -8,6 +8,11 @@ import { ApiResource } from '../../../api/base';
 import { useGetDiffs } from '../../../api/diff';
 import DiffView from '../../../components/DiffView';
 import CallMadeIcon from '@material-ui/icons/CallMade';
+import Grid from '@material-ui/core/Grid';
+import EditIcon from '@material-ui/icons/Edit';
+import IconButton from '@material-ui/core/IconButton';
+import ScoreOverrideForm from './ScoreOverrideForm';
+import { useScoreOverrideQueue } from '../contexts/ScoreOverrideQueue';
 
 interface CodeViewProps {
   mergeRequest?: ApiResource<MergeRequest>;
@@ -20,13 +25,79 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
       ? { commit: commit.meta.id }
       : { merge_request: mergeRequest.meta.id },
   );
+  const allowEdit = true;
+  const [anchor, setAnchor] = useState(null);
+  const [openOverride, setOpenOverride] = useState(false);
+  const { add } = useScoreOverrideQueue();
   const [expandedDiffs, setExpandedDiffs] = useState<ApiResource<Diff>[]>([]);
+  const defaultScore =
+    commit?.extensions?.score || mergeRequest?.extensions?.diffScore;
+  const score = ScoreOverride.computeScore(
+    (commit || mergeRequest)?.extensions?.override,
+    defaultScore,
+  );
+
+  const onScoreEdit = (e: MouseEvent) => {
+    // prevent the accordion from toggling
+    e.stopPropagation();
+    setOpenOverride(!openOverride);
+    setAnchor(anchor ? null : e.currentTarget);
+  };
+
+  const onPopperClickAway = () => {
+    setOpenOverride(false);
+    setAnchor(null);
+  };
+
+  const onSubmitPopper = (values: ScoreOverride) => {
+    add({
+      id: `${commit ? 'Commit' : 'MergeRequest'}/${
+        (commit || mergeRequest).meta.id
+      }`,
+      display: commit
+        ? 'Commit: '
+        : 'MergeRequest: ' + (commit?.title || mergeRequest?.title),
+      previousScore: score,
+      defaultScore,
+      override: {
+        ...values,
+        score: values.score ? +values.score : undefined,
+      },
+    });
+    onPopperClickAway();
+  };
+
   return (
     <Container>
       <Box my={2}>
-        <Typography variant='h2'>
-          {commit?.title || mergeRequest?.title}
-        </Typography>
+        <Grid
+          container
+          justify='space-between'
+          alignItems='flex-start'
+          spacing={4}
+        >
+          <Grid item>
+            <Typography variant='h2'>
+              {commit?.title || mergeRequest?.title}
+            </Typography>
+          </Grid>
+          <Grid item>
+            {allowEdit && (
+              <Grid item>
+                <IconButton onClick={onScoreEdit as any}>
+                  <EditIcon />
+                </IconButton>
+                <ScoreOverrideForm
+                  open={openOverride}
+                  anchor={anchor}
+                  onClickAway={onPopperClickAway}
+                  onSubmit={onSubmitPopper}
+                  defaultValues={(commit || mergeRequest)?.extensions?.override}
+                />
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
       </Box>
       <Box my={2}>
         <Button onClick={() => setExpandedDiffs(diffs?.results || [])}>
@@ -67,7 +138,7 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
                   setExpandedDiffs([...expandedDiffs, diff]);
                 }
               }}
-              allowEdit
+              allowEdit={allowEdit}
             />
           );
         })}
