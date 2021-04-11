@@ -23,7 +23,7 @@ export class IssueService extends BaseService<
     serviceRepository: TypeORMRepository<IssueEntity>,
     private readonly noteService: NoteService,
   ) {
-    super(serviceRepository, 'issue');
+    super(serviceRepository, 'issue', httpService);
   }
 
   buildFilters(

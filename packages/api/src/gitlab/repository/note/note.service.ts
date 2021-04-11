@@ -17,7 +17,7 @@ export class NoteService extends BaseService<Note, NoteEntity, NoteQueryDto> {
     @InjectRepository(NoteEntity)
     serviceRepository: TypeORMRepository<NoteEntity>,
   ) {
-    super(serviceRepository, 'note');
+    super(serviceRepository, 'note', httpService);
   }
 
   buildFilters(
