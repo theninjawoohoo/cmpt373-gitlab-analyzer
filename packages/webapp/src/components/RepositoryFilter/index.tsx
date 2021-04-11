@@ -19,7 +19,7 @@ import Select from '@material-ui/core/Select';
 
 const useStyles = makeStyles(() => ({
   gridDimensions: {
-    padding: '20px',
+    padding: '0px',
   },
 }));
 
@@ -92,7 +92,7 @@ const RepoFilter: React.FC = () => {
             </Grid>
             <Grid item xs={3}>
               <FormControl variant='filled' className={styles.gridDimensions}>
-                <InputLabel>Show results for:</InputLabel>
+                <InputLabel>Iteration:</InputLabel>
                 <Select
                   style={{ minWidth: '14rem' }}
                   value={iteration}

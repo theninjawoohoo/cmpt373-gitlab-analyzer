@@ -26,7 +26,7 @@ interface MemberDropdownProps {
 
 const useStyles = makeStyles(() => ({
   gridDimensions: {
-    padding: '20px',
+    padding: '0px',
   },
 }));
 
