@@ -9,7 +9,7 @@ export default class DiffInterpreter {
   constructor(
     private readonly hunks: Hunk[],
     private readonly fileType: FileType,
-  ) { }
+  ) {}
 
   async parse() {
     const parsedHunks = await Promise.all(
@@ -218,7 +218,7 @@ export default class DiffInterpreter {
         commentFlag ||
         (commentSectionStart.length > 0 &&
           newline.substring(0, commentSectionStart.length) ===
-          commentSectionStart)
+            commentSectionStart)
       ) {
         hunkLines.push(
           this.createLine(line, LineNumber, added, Line.Type.comment),
@@ -229,7 +229,7 @@ export default class DiffInterpreter {
       if (
         commentSectionEnd.length > 0 &&
         newline.substring(line.length - commentSectionEnd.length) ===
-        commentSectionEnd
+          commentSectionEnd
       ) {
         commentFlag = false;
       }
@@ -248,7 +248,10 @@ export default class DiffInterpreter {
     let deletedLineCount = 0;
     const deletedLine = this.getDeletedLine(leftLineNumber, lines, currentLine);
     let currentTemp = currentLine;
-    while (lines[currentTemp] && this.determineLineType(lines[currentTemp]) === Line.Type.delete) {
+    while (
+      lines[currentTemp] &&
+      this.determineLineType(lines[currentTemp]) === Line.Type.delete
+    ) {
       deletedLineCount++;
       currentTemp++;
     }

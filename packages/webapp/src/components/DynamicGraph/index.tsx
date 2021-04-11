@@ -62,13 +62,13 @@ function combineData(
       wordCounts.find(
         (count) =>
           isSameDay(date, new Date(count.date)) && Note.Type.issueComment,
-      )?.count || 0,
+      )?.wordCount || 0,
     mergeRequestWordCount:
       -wordCounts.find(
         (count) =>
           isSameDay(date, new Date(count.date)) &&
           Note.Type.mergeRequestComment,
-      )?.count || 0,
+      )?.wordCount || 0,
   }));
 }
 
