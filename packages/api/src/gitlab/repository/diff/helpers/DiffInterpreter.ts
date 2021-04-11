@@ -28,11 +28,13 @@ export default class DiffInterpreter {
 
     const hunkLines: Line[] = [];
     let commentFlag = false;
-    let result: (number | boolean)[] = [];
+    let deletedLineIndex = 0;
+    let result : (number|boolean)[] = [];
     while (currentLine < hunk.lines.length) {
       const line = hunk.lines[currentLine];
       const lineType = this.determineLineType(line);
       if (lineType === Line.Type.add) {
+        deletedLineIndex=0;
         commentFlag = this.checkAddLineType(
           line,
           hunkLines,
@@ -42,6 +44,7 @@ export default class DiffInterpreter {
         rightLineNumber++;
         currentLine++;
       } else if (lineType === Line.Type.noChange) {
+        deletedLineIndex=0;
         hunkLines.push(
           this.createChange(
             line,
@@ -55,6 +58,7 @@ export default class DiffInterpreter {
         rightLineNumber++;
         currentLine++;
       } else if (lineType == Line.Type.delete) {
+        deletedLineIndex++;
         result = this.checkDeleteLineType(
           line,
           hunkLines,
@@ -63,6 +67,7 @@ export default class DiffInterpreter {
           rightLineNumber,
           currentLine,
           commentFlag,
+          deletedLineIndex
         );
         rightLineNumber = <number>result[0];
         currentLine = <number>result[1];
@@ -103,6 +108,7 @@ export default class DiffInterpreter {
     rightLineNumber: number,
     currentLine: number,
     commentFlag: boolean,
+    deletedLineIndex: number
   ) {
     const result = this.createBlankCommentAndSyntax(
       line,
@@ -119,9 +125,12 @@ export default class DiffInterpreter {
         currentLine,
         leftLineNumber,
         rightLineNumber,
+        deletedLineIndex
       );
       hunkLines.push(...this.linkLine(deletedLine, addedLine));
-      rightLineNumber += 1;
+      if(addedLine){
+        rightLineNumber += 1;
+      }
       currentLine += 1;
     }
 
@@ -225,12 +234,20 @@ export default class DiffInterpreter {
     currentLine: number,
     leftLineNumber: number,
     rightLineNumber: number,
+    deletedLineIndex: number
   ) {
+    let deletedLineCount=0;
     const deletedLine = this.getDeletedLine(leftLineNumber, lines, currentLine);
+    let currentTemp = currentLine;
+    while (this.determineLineType(lines[currentTemp]) === Line.Type.delete) {
+      deletedLineCount++;
+      currentTemp++;
+    }
+
     const addedLine = this.getAddedLine(
       rightLineNumber,
       lines,
-      currentLine + 1,
+      currentLine + deletedLineCount + deletedLineIndex,
     );
     return { deletedLine, addedLine };
   }
@@ -319,11 +336,14 @@ export default class DiffInterpreter {
     lines: string[],
     currentLine: number,
   ) {
-    const line = lines[currentLine];
-    const addedLines: LineContent = {
-      number: rightLineNumber,
-      content: line,
-    };
+    let line = lines[currentLine];
+    let addedLines: LineContent;
+    if (this.determineLineType(line) === Line.Type.add) {
+      addedLines = {
+        number: rightLineNumber,
+        content: line,
+      };
+    }
     return addedLines;
   }
 
