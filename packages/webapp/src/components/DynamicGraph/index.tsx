@@ -23,12 +23,14 @@ function combineData(
   endDate: string,
   commitCounts: Commit.DailyCount[] = [],
   mergeRequestCounts: MergeRequest.DailyCount[] = [],
-  mergeRequestWordCounts: any[],
-  issueWordCounts: any[],
+  mergeRequestWordCounts: any[] = [],
+  issueWordCounts: any[] = [],
 ) {
   const allDates = uniq([
     ...commitCounts.map((count) => count.date),
     ...mergeRequestCounts.map((count) => count.date),
+    ...mergeRequestWordCounts.map((count) => count.date),
+    ...issueWordCounts.map((count) => count.date),
   ]).sort((a, b) => a.localeCompare(b));
   const startDateRounded = DateTime.fromISO(startDate)
     .startOf('day')
