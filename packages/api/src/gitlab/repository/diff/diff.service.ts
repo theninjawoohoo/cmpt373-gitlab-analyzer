@@ -5,7 +5,11 @@ import { MergeRequest } from '../../merge-request/merge-request.entity';
 import { Commit } from '../commit/commit.entity';
 import { DiffQueryDto } from './diff-query.dto';
 import { Diff as DiffEntity } from './diff.entity';
-import { DeepPartial, Repository as TypeORMRepository } from 'typeorm';
+import {
+  DeepPartial,
+  Repository as TypeORMRepository,
+  SelectQueryBuilder,
+} from 'typeorm';
 import {
   Diff,
   Extensions,
@@ -18,18 +22,31 @@ import {
 import { parsePatch } from 'diff';
 import DiffInterpreter from './helpers/DiffInterpreter';
 import { isMatch } from 'picomatch';
-import { Fetch } from '../../../common/fetchWithRetry';
+import { BaseService } from '../../../common/base.service';
 
 type GitlabDiff = Omit<Diff, 'hunks' | 'lines'>;
 
 @Injectable()
-export class DiffService extends Fetch {
+export class DiffService extends BaseService<Diff, DiffEntity, DiffQueryDto> {
+  buildFilters(
+    query: SelectQueryBuilder<DiffEntity>,
+    filters: DiffQueryDto,
+  ): SelectQueryBuilder<DiffEntity> {
+    throw new Error('Method not implemented.');
+  }
+  buildSort(
+    query: SelectQueryBuilder<DiffEntity>,
+    sortKey?: string,
+    order?: 'ASC' | 'DESC',
+  ): SelectQueryBuilder<DiffEntity> {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     readonly httpService: HttpService,
     @InjectRepository(DiffEntity)
     private readonly diffRepository: TypeORMRepository<DiffEntity>,
   ) {
-    super(httpService);
+    super(diffRepository, 'diff', httpService);
   }
 
   search(filters: DiffQueryDto) {
