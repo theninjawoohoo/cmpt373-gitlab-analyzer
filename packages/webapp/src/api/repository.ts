@@ -13,7 +13,10 @@ interface QueryParams {
 }
 
 export function useRepository(params: QueryParams) {
-  return useApiQuery<SearchResults<Repository>>('/repository', params);
+  return useApiQuery<SearchResults<Repository>>('/repository', {
+    ...params,
+    pageSize: 1000,
+  });
 }
 
 export function useGetRepository(id: string) {

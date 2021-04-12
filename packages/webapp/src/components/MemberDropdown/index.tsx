@@ -50,11 +50,11 @@ const MemberDropdown: React.FC<MemberDropdownProps> = ({ repositoryId }) => {
   }, [value]);
 
   return (
-    <FormControl variant='filled'>
+    <FormControl variant='filled' fullWidth>
       <InputLabel>Show results for:</InputLabel>
       <Select
-        style={{ minWidth: '15rem' }}
         value={value || 'None'}
+        fullWidth
         onChange={(e) => {
           e.preventDefault();
           setValue(e.target.value as string);

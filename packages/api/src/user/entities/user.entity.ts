@@ -3,6 +3,7 @@ import { ScoringConfig } from '../../scoring/scoring-config/scoring-config.entit
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Repository } from '../../gitlab/repository/repository.entity';
 import { Operation } from '../../operation/operation.entity';
+import { GroupConfig } from '../../group/group.entity';
 
 interface SfuAuth {
   type: 'sfu';
@@ -31,4 +32,7 @@ export class User {
 
   @OneToMany(() => ScoringConfig, (scoringConfig) => scoringConfig.user)
   scoringConfigs: ScoringConfig[];
+
+  @OneToMany(() => GroupConfig, (GroupConfig) => GroupConfig.user)
+  groupConfig: GroupConfig[];
 }
