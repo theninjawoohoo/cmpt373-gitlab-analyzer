@@ -1,9 +1,4 @@
-import {
-  SearchResults,
-  useApiInfiniteQuery,
-  useApiQuery,
-  usePaginatedQuery,
-} from './base';
+import { SearchResults, useApiInfiniteQuery, useApiQuery } from './base';
 import { MergeRequest } from '@ceres/types';
 
 export function useMergeRequest(id: string) {
@@ -18,19 +13,6 @@ interface MergeRequestSearchParams {
   merged_start_date?: string;
   merged_end_date?: string;
   note_id?: string;
-}
-
-export function useGetMergeRequests(
-  params: MergeRequestSearchParams,
-  page?: number,
-  pageSize?: number,
-) {
-  return usePaginatedQuery<MergeRequest>(
-    '/merge_request',
-    params,
-    page,
-    pageSize,
-  );
 }
 
 export function useGetCountMergeRequests(params: MergeRequestSearchParams) {
