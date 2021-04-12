@@ -146,7 +146,7 @@ const RepoSetupPage: React.FC = () => {
             </AccordionMenu>
           )}
           <AccordionMenu title='Scoring Rubric' color='#cff4fc'>
-            {data && isOwner && (
+            {data && (
               <ScoringConfigSelector
                 isLoading={updateScoreLoading}
                 onSubmit={handleUpdateScore}
