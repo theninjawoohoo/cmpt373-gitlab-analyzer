@@ -22,6 +22,8 @@ interface ScoringConfigSelectorProps {
     overrides?: GlobWeight[],
   ) => void;
   repository?: Repository;
+  isOwner?: boolean;
+  isEditor?: boolean;
 }
 
 function findConfigById(id: string, configs: SearchResults<ScoringConfig>) {
@@ -32,6 +34,8 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
   isLoading,
   onSubmit,
   repository,
+  isEditor,
+  isOwner,
 }) => {
   const { data } = useSearchScoringConfigs(0, 1000);
   const [selectedScoringConfig, setSelectedScoringConfig] = useState(
@@ -89,53 +93,61 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
       <Grid item>
         <FormControl variant='filled'>
           <InputLabel id='selected-scoring-config'>Scoring Config</InputLabel>
-          <Select
-            style={{ minWidth: '15rem' }}
-            labelId='selected-scoring-config'
-            value={selectedScoringConfig}
-            onChange={(e) => setSelectedScoringConfig(e.target.value as string)}
-          >
-            <MenuItem value='None'>None</MenuItem>
-            {(data?.results || []).map((scoringConfig) => (
-              <MenuItem
-                key={scoringConfig.meta.id}
-                value={scoringConfig.meta.id}
-              >
-                {scoringConfig.name}
-              </MenuItem>
-            ))}
-          </Select>
+          {isOwner && (
+            <Select
+              style={{ minWidth: '15rem' }}
+              labelId='selected-scoring-config'
+              value={selectedScoringConfig}
+              onChange={(e) =>
+                setSelectedScoringConfig(e.target.value as string)
+              }
+            >
+              <MenuItem value='None'>None</MenuItem>
+              {(data?.results || []).map((scoringConfig) => (
+                <MenuItem
+                  key={scoringConfig.meta.id}
+                  value={scoringConfig.meta.id}
+                >
+                  {scoringConfig.name}
+                </MenuItem>
+              ))}
+            </Select>
+          )}
         </FormControl>
       </Grid>
-      <Grid item>
-        <Grid container direction='row' spacing={2}>
-          <Grid item>
-            <Button
-              color='secondary'
-              variant='contained'
-              onClick={() => setShowDrawer(true)}
-            >
-              Overrides
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              color='primary'
-              variant='contained'
-              onClick={handleSubmit}
-              disabled={isLoading}
-            >
-              Evaluate
-            </Button>
+      {isEditor && (
+        <Grid item>
+          <Grid container direction='row' spacing={2}>
+            <Grid item>
+              <Button
+                color='secondary'
+                variant='contained'
+                onClick={() => setShowDrawer(true)}
+              >
+                Overrides
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                color='primary'
+                variant='contained'
+                onClick={handleSubmit}
+                disabled={isLoading}
+              >
+                Evaluate
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
-      <Grid item>
-        <Typography>
-          You can create and edit scoring configs{' '}
-          <Link to='/settings/scoring'>here</Link>.
-        </Typography>
-      </Grid>
+      )}
+      {isOwner && (
+        <Grid item>
+          <Typography>
+            You can create and edit scoring configs{' '}
+            <Link to='/settings/scoring'>here</Link>.
+          </Typography>
+        </Grid>
+      )}
     </Grid>
   );
 };

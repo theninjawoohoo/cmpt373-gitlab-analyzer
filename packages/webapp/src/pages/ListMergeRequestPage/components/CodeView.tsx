@@ -1,4 +1,10 @@
-import { Commit, Diff, MergeRequest, ScoreOverride } from '@ceres/types';
+import {
+  Commit,
+  Diff,
+  MergeRequest,
+  Repository,
+  ScoreOverride,
+} from '@ceres/types';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button/Button';
 import Container from '@material-ui/core/Container';
@@ -13,6 +19,9 @@ import EditIcon from '@material-ui/icons/Edit';
 import IconButton from '@material-ui/core/IconButton';
 import ScoreOverrideForm from './ScoreOverrideForm';
 import { useScoreOverrideQueue } from '../contexts/ScoreOverrideQueue';
+import { useRepositoryContext } from '../../../contexts/RepositoryContext';
+import { useGetRepository } from '../../../api/repository';
+import { useAuthContext } from '../../../contexts/AuthContext';
 
 interface CodeViewProps {
   mergeRequest?: ApiResource<MergeRequest>;
@@ -25,7 +34,18 @@ const CodeView: React.FC<CodeViewProps> = ({ mergeRequest, commit }) => {
       ? { commit: commit.meta.id }
       : { merge_request: mergeRequest.meta.id },
   );
-  const allowEdit = true;
+  const { repositoryId } = useRepositoryContext();
+  const { data: repository } = useGetRepository(repositoryId);
+  const { user } = useAuthContext();
+  const isOwner = user?.id === repository?.extensions?.owner?.id;
+  const collaborators = repository?.extensions?.collaborators || [];
+  const allowEdit =
+    isOwner ||
+    !!collaborators.find(
+      (collaborator) =>
+        collaborator.id === user?.id &&
+        collaborator.accessLevel === Repository.AccessLevel.editor,
+    );
   const [anchor, setAnchor] = useState(null);
   const [openOverride, setOpenOverride] = useState(false);
   const { add } = useScoreOverrideQueue();

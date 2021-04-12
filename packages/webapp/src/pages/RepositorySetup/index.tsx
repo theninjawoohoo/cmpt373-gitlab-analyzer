@@ -22,7 +22,7 @@ import ScoringConfigWarning from '../RepositorySetup/components/ScoringConfigWar
 import ScoringConfigSelector from './components/ScoringConfigSelector';
 import { useUpdateScoring } from '../../api/scoring';
 import { ApiResource } from '../../api/base';
-import { GlobWeight, ScoringConfig } from '@ceres/types';
+import { GlobWeight, Repository, ScoringConfig } from '@ceres/types';
 import RepoFilter from '../../components/RepositoryFilter';
 import styled from 'styled-components';
 import AccordionMenu from './components/AccordionMenu';
@@ -51,6 +51,13 @@ const RepoSetupPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const isOwner = user?.id === data?.extensions?.owner?.id;
   const collaborators = data?.extensions?.collaborators || [];
+  const isEditor =
+    isOwner ||
+    !!collaborators.find(
+      (collaborator) =>
+        collaborator.id === user?.id &&
+        collaborator.accessLevel === Repository.AccessLevel.editor,
+    );
 
   const handleUpdateScore = (
     scoringConfig: ApiResource<ScoringConfig>,
@@ -59,7 +66,9 @@ const RepoSetupPage: React.FC = () => {
     updateScoring(
       {
         repositoryId: id,
-        scoringConfigId: scoringConfig?.meta?.id,
+        scoringConfigId: isOwner
+          ? scoringConfig?.meta?.id
+          : data?.extensions?.scoringConfig?.id,
         overrides,
       },
       {
@@ -129,15 +138,19 @@ const RepoSetupPage: React.FC = () => {
               <RepoFilter />
             </Grid>
           </AccordionMenu>
-          <AccordionMenu title='Members' color='#ffd9cf'>
-            <Members id={id} />
-          </AccordionMenu>
+          {isEditor && (
+            <AccordionMenu title='Members' color='#ffd9cf'>
+              <Members id={id} />
+            </AccordionMenu>
+          )}
           <AccordionMenu title='Scoring Rubric' color='#cff4fc'>
             {data && isOwner && (
               <ScoringConfigSelector
                 isLoading={updateScoreLoading}
                 onSubmit={handleUpdateScore}
                 repository={data}
+                isEditor={isEditor}
+                isOwner={isOwner}
               />
             )}
           </AccordionMenu>
