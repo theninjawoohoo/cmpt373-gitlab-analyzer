@@ -13,9 +13,4 @@ export class AuthController {
   async login(@Req() req) {
     return this.authService.login(req.user);
   }
-
-  @Get('profile')
-  getProfile(@Req() req) {
-    return req.user;
-  }
 }
