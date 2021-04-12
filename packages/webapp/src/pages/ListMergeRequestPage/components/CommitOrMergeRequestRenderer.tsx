@@ -13,6 +13,13 @@ import ScoringChip from '../../../components/ScoringChip';
 import SmartDate from '../../../components/SmartDate';
 import { useFilterContext } from '../../../contexts/FilterContext';
 import OverridePopper from '../../../components/OverridePopper';
+import styled from 'styled-components';
+
+const StyledAccordionDetails = styled(AccordionDetails)`
+  &&& {
+    display: block;
+  }
+`;
 
 interface CommitOrMergeRequestRendererProps {
   mergeRequest?: ApiResource<MergeRequest>;
@@ -175,9 +182,7 @@ const CommitOrMergeRequestRenderer: React.FC<CommitOrMergeRequestRendererProps> 
         </Grid>
       </AccordionSummary>
       {mergeRequest && (
-        <Box component={AccordionDetails} display='block'>
-          {children}
-        </Box>
+        <StyledAccordionDetails>{children}</StyledAccordionDetails>
       )}
     </Accordion>
   );
