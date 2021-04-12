@@ -1,9 +1,4 @@
-import {
-  SearchResults,
-  useApiInfiniteQuery,
-  useApiQuery,
-  // usePaginatedQuery,
-} from './base';
+import { SearchResults, useApiInfiniteQuery, useApiQuery } from './base';
 import { MergeRequest } from '@ceres/types';
 
 export function useMergeRequest(id: string) {
