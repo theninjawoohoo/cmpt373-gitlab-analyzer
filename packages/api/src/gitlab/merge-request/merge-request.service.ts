@@ -104,11 +104,11 @@ export class MergeRequestService extends BaseService<
     query.addSelect('count(*)::integer', 'count');
     query.addSelect(
       `sum(
-        case when merge-request.resource #>> '{extensions,override,exclude}' = 'true'
+        case when merge_request.resource #>> '{extensions,override,exclude}' = 'true'
         then 0::float
         else coalesce(
-          merge-request.resource #>> '{extensions,override,score}',
-          merge-request.resource #>> '{extensions,diffScore}'
+          merge_request.resource #>> '{extensions,override,score}',
+          merge_request.resource #>> '{extensions,diffScore}'
         )::float
         end
       )`,
