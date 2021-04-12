@@ -12,6 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { GitlabModule } from './gitlab/gitlab.module';
 import { OperationModule } from './operation/operation.module';
 import { ScoringModule } from './scoring/scoring.module';
+import { GroupModule } from './group/group.module';
 import config from './config';
 
 @Module({
@@ -33,6 +34,7 @@ import config from './config';
     OperationModule,
     ScheduleModule.forRoot(),
     ScoringModule,
+    GroupModule,
   ],
   controllers: [AppController],
   providers: [

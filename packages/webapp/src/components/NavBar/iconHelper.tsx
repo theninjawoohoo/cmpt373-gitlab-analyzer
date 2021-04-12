@@ -11,6 +11,7 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PeopleIcon from '@material-ui/icons/People';
 import BuildIcon from '@material-ui/icons/Build';
 import ScoreIcon from '@material-ui/icons/Score';
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import TuneIcon from '@material-ui/icons/Tune';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import CommentIcon from '@material-ui/icons/Comment';
@@ -47,6 +48,8 @@ export default function Icon(props: any) {
       return <ListAltIcon fontSize={props.size} />;
     case 'comment':
       return <CommentIcon />;
+    case 'calendar':
+      return <CalendarTodayIcon />;
   }
   return <ErrorIcon />;
 }

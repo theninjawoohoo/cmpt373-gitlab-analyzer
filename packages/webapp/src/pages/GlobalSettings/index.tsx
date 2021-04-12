@@ -24,6 +24,11 @@ const SettingsPage: React.FC = () => {
                 Score Config
               </LinkCard>
             </Grid>
+            <Grid item xs={12}>
+              <LinkCard color='#5784BA' icon='calendar' to='/settings/group'>
+                Iteration Config
+              </LinkCard>
+            </Grid>
           </Grid>
         </Container>
       </DefaultPageLayout>
