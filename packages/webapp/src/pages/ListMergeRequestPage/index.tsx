@@ -184,7 +184,9 @@ const ListMergeRequestPage = () => {
                         onClickSummary={() => {
                           setActiveCommit(undefined);
                           setActiveMergeRequest(
-                            active ? undefined : commitOrMergeRequest,
+                            active && !activeCommit
+                              ? undefined
+                              : commitOrMergeRequest,
                           );
                         }}
                       >

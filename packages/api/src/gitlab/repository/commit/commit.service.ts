@@ -99,7 +99,15 @@ export class CommitService extends BaseService<
     query.select("DATE(commit.resource #>>'{authored_date}')", 'date');
     query.addSelect('count(*)::integer', 'count');
     query.addSelect(
-      "sum((commit.resource #>> '{extensions,score}')::float)",
+      `sum(
+        case when commit.resource #>> '{extensions,override,exclude}' = 'true'
+        then 0::float
+        else coalesce(
+          commit.resource #>> '{extensions,override,score}',
+          commit.resource #>> '{extensions,score}'
+        )::float
+        end
+      )`,
       'score',
     );
     query.groupBy('date');

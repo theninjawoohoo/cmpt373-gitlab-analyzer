@@ -103,7 +103,15 @@ export class MergeRequestService extends BaseService<
     query.select("DATE(merge_request.resource #>>'{merged_at}')", 'date');
     query.addSelect('count(*)::integer', 'count');
     query.addSelect(
-      "sum((merge_request.resource #>> '{extensions,diffScore}')::float)",
+      `sum(
+        case when commit.resource #>> '{extensions,override,exclude}' = 'true'
+        then 0::float
+        else coalesce(
+          commit.resource #>> '{extensions,override,score}',
+          commit.resource #>> '{extensions,diffScore}'
+        )::float
+        end
+      )`,
       'score',
     );
     query.groupBy('date');

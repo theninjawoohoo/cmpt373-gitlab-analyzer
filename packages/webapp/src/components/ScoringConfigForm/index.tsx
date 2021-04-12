@@ -82,7 +82,7 @@ const ScoringConfigForm: React.FC<FormProps> = ({
             <Grid container spacing={1}>
               <Grid item xs={7}>
                 <TextField
-                  label='Glob'
+                  label='File Pattern'
                   name={`weights[${index}].glob`}
                   variant='outlined'
                   inputRef={register()}
