@@ -228,7 +228,7 @@ export default class DiffInterpreter {
       }
       if (
         commentSectionEnd.length > 0 &&
-        newline.substring(line.length - commentSectionEnd.length) ===
+        newline.substring(newline.length - commentSectionEnd.length) ===
           commentSectionEnd
       ) {
         commentFlag = false;
