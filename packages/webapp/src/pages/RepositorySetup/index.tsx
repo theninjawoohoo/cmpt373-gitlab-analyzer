@@ -30,6 +30,7 @@ import Members from '../Members';
 import ScoringConfigOverrides from './components/ScoringConfigOverrides';
 import ScoringConfigOverrideWarning from './components/ScoringConfigOverrideWarning';
 import ScoringConfigDialog from './components/ScoringConfigDialog';
+import ScrollToTop from '../../components/Common/ScrollToTop';
 
 const MainContainer = styled.div`
   display: grid;
@@ -99,6 +100,7 @@ const RepoSetupPage: React.FC = () => {
   return (
     <DefaultPageLayout>
       <Container>
+        <ScrollToTop />
         <Grid container justify='space-between' alignItems='center'>
           <Grid item>
             <DefaultPageTitleFormat>
