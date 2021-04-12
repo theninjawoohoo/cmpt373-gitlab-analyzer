@@ -9,6 +9,7 @@ import {
   useGetScoringConfig,
   useUpdateScoringConfig,
 } from '../../api/scoringConfig';
+import GlobHints from './components/GlobHints';
 
 interface PreloadedFormProps {
   id: string;
@@ -51,6 +52,7 @@ const EditScoringConfigPage: React.FC = () => {
 
   return (
     <ScoringLayout>
+      <GlobHints />
       {query.id ? (
         <PreloadedForm id={query.id as string} />
       ) : (
