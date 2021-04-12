@@ -91,9 +91,9 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
         </Grid>
       )}
       <Grid item>
-        <FormControl variant='filled'>
-          <InputLabel id='selected-scoring-config'>Scoring Config</InputLabel>
-          {isOwner && (
+        {isOwner && (
+          <FormControl variant='filled'>
+            <InputLabel id='selected-scoring-config'>Scoring Config</InputLabel>
             <Select
               style={{ minWidth: '15rem' }}
               labelId='selected-scoring-config'
@@ -112,8 +112,8 @@ const ScoringConfigSelector: React.FC<ScoringConfigSelectorProps> = ({
                 </MenuItem>
               ))}
             </Select>
-          )}
-        </FormControl>
+          </FormControl>
+        )}
       </Grid>
       {isEditor && (
         <Grid item>
